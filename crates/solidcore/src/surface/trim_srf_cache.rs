@@ -48,9 +48,9 @@
 //!   `PointClassify` is the base class body; upstream dispatches to
 //!   [`TrimSrfCache::point_classify`]. Both end in [`SolidError::Unported`] today
 //!   (`GetFace`, the face classification), see `plan/findings.md`.
-//! - **Unported callees** (all return [`SolidError::Unported`]):
-//!   `SmSurfaceCache::BuildTree`, `FindUVNodes`, `SubdivideNode`
-//!   (`surface.surface_cache_p3`); `SmSurface::GetFace` (through
+//! - **Unported callees** (all return [`SolidError::Unported`]): those reached through
+//!   `SmSurfaceCache::BuildTree`, `FindUVNodes` and `SubdivideNode`
+//!   ([`crate::surface::surface_cache::p3`]); `SmSurface::GetFace` (through
 //!   [`SurfaceCache::face`]) and `Evaluate1stDerivatives`, `SmTol::MapTo2d` over a
 //!   surface (`surface.surface_p1`); `SmSurface::GetSingularities`
 //!   (`surface.surface_p3`); `SmPointClassification` (`intersect.point_class`) and
@@ -332,7 +332,7 @@ impl<O: Copy + PartialEq> TrimSrfCache<O> {
     fn build_tree_body(&mut self, k: &Kernel) -> Result<bool> {
         // Build m_ptree surface subdivision tree when it does not exist
         let clean_up_build_data = if self.base.tree().is_none() {
-            surface_cache_build_tree(&mut self.base)?;
+            surface_cache_build_tree(&mut self.base, k)?;
             true
         } else {
             // The temporary array sBezierBlock will be empty: no clean up
@@ -653,7 +653,7 @@ impl<O: Copy + PartialEq> TrimSrfCache<O> {
 
         // find all tree nodes that intersect sCurveBBox - use pOptTreeNode if given
         let nodes = match opt_tree_node {
-            None => find_uv_nodes(&self.base, &curve_bbox, true)?,
+            None => find_uv_nodes(&mut self.base, k, &curve_bbox, true)?,
             Some(n) => vec![n],
         };
 
@@ -768,7 +768,7 @@ impl<O: Copy + PartialEq> TrimSrfCache<O> {
                     };
 
                     // promote leaf node into a parent->Child(1,2) triplet
-                    let (c1, c2) = subdivide_node(&mut self.base, node, dir)?;
+                    let (c1, c2) = self.subdivide_node(k, node, dir)?;
 
                     // put the children on the stack
                     stack.push(c1);
@@ -786,6 +786,74 @@ impl<O: Copy + PartialEq> TrimSrfCache<O> {
 
         // all done
         Ok(())
+    }
+
+    /// `SmSurfaceCache::SubdivideNode(node, dir, TRUE, NULL)` on this cache: the two new
+    /// children. A parent on the boundary moves its edge uses into them through the
+    /// trimmed surface cache's `ImplantEdgeuse(pEU, FALSE, sTempExt, pNode)` (virtual
+    /// upstream), last first, and its poly edges through `ImplantPolyEdge`.
+    ///
+    /// # Errors
+    ///
+    /// Those of [`SurfaceCache::subdivide_node_split`]; [`SolidError::Unported`]:
+    /// `SmEdgeuse::GetUVTrimCurve` (`topology.edgeuse_p1`) for an edge use to move,
+    /// the poly edge points (`query.poly`) for a poly edge to move.
+    fn subdivide_node(
+        &mut self,
+        k: &Kernel,
+        node: NodeId,
+        dir: SurfParamType,
+    ) -> Result<(NodeId, NodeId)> {
+        const OP: &str = "surface::trim_srf_cache::TrimSrfCache::subdivide_node";
+        if let Some((node1, node2)) = self.base.subdivide_node_split(node, dir, true)? {
+            if self.base.aux(node)?.poly_edge_list.is_empty() {
+                // for every edge use in the parent node, last first
+                while let Some(eu) = self.base.aux(node)?.edgeuse_list.last().copied() {
+                    // implant the edge use in both children without subsequent
+                    // subdivision (the status is ignored)
+                    let curve = edgeuse_uv_trim_curve(eu)?;
+                    for child in [node1, node2] {
+                        let mut temp_ext = Extent2d::new();
+                        let r = self.implant_edgeuse(
+                            k,
+                            eu,
+                            curve.as_ref(),
+                            false,
+                            &mut temp_ext,
+                            Some(child),
+                        );
+                        if let Err(e) = r {
+                            if e.is_unported() {
+                                return Err(e);
+                            }
+                        }
+                    }
+                    self.base.aux_mut(node)?.edgeuse_list.pop();
+                }
+            } else {
+                // UNPORTED(query.poly): SmPolyEdge::GetStartPoint / GetEndPoint /
+                // GetTolerance (the PolyEdgeInput of ImplantPolyEdge)
+                return Err(SolidError::unported(
+                    "SmPolyEdge::GetStartPoint",
+                    "query.poly",
+                ));
+            }
+        }
+        let n = self
+            .base
+            .tree()
+            .ok_or(SolidError::InvalidInput {
+                operation: OP,
+                reason: "cache has no tree",
+            })?
+            .node(node)?;
+        match (n.child1, n.child2) {
+            (Some(c1), Some(c2)) => Ok((c1, c2)),
+            _ => Err(SolidError::InvalidInput {
+                operation: OP,
+                reason: "split node has no children",
+            }),
+        }
     }
 
     /// Embeds a poly edge segment into `node` (`ImplantPolyEdge`): when the node's
@@ -852,9 +920,9 @@ impl<O: Copy + PartialEq> TrimSrfCache<O> {
     ///
     /// # Errors
     ///
-    /// Those of the tree and of `Evaluate1stDerivatives`; [`SolidError::Unported`]:
-    /// `GetSingularities` (`surface.surface_p3`),
-    /// `FindUVNodes` (`surface.surface_cache_p3`).
+    /// Those of the tree, of `Evaluate1stDerivatives` and of
+    /// [`SurfaceCache::find_uv_nodes`]; [`SolidError::Unported`]: `GetSingularities`
+    /// (`surface.surface_p3`).
     pub fn implant_vertexuse(
         &mut self,
         k: &Kernel,
@@ -929,7 +997,7 @@ impl<O: Copy + PartialEq> TrimSrfCache<O> {
         let uv_ext = Extent2d::from_points(uv - uv_tol, uv + uv_tol);
 
         // get all nodes that intersect the point extent
-        let nodes = find_uv_nodes(&self.base, &uv_ext, false)?;
+        let nodes = find_uv_nodes(&mut self.base, k, &uv_ext, false)?;
 
         // for every intersecting node
         for node in nodes {
@@ -971,39 +1039,23 @@ impl<O: Copy + PartialEq> TrimSrfCache<O> {
 
 // ---- unported callees ---------------------------------------------------------------
 
-/// `SmSurfaceCache::BuildTree` (base class tree construction).
-fn surface_cache_build_tree<O>(_cache: &mut SurfaceCache<O>) -> Result<()> {
-    // UNPORTED(surface.surface_cache_p3): SmSurfaceCache::BuildTree
-    Err(SolidError::unported(
-        "SmSurfaceCache::BuildTree",
-        "surface.surface_cache_p3",
-    ))
+/// `SmSurfaceCache::BuildTree(&sBezierBlock)` (base class tree construction for a derived
+/// cache, which finishes it).
+fn surface_cache_build_tree<O: Copy + PartialEq>(
+    cache: &mut SurfaceCache<O>,
+    k: &Kernel,
+) -> Result<()> {
+    cache.build_tree(k, true)
 }
 
 /// `SmSurfaceCache::FindUVNodes`.
-fn find_uv_nodes<O>(
-    _cache: &SurfaceCache<O>,
-    _uv_box: &Extent2d,
-    _near_poles: bool,
+fn find_uv_nodes<O: Copy + PartialEq>(
+    cache: &mut SurfaceCache<O>,
+    k: &Kernel,
+    uv_box: &Extent2d,
+    near_poles: bool,
 ) -> Result<Vec<NodeId>> {
-    // UNPORTED(surface.surface_cache_p3): SmSurfaceCache::FindUVNodes
-    Err(SolidError::unported(
-        "SmSurfaceCache::FindUVNodes",
-        "surface.surface_cache_p3",
-    ))
-}
-
-/// `SmSurfaceCache::SubdivideNode(node, dir, TRUE, NULL)`: the two new children.
-fn subdivide_node<O>(
-    _cache: &mut SurfaceCache<O>,
-    _node: NodeId,
-    _dir: SurfParamType,
-) -> Result<(NodeId, NodeId)> {
-    // UNPORTED(surface.surface_cache_p3): SmSurfaceCache::SubdivideNode
-    Err(SolidError::unported(
-        "SmSurfaceCache::SubdivideNode",
-        "surface.surface_cache_p3",
-    ))
+    cache.find_uv_nodes(k, uv_box, near_poles)
 }
 
 /// `SmSurface::GetSingularities`: the `SM_SS_*` sides that are poles.
@@ -1292,23 +1344,27 @@ mod tests {
     }
 
     #[test]
-    fn unavailable_surface_operations_are_explicit_and_preserve_state() {
+    fn implant_vertexuse_away_from_poles_marks_the_leaf() {
         let k = Kernel::default();
         let mut c = cache();
         let mut ext = Extent2d::new();
-        let before = ext;
         let vu = VertexuseInput {
             vertexuse: 7,
             uv_point: Point2::new(0.4, 0.4),
             vertex_tolerance: 0.001,
         };
-        // past Evaluate1stDerivatives (surface::surface::p7): the singularities or the
-        // UV node search are unported
-        assert!(matches!(
-            c.implant_vertexuse(&k, vu, &mut ext),
-            Err(SolidError::Unported { .. })
-        ));
-        assert_eq!(ext, before);
+        // away from the domain sides no pole check (GetSingularities) is made
+        c.implant_vertexuse(&k, vu, &mut ext).unwrap();
+        assert_eq!(ext, Extent2d::from_bounds(0.399, 0.399, 0.401, 0.401));
+        let leaf = c.base().aux(NodeId(1)).unwrap();
+        assert_eq!(leaf.vertex_list.len(), 1);
+        assert_eq!(leaf.vertex_list[0].vertexuse, Some(7));
+        assert!(c.base().aux(NodeId(2)).unwrap().vertex_list.is_empty());
+    }
+
+    #[test]
+    fn unavailable_surface_operations_are_explicit_and_preserve_state() {
+        let mut c = cache();
         let surface = plane();
         let edge = PolyEdgeInput {
             poly_edge: 8,

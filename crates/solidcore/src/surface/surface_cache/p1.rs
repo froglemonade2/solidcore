@@ -20,7 +20,7 @@
 //! | [`compute_bezier_approximation`]                  | `sm_ComputeBezierApproximation` (static)         |
 //! | [`cull_array`]                                    | `sm_CullArray` (static)                          |
 //! | [`BezierAux2d`], [`BezierAux2d::uv_domain`]       | `SmBezierAux2d`, `GetUVDomain`                   |
-//! | [`SurfaceCache::polar_box`]                       | `SmBezierAux2d::GetPolarBox`                     |
+//! | [`SurfaceCache::polar_box`], [`SurfaceCache::polar_box_unstored`] | `SmBezierAux2d::GetPolarBox`     |
 //! | [`SurfaceCache::build_polar_box`]                 | `SmBezierAux2d::BuildPolarBox`                   |
 //! | [`BezierPatch`], [`BezierPatch::pseudo_box`], [`BezierPatch::bezier`] | `SmBezierPatch`, `GetPseudoBox`, `GetBezierPtr` |
 //! | [`AltSrfCache`], [`AltSrfCacheType`], [`AltCacheKey`] | `SmAltSrfCache`, `SmAltSrfCacheType`, the user data arguments |
@@ -72,10 +72,9 @@
 //!   for cache trees.
 //! - **Construction.** `SmSurfaceCache::SmSurfaceCache` (unit `surface.surface_cache_p3`)
 //!   only initialises fields; [`SurfaceCache::new`] does the same so the cache can
-//!   exist before its tree is built. The byte-size bookkeeping (`m_lBezierSize`,
+//!   exist before its tree is built ([`crate::surface::surface_cache::p3`] builds it). The byte-size bookkeeping (`m_lBezierSize`,
 //!   `m_lTotalBezSize`, `sm_ComputeNurbSurfaceSize`) has no counterpart.
-//!   `SmSurfaceCache::GetTree` (same unit) is only reproduced as far as returning an
-//!   existing tree: when it would build one, [`SolidError::Unported`] is returned.
+//!   `SmSurfaceCache::GetTree` is [`SurfaceCache::get_tree`] (same unit).
 //! - **Virtual dispatch.** The surface calls go through the surface kind: the
 //!   [`BSplineSurface`] overrides (`CreateIsoParametricCurve`, `CalculateBoundingBox`)
 //!   are used; the curve-bounded surface runs the base class bodies
@@ -109,7 +108,8 @@
 //!   list; a continuity array longer than the knot list) or dereference a null
 //!   subdivision surface, the port returns [`SolidError::InvalidInput`].
 //! - **Not ported here.** `GetNthBoundingPlane`, `AddCurvesToCache`, the destructor
-//!   (`surface.surface_cache_p2`, [`crate::surface::surface_cache::p2`]), the tree construction (`surface.surface_cache_p3`),
+//!   (`surface.surface_cache_p2`, [`crate::surface::surface_cache::p2`]), the tree construction
+//!   (`surface.surface_cache_p3`, [`crate::surface::surface_cache::p3`]),
 //!   `GetBoundingPlane`, `GetBrep`, `GetMemoryUsed`, `AssertValid`, the `Dump` and
 //!   `Draw` functions (other units or debug output).
 
@@ -144,7 +144,7 @@ pub const TYPE: i64 = 15100;
 pub const TYPE_STRING: &str = "SmSurfaceCache_TYPE";
 
 /// `SmFace_TYPE` (`TOPO_BASE_TYPE + 2`).
-const FACE_TYPE: i64 = 16002;
+pub(super) const FACE_TYPE: i64 = 16002;
 
 /// `SM_PB_SAMPLECOUNT`: sample points stored per bounding plane.
 pub const PB_SAMPLE_COUNT: usize = 5;
@@ -1909,6 +1909,74 @@ impl<O: Copy + PartialEq> SurfaceCache<O> {
         Ok(())
     }
 
+    /// The polar box [`Self::polar_box`] returns for `node`, for callers that only
+    /// borrow the cache: a missing box is built as [`Self::build_polar_box`] builds it
+    /// (from the nearest ancestor with a box, or the root, down to `node`, each with
+    /// its parent's box as guess) without storing the chain; the values are the
+    /// same.
+    ///
+    /// # Errors
+    ///
+    /// `InvalidInput` for a node without surface data; [`SolidError::Unported`] from
+    /// the build (its other failures leave the stored box, as [`Self::polar_box`]).
+    pub fn polar_box_unstored(&self, node: NodeId) -> Result<PolarBox> {
+        if self.aux(node)?.polar_box.state() == PolarBoxState::Uninitialized {
+            match self.build_polar_box_unstored(node) {
+                Err(e) if e.is_unported() => return Err(e),
+                Err(_) => {}
+                Ok(b) => return Ok(b),
+            }
+        }
+        Ok(self.aux(node)?.polar_box)
+    }
+
+    /// The box [`Self::build_polar_box`] would store at `node`.
+    fn build_polar_box_unstored(&self, node: NodeId) -> Result<PolarBox> {
+        // collect chain of nodes up the tree, as build_polar_box
+        let mut chain = vec![node];
+        let mut found_polar = false;
+        let mut cur = node;
+        let limit = self.tree_ref(OP_POLAR)?.nodes().len();
+        loop {
+            if chain.len() > limit + 1 {
+                return Err(invalid(OP_POLAR, "tree node links are cyclic"));
+            }
+            let parent = self.tree_ref(OP_POLAR)?.node(cur)?.parent;
+            let Some(p) = parent else {
+                break; // found the root
+            };
+            chain.push(p);
+            if self.aux(p)?.polar_box.state() != PolarBoxState::Uninitialized {
+                found_polar = true;
+                break;
+            }
+            cur = p;
+        }
+
+        let last = chain
+            .pop()
+            .ok_or_else(|| invalid(OP_POLAR, "empty node chain"))?;
+        let mut last_polar = if found_polar {
+            self.aux(last)?.polar_box
+        } else {
+            // the root (can't have a box, else we would have stopped when we saw it)
+            match self.compute_polar_box(last, None)? {
+                Some(b) => b,
+                None => self.aux(last)?.polar_box,
+            }
+        };
+
+        // build boxes toward the start of the array (our starting node)
+        while let Some(n) = chain.pop() {
+            let guess = (last_polar.state() != PolarBoxState::Unbounded).then_some(last_polar);
+            last_polar = match self.compute_polar_box(n, guess.as_ref())? {
+                Some(b) => b,
+                None => self.aux(n)?.polar_box,
+            };
+        }
+        Ok(last_polar)
+    }
+
     /// `mBA_pSurface->CalculateBoundingBox(m_sUVDomain, NULL, NULL, &m_sPolarBox,
     /// NULL, guess)`; `None` when the (ignored) status is a failure.
     fn compute_polar_box(
@@ -2128,26 +2196,6 @@ impl<O: Copy + PartialEq> SurfaceCache<O> {
         Ok(out)
     }
 
-    /// `SmSurfaceCache::GetTree` as far as it returns an existing tree.
-    fn existing_tree(&self) -> Result<()> {
-        let face_owned = self
-            .surface
-            .owner()
-            .is_some_and(|o| o.type_code == FACE_TYPE);
-        if self.tree.is_none()
-            || (!self.have_t_surface_cache
-                && face_owned
-                && self.face_containment_done != FaceContainment::UnderConstruction)
-        {
-            // UNPORTED(surface.surface_cache_p3): SmSurfaceCache::GetTree (BuildTree)
-            return Err(SolidError::unported(
-                "SmSurfaceCache::GetTree",
-                "surface.surface_cache_p3",
-            ));
-        }
-        Ok(())
-    }
-
     /// Classifies every unclassified leaf inside or outside the face
     /// (`MarkFaceContainment`): each connected region of unknown leaves takes the
     /// class (and face) of a classified neighbour, else that of `PointClassify` at
@@ -2158,9 +2206,10 @@ impl<O: Copy + PartialEq> SurfaceCache<O> {
     ///
     /// `SM_ERR` from the base class `PointClassify` (a region without classified
     /// neighbour); `InvalidInput` for malformed trees; [`SolidError::Unported`] from
-    /// `GetTree` (building a tree) and `SmTol::GetZoneTol3d` of a face.
+    /// `GetTree` (a tree build needs `SmSurface::CalculateContinuities`) and
+    /// `SmTol::GetZoneTol3d` of a face.
     pub fn mark_face_containment(&mut self, k: &Kernel) -> Result<()> {
-        self.existing_tree()?;
+        self.get_tree(k)?;
         let top = self
             .tree_ref(OP_MARK)?
             .top_node()

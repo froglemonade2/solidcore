@@ -61,10 +61,10 @@
 //!   [`SolidError::Unported`] for `surface.surface_p1`) cannot hand out a cache yet,
 //!   so [`SurfaceTrace::do_trace`], [`SurfaceTrace::find_boundary_start_points`] and
 //!   [`SurfaceTrace::find_interior_curves`] take the cache it returns for the
-//!   surface as an argument. The constructor's `GetTree` is made where the tree is
-//!   used (the global solve of [`find_interior_curves_base`]); a cache without tree
-//!   is [`SolidError::Unported`] (`SmSurfaceCache::GetTree` builds it,
-//!   `surface.surface_cache_p3`). `SmCacheCheckOutIn` has no counterpart (the cache
+//!   surface as an argument. The constructor's `GetTree`
+//!   ([`SurfaceCache::get_tree`], which builds the tree when needed) is made where the
+//!   tree is used (the global solve of [`find_interior_curves_base`]).
+//!   `SmCacheCheckOutIn` has no counterpart (the cache
 //!   is borrowed for the whole trace), the `SmTemporaryChangeValue`s of
 //!   `DoTrace` are restored on every exit.
 //! - **Global solver.** The tracer's `SmGlobalSolver` base is made for the solve in
@@ -273,12 +273,19 @@ impl TracePoint {
 
 /// The object of the boundary solutions of
 /// [`SurfaceTrace::find_solutions_on_boundary_curve`]: the boundary iso curve.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub struct BoundaryCurve;
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct BoundaryCurve {
+    /// The curve's natural interval (`SmCurve::GetNaturalInterval`), when known.
+    pub natural_interval: Option<Extent1d>,
+}
 
 impl SolutionObject for BoundaryCurve {
     fn kind(&self) -> ObjectKind {
         ObjectKind::Curve
+    }
+
+    fn natural_interval(&self) -> Option<Extent1d> {
+        self.natural_interval
     }
 }
 
@@ -747,7 +754,7 @@ pub trait SurfaceTrace<'s> {
     fn find_interior_curves<O: SolutionObject>(
         &mut self,
         k: &Kernel,
-        cache: &SurfaceCache<O>,
+        cache: &mut SurfaceCache<O>,
         out: &mut TraceOutput,
     ) -> Result<()> {
         find_interior_curves_base(self, k, cache, out)
@@ -769,7 +776,8 @@ pub trait SurfaceTrace<'s> {
     }
 
     /// `BranchMayContainAnswers` of the tracer's global solve (the base:
-    /// `SmGlobalSolver::BranchMayContainAnswers`).
+    /// `SmGlobalSolver::BranchMayContainAnswers`); `cache` owns the solved tree and
+    /// the node data its nodes point at.
     ///
     /// # Errors
     ///
@@ -777,8 +785,10 @@ pub trait SurfaceTrace<'s> {
     fn branch_may_contain_answers<O: SolutionObject>(
         &mut self,
         solver: &GlobalSolver<'_, O>,
+        cache: &SurfaceCache<O>,
         branch: &Branch,
     ) -> Result<bool> {
+        let _ = cache;
         solver.branch_may_contain_answers(branch)
     }
 
@@ -1838,6 +1848,7 @@ pub fn test_iso_curve_base<'s, T: SurfaceTrace<'s> + ?Sized>(
 /// state plus the tracer's hooks.
 struct InteriorSolver<'a, 't, T: ?Sized, O> {
     solver: GlobalSolver<'t, O>,
+    cache: &'t SurfaceCache<O>,
     tracer: &'a mut T,
 }
 
@@ -1855,7 +1866,8 @@ where
     }
 
     fn branch_may_contain_answers(&mut self, branch: &Branch) -> Result<bool> {
-        self.tracer.branch_may_contain_answers(&self.solver, branch)
+        self.tracer
+            .branch_may_contain_answers(&self.solver, self.cache, branch)
     }
 
     fn local_solve(&mut self, branch: &Branch) -> Result<bool> {
@@ -1871,24 +1883,26 @@ where
 ///
 /// # Errors
 ///
-/// [`SolidError::Unported`] when the cache has no tree yet
-/// (`SmSurfaceCache::GetTree`, `surface.surface_cache_p3`); those of the global
-/// solve, the curve caches and the curve queries. Failures of a single start
+/// Those of building the tree (`SmSurfaceCache::GetTree`, [`SurfaceCache::get_tree`]),
+/// of the global solve, the curve caches and the curve queries. Failures of a single start
 /// point skip it, as upstream.
 pub fn find_interior_curves_base<'s, T, O>(
     t: &mut T,
     k: &Kernel,
-    cache: &SurfaceCache<O>,
+    cache: &mut SurfaceCache<O>,
     out: &mut TraceOutput,
 ) -> Result<()>
 where
     T: SurfaceTrace<'s> + ?Sized,
     O: SolutionObject,
 {
-    let tree: &Tree<O> = cache.tree().ok_or(
-        // UNPORTED(surface.surface_cache_p3): SmSurfaceCache::GetTree
-        SolidError::unported("SmSurfaceCache::GetTree", "surface.surface_cache_p3"),
-    )?;
+    // the constructor's m_pTree = pCache->GetTree() (built if needed)
+    cache.get_tree(k)?;
+    let cache: &SurfaceCache<O> = cache;
+    let tree: &Tree<O> = cache.tree().ok_or(SolidError::invalid_input(
+        "intersect::surface_tracer::find_interior_curves",
+        "surface cache without tree",
+    ))?;
 
     // Find pairs of tree nodes containing possible solutions from which StartPoints can be found
     let mut solutions = SolutionArray::new();
@@ -1899,7 +1913,11 @@ where
         solver.set_best_answer_so_far_sq(0.0);
         solver.set_at_distance(0.0);
         solver.set_3d_tolerance(0.0);
-        let mut gs = InteriorSolver { solver, tracer: t };
+        let mut gs = InteriorSolver {
+            solver,
+            cache,
+            tracer: t,
+        };
         gs.solve_it(
             &SolveRequest {
                 operation: SolverOperation::Find,
