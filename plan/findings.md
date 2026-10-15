@@ -3953,6 +3953,8 @@ a gap below 0.1 and a loose tolerance, so it only shows in large seed counts; th
 default 3,093-case set (which the gate and CI run) is clean, and the previous generator's
 30,055-case run was clean.
 
+**Shim coverage gap (curve.curve_p9).** The shim does not build `SmHyperbola` or `SmParabola`, so the `Curve::is_on_plane` arms for those kinds are exercised by Rust unit tests only and are not compared against C++. Adding them needs two more kind readers in `harness/cpp/shim/curve_curve_p9.cpp` and the FFI curve-block grammar.
+
 ## intersect.surface_intersector_p5 (`SmSurfaceIntersector::DoIntersection`, 2026-10-14; partial, no disagreements)
 
 - **Dispatch.** Every upstream caller runs `DoIntersection` on an
