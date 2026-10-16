@@ -555,6 +555,25 @@ void put_surface(std::vector<double>& o, const SmSurface* s)
         o.push_back(s == nullptr ? -1.0 : -2.0);
         return;
     }
+    if (s->GetType() == SmPlane_TYPE)
+    {
+        // `1 O[3] X[3] Y[3] scale[2] anal_domain(u0 v0 u1 v1)`, as topology.edge
+        const SmPlane* pl = (const SmPlane*)s;
+        const SmAxis2Placement& pos = pl->GetPosition();
+        o.push_back(1.0);
+        put_vec(o, pos.GetOrigin());
+        put_vec(o, pos.GetXAxis());
+        put_vec(o, pos.GetYAxis());
+        SmVector2d sc = pl->GetUVScale();
+        o.push_back(sc.x);
+        o.push_back(sc.y);
+        SmExtent2d d = pl->GetSTEPUVDomain();
+        o.push_back(d.GetMin().x);
+        o.push_back(d.GetMin().y);
+        o.push_back(d.GetMax().x);
+        o.push_back(d.GetMax().y);
+        return;
+    }
     const SmBSplineSurface* b = (const SmBSplineSurface*)s;
     gw_SURFACE* sur = b->GetGwNurbPointer();
     o.push_back(0.0);

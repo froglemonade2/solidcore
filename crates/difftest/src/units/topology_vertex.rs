@@ -28,9 +28,10 @@ use solidcore::curve::curve::Curve as SmCurve;
 use solidcore::curve::line::Line;
 use solidcore::geom::attribute::{AttributeStore, ObjectKey};
 use solidcore::geom::extent1d::Extent1d;
+use solidcore::geom::extent2d::Extent2d;
 use solidcore::geom::object::{NotifyOperation, ObjectRef};
 use solidcore::geom::solution_array::ObjectKind;
-use solidcore::geom::vector2d::Point2;
+use solidcore::geom::vector2d::{Point2, Vec2};
 use solidcore::geom::vector3d::Vec3;
 use solidcore::kernel::Kernel;
 use solidcore::nurbs::b_spline_curve::BSplineCurve;
@@ -40,6 +41,7 @@ use solidcore::nurbs::crv_basic::Curve;
 use solidcore::nurbs::math::{CPoint, NOW, NOZ};
 use solidcore::nurbs::srf_basic::Surface as NlSurface;
 use solidcore::query::poly::PolyVertexId;
+use solidcore::surface::plane::Plane;
 use solidcore::surface::surface::p2::DropCurveFail;
 use solidcore::surface::surface::Surface;
 use solidcore::topology::topology::Topology;
@@ -426,8 +428,17 @@ fn read_surface(rd: &mut Rd<'_>) -> Result<Option<Surface>, HarnessError> {
     if kind == -1.0 {
         return Ok(None);
     }
+    if kind == 1.0 {
+        // an SmPlane: origin, axes, scales, analytic domain
+        let o = Vec3::new(rd.num()?, rd.num()?, rd.num()?);
+        let x = Vec3::new(rd.num()?, rd.num()?, rd.num()?);
+        let y = Vec3::new(rd.num()?, rd.num()?, rd.num()?);
+        let sc = Vec2::new(rd.num()?, rd.num()?);
+        let d = Extent2d::from_bounds(rd.num()?, rd.num()?, rd.num()?, rd.num()?);
+        return Ok(Some(Surface::from(Plane::new(o, x, y, sc, &d))));
+    }
     if kind != 0.0 {
-        return Err(harness("export: a surface is not a B-spline"));
+        return Err(harness("export: a surface is not a B-spline or plane"));
     }
     let oob = rd.num()? != 0.0;
     let form = rd.num()?;
