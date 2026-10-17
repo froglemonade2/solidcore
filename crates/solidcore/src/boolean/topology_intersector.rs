@@ -4,3 +4,4 @@
 //! The minimal bidirectional mate storage was co-ported by `boolean.merge_p1`.
 
 pub mod p1;
+pub mod p2;
