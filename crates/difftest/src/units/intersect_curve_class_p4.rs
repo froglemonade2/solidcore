@@ -2703,6 +2703,11 @@ fn rejected_cases() -> Vec<(String, Script, bool)> {
     let mut ops = edge_setup(0, None, &bounds, 1e-5);
     ops.push(crossings(0, vec![EDGE_LOOP], false, Vec::new()));
     out.push(("loop_crossings_no_curve".into(), script(ops), false));
+    // the loop crossings of a classification squeezed to no interval (reads m_pData[0])
+    let mut ops = edge_setup(0, Some(0), &[0.0, 1.0], 1e-5);
+    ops.push(OpIn::Squeeze { t: 0 });
+    ops.push(crossings(0, vec![EDGE_LOOP], false, Vec::new()));
+    out.push(("loop_crossings_no_intervals".into(), script(ops), false));
     // UB-131: a props seed at stage GAPSa/GAPS without the face pointer (field 24)
     for stage in [1.0, 2.0] {
         let mut ops = edge_setup(0, Some(0), &bounds, 1e-5);

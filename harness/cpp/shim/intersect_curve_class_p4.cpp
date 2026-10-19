@@ -885,6 +885,12 @@ int32_t run(Rd& rd, std::vector<double>& o)
             // UB-124: the classification curve's GetNaturalInterval() before its NULL check
             if (rd.bad || (n > 0 && cc.GetCurve() == NULL))
                 return SC_ERR_ARG;
+            // GetPointClassifiesConnectedTo reads m_pData[0] of a classification without
+            // intervals (the array of a squeezed-out or never sized one is stale or NULL);
+            // a degenerate classification curve returns before that read and is over-refused
+            // here, deliberately (the degeneracy test needs the face's tolerance)
+            if (n > 0 && cc.GetSize() == 0)
+                return SC_ERR_ARG;
             SmTArray<ULONG> counts;
             SmTArray<SmTouchData> raw, done;
             SmStatus s = cc.GetLoopCrossings(loops, with_props ? &props : NULL, &counts, &raw, &done);

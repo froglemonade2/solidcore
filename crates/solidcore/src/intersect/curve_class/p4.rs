@@ -78,7 +78,7 @@ use crate::geom::tol::{
 };
 use crate::heal::face_props::{FaceProps, HealerOpType, LoopObject, PropStage, Tri, UNDEF_ULONG};
 use crate::intersect::curve_class::p1::{
-    get_connected_touches, CrvDirOnFaceType, CurveClassification, IntervalPosition, TouchData,
+    get_connected_touches, CrvDirOnFaceType, CurveClassification, TouchData,
 };
 use crate::intersect::curve_class::p2::ResetOptions;
 use crate::intersect::curve_class::p3::curve_is_degenerate;
