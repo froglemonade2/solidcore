@@ -11,8 +11,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_square_intersect_ang0_a",
@@ -23,8 +23,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_square_intersect_ang0_b",
@@ -83,8 +83,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "endcap_intersect_ang0",
@@ -594,52 +594,36 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_square_degenerate_31",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#55 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_square_degenerate_32",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#56 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_square_degenerate_33",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#57 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_square_degenerate_34",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#58 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "max_rel_err": 0.0,
@@ -658,52 +642,36 @@
       "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_square_degenerate_37",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#61 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_square_degenerate_38",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#62 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_square_degenerate_39",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#63 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_square_degenerate_40",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#64 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "max_rel_err": 0.0,
@@ -795,8 +763,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_square_intersect_48",
@@ -815,8 +783,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_square_intersect_50",
@@ -827,8 +795,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_square_intersect_51",
@@ -847,8 +815,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_square_intersect_53",
@@ -859,8 +827,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_square_intersect_54",
@@ -879,8 +847,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_square_intersect_56",
@@ -1398,52 +1366,36 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_square_rebuilt_degenerate_31",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#131 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_square_rebuilt_degenerate_32",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#132 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_square_rebuilt_degenerate_33",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#133 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_square_rebuilt_degenerate_34",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#134 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "max_rel_err": 0.0,
@@ -1462,52 +1414,36 @@
       "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_square_rebuilt_degenerate_37",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#137 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_square_rebuilt_degenerate_38",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#138 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_square_rebuilt_degenerate_39",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#139 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_square_rebuilt_degenerate_40",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#140 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "max_rel_err": 0.0,
@@ -1599,8 +1535,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_square_rebuilt_intersect_48",
@@ -1619,8 +1555,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_square_rebuilt_intersect_50",
@@ -1631,8 +1567,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_square_rebuilt_intersect_51",
@@ -1651,8 +1587,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_square_rebuilt_intersect_53",
@@ -1663,8 +1599,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_square_rebuilt_intersect_54",
@@ -1683,8 +1619,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_square_rebuilt_intersect_56",
@@ -2202,52 +2138,36 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_circ_degenerate_31",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#207 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_circ_degenerate_32",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#208 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_circ_degenerate_33",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#209 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_circ_degenerate_34",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#210 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "max_rel_err": 0.0,
@@ -2266,52 +2186,36 @@
       "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_circ_degenerate_37",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#213 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_circ_degenerate_38",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#214 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_circ_degenerate_39",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#215 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_circ_degenerate_40",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#216 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "max_rel_err": 0.0,
@@ -2403,8 +2307,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_circ_intersect_48",
@@ -2423,8 +2327,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_circ_intersect_50",
@@ -2435,8 +2339,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_circ_intersect_51",
@@ -2455,8 +2359,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_circ_intersect_53",
@@ -2467,8 +2371,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_circ_intersect_54",
@@ -2487,8 +2391,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_circ_intersect_56",
@@ -3006,52 +2910,36 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_circ_rebuilt_degenerate_31",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#283 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_circ_rebuilt_degenerate_32",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#284 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_circ_rebuilt_degenerate_33",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#285 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_circ_rebuilt_degenerate_34",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#286 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "max_rel_err": 0.0,
@@ -3070,52 +2958,36 @@
       "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_circ_rebuilt_degenerate_37",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#289 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_circ_rebuilt_degenerate_38",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#290 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_circ_rebuilt_degenerate_39",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#291 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_circ_rebuilt_degenerate_40",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#292 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "max_rel_err": 0.0,
@@ -3207,8 +3079,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_circ_rebuilt_intersect_48",
@@ -3227,8 +3099,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_circ_rebuilt_intersect_50",
@@ -3239,8 +3111,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_circ_rebuilt_intersect_51",
@@ -3259,8 +3131,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_circ_rebuilt_intersect_53",
@@ -3271,8 +3143,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_circ_rebuilt_intersect_54",
@@ -3291,8 +3163,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_circ_rebuilt_intersect_56",
@@ -3810,21 +3682,17 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "disk_degenerate_31",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#359 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmEdge::GetTolerance",
+        "unit": "topology.edge"
       },
       "max_rel_err": 0.0,
       "name": "disk_degenerate_32",
@@ -3835,8 +3703,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmEdge::GetTolerance",
+        "unit": "topology.edge"
       },
       "max_rel_err": 0.0,
       "name": "disk_degenerate_33",
@@ -3846,16 +3714,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "disk_degenerate_34",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#362 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "max_rel_err": 0.0,
@@ -3874,21 +3738,17 @@
       "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "disk_degenerate_37",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#365 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmEdge::GetTolerance",
+        "unit": "topology.edge"
       },
       "max_rel_err": 0.0,
       "name": "disk_degenerate_38",
@@ -3899,8 +3759,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmEdge::GetTolerance",
+        "unit": "topology.edge"
       },
       "max_rel_err": 0.0,
       "name": "disk_degenerate_39",
@@ -3910,16 +3770,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "disk_degenerate_40",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#368 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "max_rel_err": 0.0,
@@ -4011,8 +3867,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "disk_intersect_48",
@@ -4031,8 +3887,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "disk_intersect_50",
@@ -4043,8 +3899,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "disk_intersect_51",
@@ -4063,8 +3919,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "disk_intersect_53",
@@ -4075,8 +3931,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "disk_intersect_54",
@@ -4095,8 +3951,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "disk_intersect_56",
@@ -4614,21 +4470,17 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "disk_rebuilt_degenerate_31",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#435 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmEdge::GetTolerance",
+        "unit": "topology.edge"
       },
       "max_rel_err": 0.0,
       "name": "disk_rebuilt_degenerate_32",
@@ -4639,8 +4491,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmEdge::GetTolerance",
+        "unit": "topology.edge"
       },
       "max_rel_err": 0.0,
       "name": "disk_rebuilt_degenerate_33",
@@ -4650,16 +4502,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "disk_rebuilt_degenerate_34",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#438 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "max_rel_err": 0.0,
@@ -4678,21 +4526,17 @@
       "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "disk_rebuilt_degenerate_37",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#441 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmEdge::GetTolerance",
+        "unit": "topology.edge"
       },
       "max_rel_err": 0.0,
       "name": "disk_rebuilt_degenerate_38",
@@ -4703,8 +4547,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmEdge::GetTolerance",
+        "unit": "topology.edge"
       },
       "max_rel_err": 0.0,
       "name": "disk_rebuilt_degenerate_39",
@@ -4714,16 +4558,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "disk_rebuilt_degenerate_40",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#444 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "max_rel_err": 0.0,
@@ -4815,8 +4655,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "disk_rebuilt_intersect_48",
@@ -4835,8 +4675,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "disk_rebuilt_intersect_50",
@@ -4847,8 +4687,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "disk_rebuilt_intersect_51",
@@ -4867,8 +4707,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "disk_rebuilt_intersect_53",
@@ -4879,8 +4719,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "disk_rebuilt_intersect_54",
@@ -4899,8 +4739,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "disk_rebuilt_intersect_56",
@@ -7043,8 +6883,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "Endcap_degenerate_31",
@@ -7054,33 +6894,25 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "Endcap_degenerate_32",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#664 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "Endcap_degenerate_33",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#665 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "Endcap_degenerate_34",
@@ -7107,8 +6939,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "Endcap_degenerate_37",
@@ -7118,33 +6950,25 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "Endcap_degenerate_38",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#670 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "Endcap_degenerate_39",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#671 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "Endcap_degenerate_40",
@@ -7255,8 +7079,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "Endcap_intersect_48",
@@ -7275,8 +7099,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "Endcap_intersect_50",
@@ -7287,8 +7111,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "Endcap_intersect_51",
@@ -7307,8 +7131,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "Endcap_intersect_53",
@@ -7319,8 +7143,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "Endcap_intersect_54",
@@ -7339,8 +7163,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "Endcap_intersect_56",
@@ -7795,8 +7619,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "Endcap_rebuilt_degenerate_31",
@@ -7806,33 +7630,25 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "Endcap_rebuilt_degenerate_32",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#740 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "Endcap_rebuilt_degenerate_33",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#741 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "Endcap_rebuilt_degenerate_34",
@@ -7859,8 +7675,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "Endcap_rebuilt_degenerate_37",
@@ -7870,33 +7686,25 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "Endcap_rebuilt_degenerate_38",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#746 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "Endcap_rebuilt_degenerate_39",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#747 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "Endcap_rebuilt_degenerate_40",
@@ -8007,8 +7815,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "Endcap_rebuilt_intersect_48",
@@ -8027,8 +7835,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "Endcap_rebuilt_intersect_50",
@@ -8039,8 +7847,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "Endcap_rebuilt_intersect_51",
@@ -8059,8 +7867,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "Endcap_rebuilt_intersect_53",
@@ -8071,8 +7879,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "Endcap_rebuilt_intersect_54",
@@ -8091,8 +7899,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "Endcap_rebuilt_intersect_56",
@@ -11923,8 +11731,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_degenerate_31",
@@ -11934,33 +11742,25 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_face_degenerate_32",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#1120 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_face_degenerate_33",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#1121 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_degenerate_34",
@@ -11987,8 +11787,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_degenerate_37",
@@ -11998,33 +11798,25 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_face_degenerate_38",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#1126 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "plane_face_degenerate_39",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#1127 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_degenerate_40",
@@ -12135,8 +11927,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_intersect_48",
@@ -12155,8 +11947,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_intersect_50",
@@ -12167,8 +11959,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_intersect_51",
@@ -12187,8 +11979,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_intersect_53",
@@ -12199,8 +11991,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_intersect_54",
@@ -12219,8 +12011,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_intersect_56",
@@ -12675,8 +12467,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_tilted_degenerate_31",
@@ -12687,8 +12479,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmEdge::GetTolerance",
+        "unit": "topology.edge"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_tilted_degenerate_32",
@@ -12699,8 +12491,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmEdge::GetTolerance",
+        "unit": "topology.edge"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_tilted_degenerate_33",
@@ -12711,8 +12503,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_tilted_degenerate_34",
@@ -12739,8 +12531,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_tilted_degenerate_37",
@@ -12751,8 +12543,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmEdge::GetTolerance",
+        "unit": "topology.edge"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_tilted_degenerate_38",
@@ -12763,8 +12555,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmEdge::GetTolerance",
+        "unit": "topology.edge"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_tilted_degenerate_39",
@@ -12775,8 +12567,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_tilted_degenerate_40",
@@ -12887,8 +12679,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_tilted_intersect_48",
@@ -12907,8 +12699,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_tilted_intersect_50",
@@ -12919,8 +12711,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_tilted_intersect_51",
@@ -12939,8 +12731,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_tilted_intersect_53",
@@ -12951,8 +12743,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_tilted_intersect_54",
@@ -12971,8 +12763,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_tilted_intersect_56",
@@ -13427,8 +13219,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_degenerate_31",
@@ -13438,33 +13230,25 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "bilinear_degenerate_32",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#1272 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "bilinear_degenerate_33",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#1273 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_degenerate_34",
@@ -13491,8 +13275,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_degenerate_37",
@@ -13502,33 +13286,25 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "bilinear_degenerate_38",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#1278 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "bilinear_degenerate_39",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#1279 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_degenerate_40",
@@ -13639,8 +13415,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_intersect_48",
@@ -13659,8 +13435,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_intersect_50",
@@ -13671,8 +13447,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_intersect_51",
@@ -13691,8 +13467,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_intersect_53",
@@ -13703,8 +13479,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_intersect_54",
@@ -13723,8 +13499,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_intersect_56",
@@ -14179,8 +13955,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_subdomain_degenerate_31",
@@ -14191,8 +13967,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmEdge::GetTolerance",
+        "unit": "topology.edge"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_subdomain_degenerate_32",
@@ -14203,8 +13979,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmEdge::GetTolerance",
+        "unit": "topology.edge"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_subdomain_degenerate_33",
@@ -14215,8 +13991,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_subdomain_degenerate_34",
@@ -14243,8 +14019,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_subdomain_degenerate_37",
@@ -14255,8 +14031,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmEdge::GetTolerance",
+        "unit": "topology.edge"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_subdomain_degenerate_38",
@@ -14267,8 +14043,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmEdge::GetTolerance",
+        "unit": "topology.edge"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_subdomain_degenerate_39",
@@ -14279,8 +14055,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_subdomain_degenerate_40",
@@ -14391,8 +14167,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_subdomain_intersect_48",
@@ -14411,8 +14187,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_subdomain_intersect_50",
@@ -14423,8 +14199,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_subdomain_intersect_51",
@@ -14443,8 +14219,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_subdomain_intersect_53",
@@ -14455,8 +14231,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_subdomain_intersect_54",
@@ -14475,8 +14251,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_subdomain_intersect_56",
@@ -14931,8 +14707,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "triangle_pole_degenerate_31",
@@ -14942,33 +14718,25 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "triangle_pole_degenerate_32",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#1424 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "triangle_pole_degenerate_33",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#1425 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "triangle_pole_degenerate_34",
@@ -14995,8 +14763,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "triangle_pole_degenerate_37",
@@ -15006,33 +14774,25 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "triangle_pole_degenerate_38",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#1430 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "triangle_pole_degenerate_39",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#1431 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "triangle_pole_degenerate_40",
@@ -15143,8 +14903,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "triangle_pole_intersect_48",
@@ -15163,8 +14923,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "triangle_pole_intersect_50",
@@ -15175,8 +14935,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "triangle_pole_intersect_51",
@@ -15195,8 +14955,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "triangle_pole_intersect_53",
@@ -15207,8 +14967,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "triangle_pole_intersect_54",
@@ -15227,8 +14987,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "triangle_pole_intersect_56",
@@ -15683,8 +15443,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "biquadratic_degenerate_31",
@@ -15694,33 +15454,25 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "biquadratic_degenerate_32",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#1500 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "biquadratic_degenerate_33",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#1501 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "biquadratic_degenerate_34",
@@ -15747,8 +15499,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "biquadratic_degenerate_37",
@@ -15758,33 +15510,25 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "biquadratic_degenerate_38",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#1506 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "biquadratic_degenerate_39",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/topology.face_p3/constructed.json#1507 (upstream source/SMLib/src/SmFace.cpp:14964)",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "biquadratic_degenerate_40",
@@ -15895,8 +15639,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "biquadratic_intersect_48",
@@ -15915,8 +15659,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "biquadratic_intersect_50",
@@ -15927,8 +15671,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "biquadratic_intersect_51",
@@ -15947,8 +15691,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "biquadratic_intersect_53",
@@ -15959,8 +15703,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "biquadratic_intersect_54",
@@ -15979,8 +15723,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "biquadratic_intersect_56",
@@ -16321,8 +16065,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_vloop_50_degenerate",
@@ -16453,8 +16197,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_vloop_25_degenerate",
@@ -16585,8 +16329,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_tilted_vloop_50_degenerate",
@@ -16717,8 +16461,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "plane_face_tilted_vloop_25_degenerate",
@@ -16849,8 +16593,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_vloop_50_degenerate",
@@ -16981,8 +16725,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "bilinear_vloop_25_degenerate",
@@ -17113,8 +16857,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "biquadratic_vloop_50_degenerate",
@@ -17245,8 +16989,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "biquadratic_vloop_25_degenerate",
@@ -18305,8 +18049,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "cyl_bspline_degenerate",
@@ -18458,8 +18202,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
+        "symbol": "SmFace::GetEdges",
+        "unit": "topology.face_p4"
       },
       "max_rel_err": 0.0,
       "name": "gen0004",
@@ -18541,16 +18285,12 @@
       "values_compared": 2
     },
     {
-      "deferred": {
-        "symbol": "SmCurveClassification::ReSet",
-        "unit": "intersect.curve_class_p2"
-      },
       "max_rel_err": 0.0,
       "name": "gen0013",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=9751867694585732558",
-      "values_compared": 0
+      "values_compared": 2
     },
     {
       "deferred": {
@@ -18578,17 +18318,17 @@
     }
   ],
   "cases_both_errored": 3,
-  "cases_deferred": 1081,
+  "cases_deferred": 1016,
   "cases_failed": 0,
-  "cases_passed": 700,
+  "cases_passed": 765,
   "cases_total": 1781,
   "deferred_by_unit": {
-    "intersect.curve_class_p2": 210,
-    "intersect.surface_drop_lib_p3": 115,
+    "intersect.surface_drop_lib_p3": 156,
     "surface.surf_of_extrusion_p2": 112,
     "surface.surface_p2": 228,
+    "topology.edge": 16,
     "topology.face_p2": 148,
-    "topology.face_p4": 268
+    "topology.face_p4": 356
   },
   "max_rel_err": 0.0,
   "pass": true,
