@@ -88,8 +88,7 @@
 //! - **`CreateCurvesByTrimming`** drops its unused `bForceUVClassify` argument; the
 //!   output arrays are asked for with `want_3d` / `want_uv`.
 //! - **Unported callees.** `sm_FaceClassifyUVLine` (`query.face_p3`),
-//!   `SmCurveClassification::ReSet` in the constructor of a curve
-//!   (`intersect.curve_class_p2`; `SmFace::CurveOnClassify` follows it), the face member
+//!   the face member
 //!   `GetUpwardFaceuse` of an opaque handle in `SmCurveInterval::GetIvlBound_EdgeuseObj`,
 //!   `SmFace::CalculateUVDomainFromUVTrimCurves` (`topology.face_p1`),
 //!   `SmSurface::IsSingularity` of a non-plane
@@ -2718,10 +2717,12 @@ mod tests {
             BSplineCurve::create_line_segment(2, Vec3::ZERO, Vec3::new(1.0, 1.0, 0.0)).unwrap(),
         );
         let uv = [Some(line)];
+        let e = create_curves_by_trimming(&k, &b, f, Some(1.0), None, Some(&uv), false, true)
+            .unwrap_err();
+        // the constructor (ReSet) is ported; CurveOnClassify of this loop-less face fails
         assert!(
-            create_curves_by_trimming(&k, &b, f, Some(1.0), None, Some(&uv), false, true)
-                .unwrap_err()
-                .is_unported()
+            matches!(e, SolidError::Upstream { code: 1001, .. }),
+            "{e:?}"
         );
         assert!(create_curves_by_trimming(&k, &b, f, None, None, None, true, false).is_err());
     }
