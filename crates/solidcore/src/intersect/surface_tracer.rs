@@ -1731,7 +1731,8 @@ where
                 }
 
                 // Add a copy of this solution curve to r3DCurves.
-                let result = new_bsc.clone();
+                // (`new SmBSplineCurve(*pNewBSC)`: a plain B-spline copy)
+                let result = crate::surface::surface_cache::p1::copy_as_bspline(new_bsc)?;
                 let result_ivl = result.natural_interval();
                 out.curves_3d.push(result.clone());
 

@@ -672,7 +672,8 @@ impl SurfaceIntersector<'_> {
         let tol = self.this_approx_tol_3d;
 
         // copy and trim the boundary curve (may snap the interval to knots)
-        let mut result = tgt.clone();
+        // (`new SmBSplineCurve(*pTgtBSC)`: a plain B-spline copy)
+        let mut result = crate::surface::surface_cache::p1::copy_as_bspline(tgt)?;
         let mut trim_ivl = Extent1d::from_min_max(par(&sol.start, 0), par(&sol.end, 0));
         result.trim(k, &mut trim_ivl, TrimMode::Notify)?;
         out.curves_3d.push(result);

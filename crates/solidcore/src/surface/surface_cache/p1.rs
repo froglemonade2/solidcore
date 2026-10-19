@@ -196,6 +196,23 @@ pub(super) const fn bspline_of(surface: &Surface) -> Option<&BSplineSurface> {
     }
 }
 
+/// `new SmBSplineCurve(*pCurve)` for an `SmBSplineCurve*` that may point at an `SmLine` or
+/// `SmCircle` (the iso curves of a plane or a sweep): the copy constructor of the base
+/// class makes a plain B-spline curve, dropping the derived class.
+///
+/// # Errors
+///
+/// `SM_ERR_NULL_POINTER` for a curve that is not of a B-spline kind.
+pub fn copy_as_bspline(curve: &Curve) -> Result<Curve> {
+    // (an SmLine makes its NURB when the copy constructor asks for it)
+    if let CurveKind::Line(l) = curve.kind() {
+        return Ok(Curve::from(l.base_with_nurb()?.into_owned()));
+    }
+    bspline_curve_of(curve)
+        .map(|b| Curve::from(b.clone()))
+        .ok_or(SolidError::null_pointer(OP_COPY))
+}
+
 /// `SM_CAST_PTR(SmBSplineCurve, curve)`: the B-spline (base) of the B-spline kinds.
 const fn bspline_curve_of(curve: &Curve) -> Option<&BSplineCurve> {
     match curve.kind() {
@@ -2385,13 +2402,13 @@ impl<O: Copy + PartialEq> SurfaceCache<O> {
             // when no classified neighbor was found - cast a ray
             if found_class == NodeClass::Unknown {
                 let src_zone_tol_3d = if curr_fields.face.is_some() {
-                    // UNPORTED(surface.surface_cache_p1): SmTol::GetZoneTol3d(const SmObject*) on an opaque handle. Every
+                    // UNPORTED(geom.tol): SmTol::GetZoneTol3d(const SmObject*) on an opaque handle. Every
                     // arm it dispatches to is ported (topology::{vertex, edge, face::p2, edgeuse::p1}::tolerance,
                     // Brep::tolerance) but each takes `&Brep` and none is in scope here; wire once this code
-                    // receives the owning B-rep
+                    // receives the owning B-rep (justified: findings.md "stubs naming green units")
                     return Err(SolidError::unported(
                         "SmTol::GetZoneTol3d(const SmObject*)",
-                        "surface.surface_cache_p1",
+                        "geom.tol",
                     ));
                 } else {
                     zone_tol_3d(k, SmallTopoType::NormalSize)
@@ -2612,6 +2629,16 @@ impl<O: Copy + PartialEq> SurfaceCache<O> {
 
         // build isoParameter curves
         let d = Some(*uv_domain);
+        if matches!(self.surface.kind(), SurfaceKind::Plane(_)) {
+            // UNPORTED(surface.surface_cache_p1): SmPlane::CreateIsoParametricCurve for
+            // GetIsoBoundaryCurves (justified: findings.md "stubs naming green units": wiring
+            // it makes intersect.surface_intersector_p5 gen0072 lose its curve, a
+            // disagreement not yet explained; the bounding-plane use of the same call is wired)
+            return Err(SolidError::unported(
+                "SmPlane::CreateIsoParametricCurve",
+                "surface.surface_cache_p1",
+            ));
+        }
         let c0 =
             create_iso_parametric_curve(k, &self.surface, SurfParamType::U, uv_domain.min().x, d)?;
         let c1 =

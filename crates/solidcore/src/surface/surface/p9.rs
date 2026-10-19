@@ -60,6 +60,7 @@ fn bss(surface: &Surface) -> Result<Cow<'_, BSplineSurface>> {
             // view (the iso curves go through `IsoCurve::from_surface`); the Rust
             // CrvOnSurf holds B-spline surfaces only
             // UNPORTED(curve.crv_on_surf): SmCrvOnSurf::SmCrvOnSurf (non-B-spline surface)
+            // (justified: findings.md "stubs naming green units")
             Err(SolidError::unported(
                 "SmCrvOnSurf::SmCrvOnSurf (non-B-spline surface)",
                 "curve.crv_on_surf",

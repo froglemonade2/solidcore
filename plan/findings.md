@@ -7860,6 +7860,43 @@ stay, because the caller holds the object only as an opaque handle (`ObjectRef`,
   `ProtoBrep` method with a surface-backed implementation.
 - **`SmBSplineSurface::GetGwNurbPointer` in `geom/tree.rs` (`propagate_to_parents`)**: the surface
   behind the tree's owner handle is held by the surface cache; the tree has no way to reach it.
+- **`SmCrvOnSurf` over a non-B-spline surface** (the diagonal curves of `Surface::find_tessellation_splits`
+  in `surface/surface/p9.rs`) stays: the Rust `CrvOnSurf` holds a `BSplineSurface` only (see
+  `curve.crv_on_surf` above). The `SmIsoCurve` and iso-curve uses next to it are wired.
+- **`SmIsoCurve` over non-B-spline surfaces** (the `surface.surface_p5` entry above) is resolved:
+  `IsoCurve::from_surface` holds any `Surface`, and `boundary_iso_curve`, `Surface::approximate_size`
+  and `implicit_iso` use it (the plane case of the second bullet there included).
+- **`SmPlane::CreateIsoParametricCurve` inside `SurfaceCache::iso_boundary_curves` (`GetIsoBoundaryCurves`)
+  stays unwired; found while wiring.** Wiring it (the plane's `SmLine` iso curves, outputs sliced to
+  `SmBSplineCurve` copies where upstream does `new SmBSplineCurve(*p)`) turns 380 of the 716 deferrals of
+  `intersect.surface_intersector_p5` into passes with 0 failures except one: generated case `gen0072`
+  (seed 6023561391845282262; plane A with domain `[0, 0, 7691.4, 7691.4]`, origin
+  `(5369.2, -1913.5, -7658.4)`, against a 2x2 B-spline B at coordinates about 1e4) returns 157 record values
+  from C++ (one 3D curve with its UV curves) and 17 from Rust (no curve; Rust returns success). Not caused by
+  the `boundary_iso_curve` or bounding-plane wiring (reverting either leaves it unchanged), nor by the
+  missing NURB of the line copy. Suspects: a line-specific branch in the curve/surface intersection of an
+  `SmLine` target (`surface_global_curve_intersect` with a `Curve::Line`) at this scale, or the `Line`
+  tolerance/degeneracy tests. The plane iso curves are still wired for `GetBoundaryUVEndPoints` /
+  `CreateBoundaryCurveForIndex` (bounding planes) and everywhere else; only the cache's natural boundary
+  iso curves of a plane keep the stub until `gen0072` is explained.
 - **Iso curves of the surface cache** were the opposite case and are wired: the cache now holds its
   iso boundary curves as `Curve` (an `SmLine` for a plane, an `SmCircle` for a sweep) instead of
   `BSplineCurve`, so the derived classes' overrides apply.
+- **`SmTol::GetZoneTol3d(const SmObject*)`** (`curve/curve_cache.rs` `curve_approx_tol_3d`,
+  `curve/ellipse/p1.rs`, `SurfaceCache` node classification in `surface_cache/p1.rs`): retagged from
+  the file's own unit to the owner `geom.tol`. It stays: every arm (`topology::{vertex, edge, face::p2,
+  edgeuse::p1}::tolerance`) takes a `&Brep`, and these callers hold the owning object only as an
+  opaque `ObjectRef`.
+- **`SmCurve::EvaluatePoint` / `GetNaturalInterval` and `SmVolume::GetNaturalParamDomain` in
+  `geom/solution_array.rs`**: the solution objects are opaque handles `O` that cannot reach their
+  curve or volume; the ported methods exist but there is nothing to call them on.
+- **`SmCurve::DeformToEndPointTargets` with `pOptSurfCrvOnSurf`** (`topology/brep/p7.rs`): the ported
+  `Curve::deform_to_end_point_targets` has no surface parameter, so a curve on surface with targets
+  would be approximated instead of having its UV curve edited in place. Needs a `curve.curve_p6`
+  follow-up (add the parameter, port the in-place UV edit), then the stub goes.
+- **Not touched here because an open PR modifies the file**: `SmSphere::IsNurbSurfaceSphere` (and the
+  surface of revolution / extrusion recognisers after it) in `nurbs/b_spline_surface/p2.rs`
+  `is_nurb_surface_cone` (#156; wireable: all four recognisers are ported, a recognised sphere or
+  extrusion would return the `surface.surface_p2` dispatch gap like the cone; 328 deferrals in
+  `topology.brep_p10`, 77 in the two sweep units, 20 in `topology.brep_p7`), and the notes in
+  `geom/tol.rs` (#129, #136, #192).

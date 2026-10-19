@@ -74,6 +74,10 @@ const NO_POINT: f64 = -3.0;
 /// An output upstream leaves unset (the shim presets it).
 const UNSET: f64 = -7.0;
 
+/// The curve type the shim presets (`(SmTsectCurveType)-7`) as the record holds it:
+/// `(double)type` of an enum with an unsigned underlying type, `2^32 - 7`.
+const UNSET_TYPE: f64 = 4_294_967_289.0;
+
 // ---- inputs ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -179,9 +183,7 @@ enum SurfaceIn {
     },
     /// An `SmCurveBoundedSurface` (implicit outer, no boundary curves) over a plane or
     /// B-spline basis.
-    CurveBounded {
-        basis: Box<SurfaceIn>,
-    },
+    CurveBounded { basis: Box<SurfaceIn> },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -390,7 +392,10 @@ fn rust_curve(c: &CurveIn) -> Result<Curve, Fail> {
                 .len()
                 .checked_sub(1)
                 .ok_or_else(|| harness("empty B-spline"))?;
-            let m = knots.len().checked_sub(1).ok_or_else(|| harness("no knots"))?;
+            let m = knots
+                .len()
+                .checked_sub(1)
+                .ok_or_else(|| harness("no knots"))?;
             BSplineCurve::from_data(u64::from(*dim), n, m, *p, &pw, knots)
                 .map(Curve::from)
                 .map_err(|e| Fail::Harness(harness(format!("B-spline: {e}"))))
@@ -450,7 +455,12 @@ fn put_uv(o: &mut Vec<f64>, v: Vec2) {
 
 fn put_point(o: &mut Vec<f64>, t: &TsectPnt) {
     o.push(f64::from(t.point_type.code()));
-    o.extend(t.uv_param_type.iter().flatten().map(|pt| f64::from(pt.code())));
+    o.extend(
+        t.uv_param_type
+            .iter()
+            .flatten()
+            .map(|pt| f64::from(pt.code())),
+    );
     for uv in t.uv_curve_pv.iter().flatten() {
         put_uv(o, *uv);
     }
@@ -626,7 +636,9 @@ fn gen_plane(rng: &mut Rng, s: f64, near: Option<([f64; 3], f64)>) -> SurfaceIn 
 fn clamped_knots(rng: &mut Rng, n: usize, p: usize, lo: f64, hi: f64) -> Vec<f64> {
     let interior = n - p - 1;
     let mut inner: Vec<f64> = (0..interior)
-        .map(|i| lo + (hi - lo) * (i as f64 + 1.0 + rng.uniform(-0.3, 0.3)) / (interior as f64 + 1.0))
+        .map(|i| {
+            lo + (hi - lo) * (i as f64 + 1.0 + rng.uniform(-0.3, 0.3)) / (interior as f64 + 1.0)
+        })
         .collect();
     inner.sort_by(f64::total_cmp);
     let mut k = vec![lo; p + 1];
@@ -784,7 +796,6 @@ fn gen_point(rng: &mut Rng, doms: [[f64; 4]; 2], s: f64, param: f64) -> Vec<f64>
     v
 }
 
-
 fn ffi_program(i: &Inputs) -> ffi::Program {
     ffi::Program {
         a: ffi_surface(&i.a),
@@ -801,7 +812,12 @@ fn ffi_program(i: &Inputs) -> ffi::Program {
 // ---- Rust side: state and ops -------------------------------------------------------------
 
 /// A list entry: a program point's index, or `-1` and the point.
-fn put_ref(o: &mut Vec<f64>, si: &SurfaceIntersector<'_>, nprog: usize, id: TsectId) -> Result<(), Fail> {
+fn put_ref(
+    o: &mut Vec<f64>,
+    si: &SurfaceIntersector<'_>,
+    nprog: usize,
+    id: TsectId,
+) -> Result<(), Fail> {
     if id.index() < nprog {
         o.push(id.index() as f64);
     } else {
@@ -812,7 +828,12 @@ fn put_ref(o: &mut Vec<f64>, si: &SurfaceIntersector<'_>, nprog: usize, id: Tsec
     Ok(())
 }
 
-fn put_list(o: &mut Vec<f64>, si: &SurfaceIntersector<'_>, nprog: usize, l: &[TsectId]) -> Result<(), Fail> {
+fn put_list(
+    o: &mut Vec<f64>,
+    si: &SurfaceIntersector<'_>,
+    nprog: usize,
+    l: &[TsectId],
+) -> Result<(), Fail> {
     o.push(l.len() as f64);
     for &id in l {
         put_ref(o, si, nprog, id)?;
@@ -960,13 +981,18 @@ fn put_single(o: &mut Vec<f64>, c: &IntersectionCurve) -> Result<(), Fail> {
             }
         }
     }
-    o.push(c.curve_type.map_or(UNSET, |t| f64::from(t as i32)));
+    o.push(c.curve_type.map_or(UNSET_TYPE, |t| f64::from(t as i32)));
     o.push(c.deviation.unwrap_or(UNSET));
     Ok(())
 }
 
 #[allow(clippy::too_many_lines)]
-fn run_op(run: &mut Run, si: &mut SurfaceIntersector<'_>, op: &OpIn, o: &mut Vec<f64>) -> Result<(), Fail> {
+fn run_op(
+    run: &mut Run,
+    si: &mut SurfaceIntersector<'_>,
+    op: &OpIn,
+    o: &mut Vec<f64>,
+) -> Result<(), Fail> {
     let nprog = run.nprog;
     let k = Kernel::default();
     match op {
@@ -998,7 +1024,13 @@ fn run_op(run: &mut Run, si: &mut SurfaceIntersector<'_>, op: &OpIn, o: &mut Vec
                 Some(j) => Some(pt_of(si, *j)?),
                 None => None,
             };
-            let r = si.compute_point_values(&Kernel::default(), [p2(uvs[0]), p2(uvs[1])], &mut p, prev_p.as_ref(), *step);
+            let r = si.compute_point_values(
+                &Kernel::default(),
+                [p2(uvs[0]), p2(uvs[1])],
+                &mut p,
+                prev_p.as_ref(),
+                *step,
+            );
             st(o, r)?;
             put_point(o, &p);
             set_pt(si, *i, p)?;
@@ -1088,7 +1120,10 @@ fn run_op(run: &mut Run, si: &mut SurfaceIntersector<'_>, op: &OpIn, o: &mut Vec
             average,
             tol,
         } => {
-            let curve = run.curves.get(*curve).ok_or_else(|| harness("curve index"))?;
+            let curve = run
+                .curves
+                .get(*curve)
+                .ok_or_else(|| harness("curve index"))?;
             if points_rejected(si, points) {
                 o.push(ffi::REJECTED);
             } else {
@@ -1352,7 +1387,11 @@ fn gen_scene(rng: &mut Rng) -> Scene {
     } else {
         ((ob, [xb, yb]), dom2)
     };
-    let dom1 = if rng.chance(0.85) { dom } else { gen_domain(rng, dom) };
+    let dom1 = if rng.chance(0.85) {
+        dom
+    } else {
+        gen_domain(rng, dom)
+    };
     Scene {
         kind,
         s,
@@ -1439,7 +1478,10 @@ fn gen_ext(rng: &mut Rng, s: f64) -> OpIn {
 
 /// A raw point type: mostly ones the basic intersector does not refine.
 fn gen_raw_type(rng: &mut Rng) -> f64 {
-    pick_f(rng, &[1.0, 1.0, 3.0, 3.0, 3.0, 6.0, 7.0, 0.0, 2.0, 4.0, 5.0])
+    pick_f(
+        rng,
+        &[1.0, 1.0, 3.0, 3.0, 3.0, 6.0, 7.0, 0.0, 2.0, 4.0, 5.0],
+    )
 }
 
 /// A raw point at A's `uv` (and B's matching point) with a random type, tangent and
@@ -1458,7 +1500,11 @@ fn gen_raw_point(rng: &mut Rng, sc: &Scene, uv: [f64; 2], param: f64) -> Vec<f64
     let mut v = uv_point(ty, uv, sc.uv_b(uv), duv, param);
     // a 3D position and tangent for the on-curve tests
     let p = sc.pos_a(uv);
-    let d = if rng.chance(0.8) { sc.dir_u() } else { unit_vec(rng) };
+    let d = if rng.chance(0.8) {
+        sc.dir_u()
+    } else {
+        unit_vec(rng)
+    };
     for (k, x) in [p, d].concat().into_iter().enumerate() {
         if let Some(slot) = v.get_mut(67 + k) {
             *slot = x;
@@ -1484,7 +1530,15 @@ fn gen_dpi_case(rng: &mut Rng, sc: &Scene) -> (Vec<CurveIn>, Vec<Vec<f64>>, Vec<
     let uvs = gen_uvs(rng, sc, n);
     let points: Vec<Vec<f64>> = uvs
         .iter()
-        .map(|&uv| uv_point(pick_f(rng, &[1.0, 2.0, 0.0]), uv, sc.uv_b(uv), [[0.0; 2]; 2], 7.0))
+        .map(|&uv| {
+            uv_point(
+                pick_f(rng, &[1.0, 2.0, 0.0]),
+                uv,
+                sc.uv_b(uv),
+                [[0.0; 2]; 2],
+                7.0,
+            )
+        })
         .collect();
     let mut ops = Vec::new();
     if rng.chance(0.3) {
@@ -1535,7 +1589,10 @@ fn gen_dpi_case(rng: &mut Rng, sc: &Scene) -> (Vec<CurveIn>, Vec<Vec<f64>>, Vec<
             ang_tol: None,
         });
     } else if tail < 6 {
-        curves.push(segment_through(sc, uvs.first().copied().unwrap_or([0.0; 2])));
+        curves.push(segment_through(
+            sc,
+            uvs.first().copied().unwrap_or([0.0; 2]),
+        ));
     }
     (curves, points, ops)
 }
@@ -1618,7 +1675,10 @@ fn gen_law_or_interior_case(rng: &mut Rng, sc: &Scene) -> (Vec<CurveIn>, Vec<Vec
         .iter()
         .map(|&uv| gen_raw_point(rng, sc, uv, 0.0))
         .collect();
-    let curves = vec![segment_through(sc, uvs.first().copied().unwrap_or([0.0; 2]))];
+    let curves = vec![segment_through(
+        sc,
+        uvs.first().copied().unwrap_or([0.0; 2]),
+    )];
     let mut ops = Vec::new();
     if rng.chance(0.3) {
         ops.push(gen_members(rng, s));
@@ -1650,7 +1710,10 @@ fn gen_other_surfaces_case(rng: &mut Rng) -> Inputs {
             let tube = rng.chance(0.3);
             (gen_bspline(rng, s, false), Some(gen_bspline(rng, s, tube)))
         }
-        2 => (bounded(gen_plane(rng, s, None)), Some(gen_plane(rng, s, None))),
+        2 => (
+            bounded(gen_plane(rng, s, None)),
+            Some(gen_plane(rng, s, None)),
+        ),
         _ => (gen_bspline(rng, s, false), None),
     };
     let na = natural(&a);
@@ -1728,7 +1791,8 @@ fn edge_cases() -> Vec<(String, Value)> {
     // y = 0.5: crosses z = 0 along x at v = 0.5 on both
     let xz = plane_json([0.0, 0.5, -0.5], [1.0, 0.0, 0.0], [0.0, 0.0, 1.0], d);
     // a point at A's (u, v): B = xy_rev's UV is (1 - u, 1 - v)
-    let rev = |u: f64, v: f64, ty: f64| uv_point(ty, [u, v], [1.0 - u, 1.0 - v], [[0.0; 2]; 2], 7.0);
+    let rev =
+        |u: f64, v: f64, ty: f64| uv_point(ty, [u, v], [1.0 - u, 1.0 - v], [[0.0; 2]; 2], 7.0);
     let same = |u: f64, v: f64, ty: f64, du: [f64; 2]| uv_point(ty, [u, v], [u, v], [du, du], 0.0);
     let pts_rev: Vec<Vec<f64>> = vec![rev(0.2, 0.3, 1.0), rev(0.6, 0.3, 1.0), rev(0.9, 0.9, 2.0)];
     let prog = |a: &Value, bb: &Value, curves: Value, pts: &[Vec<f64>], ops: Value| {
@@ -1743,43 +1807,78 @@ fn edge_cases() -> Vec<(String, Value)> {
     let mut v = vec![
         (
             "edge_dpi_coincident_single_point".into(),
-            prog(&xy, &xy_rev, json!([]), &pts_rev,
-                 json!([dpi(json!([0]), false, false, Value::Null, Value::Null), {"op": "state"}])),
+            prog(
+                &xy,
+                &xy_rev,
+                json!([]),
+                &pts_rev,
+                json!([dpi(json!([0]), false, false, Value::Null, Value::Null), {"op": "state"}]),
+            ),
         ),
         (
             "edge_dpi_coincident_three_points".into(),
-            prog(&xy, &xy_rev, json!([]), &pts_rev,
-                 json!([dpi(json!([0, 1, 2]), true, true, json!([1.0, 0.0, 0.0]), Value::Null),
-                        {"op": "state"}])),
+            prog(
+                &xy,
+                &xy_rev,
+                json!([]),
+                &pts_rev,
+                json!([dpi(json!([0, 1, 2]), true, true, json!([1.0, 0.0, 0.0]), Value::Null),
+                        {"op": "state"}]),
+            ),
         ),
         (
             "edge_dpi_coincident_on_a_curve".into(),
-            prog(&xy, &xy_rev, seg([0.0, 0.3, 0.0], [1.0, 0.3, 0.0]), &pts_rev,
-                 json!([{"op": "trace", "i": 2}, {"op": "flush"},
-                        dpi(json!([0]), false, false, Value::Null, Value::Null), {"op": "state"}])),
+            prog(
+                &xy,
+                &xy_rev,
+                seg([0.0, 0.3, 0.0], [1.0, 0.3, 0.0]),
+                &pts_rev,
+                json!([{"op": "trace", "i": 2}, {"op": "flush"},
+                        dpi(json!([0]), false, false, Value::Null, Value::Null), {"op": "state"}]),
+            ),
         ),
         (
             "edge_dpi_no_points".into(),
-            prog(&xy, &xz, json!([]), &pts_rev,
-                 json!([dpi(json!([]), false, false, Value::Null, json!(0.5)), {"op": "state"}])),
+            prog(
+                &xy,
+                &xz,
+                json!([]),
+                &pts_rev,
+                json!([dpi(json!([]), false, false, Value::Null, json!(0.5)), {"op": "state"}]),
+            ),
         ),
         (
             "edge_dpi_first_point_off".into(),
-            prog(&xy, &xy_up, json!([]), &[same(0.5, 0.5, 1.0, [0.0, 0.0])],
-                 json!([dpi(json!([0]), false, false, Value::Null, Value::Null), {"op": "state"}])),
+            prog(
+                &xy,
+                &xy_up,
+                json!([]),
+                &[same(0.5, 0.5, 1.0, [0.0, 0.0])],
+                json!([dpi(json!([0]), false, false, Value::Null, Value::Null), {"op": "state"}]),
+            ),
         ),
         (
             "edge_dpi_parallel_within_tol".into(),
-            prog(&xy, &xy_up, json!([]), &[same(0.5, 0.5, 1.0, [0.0, 0.0])],
-                 json!([dpi(json!([0]), false, false, Value::Null, json!(1e-3)), {"op": "state"}])),
+            prog(
+                &xy,
+                &xy_up,
+                json!([]),
+                &[same(0.5, 0.5, 1.0, [0.0, 0.0])],
+                json!([dpi(json!([0]), false, false, Value::Null, json!(1e-3)), {"op": "state"}]),
+            ),
         ),
         (
             "edge_dpi_rejected".into(),
-            prog(&xy, &xy_rev, json!([]), &pts_rev,
-                 json!([dpi(json!([0, 0]), false, false, Value::Null, Value::Null),
+            prog(
+                &xy,
+                &xy_rev,
+                json!([]),
+                &pts_rev,
+                json!([dpi(json!([0, 0]), false, false, Value::Null, Value::Null),
                         {"op": "add_through", "i": 1},
                         dpi(json!([0, 1]), false, false, Value::Null, Value::Null),
-                        {"op": "state"}])),
+                        {"op": "state"}]),
+            ),
         ),
     ];
     // traces on z = 0 / y = 0.5 from raw points
@@ -1800,14 +1899,26 @@ fn edge_cases() -> Vec<(String, Value)> {
         raw(7.0, 0.0, [-1.0, 0.0]),
     ];
     for (name, curves, ops) in [
-        ("edge_trace_tangent_start", json!([]), json!([{"op": "trace", "i": 0}, {"op": "flush"}])),
+        (
+            "edge_trace_tangent_start",
+            json!([]),
+            json!([{"op": "trace", "i": 0}, {"op": "flush"}]),
+        ),
         (
             "edge_trace_tangent_start_on_curve",
             seg([0.0, 0.5, 0.0], [1.0, 0.5, 0.0]),
             json!([{"op": "trace", "i": 0}, {"op": "flush"}]),
         ),
-        ("edge_trace_coincidence_start", json!([]), json!([{"op": "trace", "i": 3}])),
-        ("edge_trace_unknown_start", json!([]), json!([{"op": "trace", "i": 1}, {"op": "flush"}])),
+        (
+            "edge_trace_coincidence_start",
+            json!([]),
+            json!([{"op": "trace", "i": 3}]),
+        ),
+        (
+            "edge_trace_unknown_start",
+            json!([]),
+            json!([{"op": "trace", "i": 1}, {"op": "flush"}]),
+        ),
         (
             "edge_trace_unknown_start_reversed",
             json!([]),
@@ -1848,7 +1959,10 @@ fn edge_cases() -> Vec<(String, Value)> {
     ] {
         let mut ops = ops.as_array().cloned().unwrap_or_default();
         ops.push(json!({"op": "state"}));
-        v.push((name.into(), prog(&xy, &xz, curves, &raws, Value::Array(ops))));
+        v.push((
+            name.into(),
+            prog(&xy, &xz, curves, &raws, Value::Array(ops)),
+        ));
     }
     // a tangent point stepping back to the corner where z = 0 meets y = 0
     let xz_origin = plane_json([0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, 1.0], d);
@@ -1867,7 +1981,11 @@ fn edge_cases() -> Vec<(String, Value)> {
         ]
         .concat()
     };
-    let tpts = vec![tangent_prev(0.5, -1.0), tangent_prev(0.05, -1.0), tangent_prev(0.5, 1.0)];
+    let tpts = vec![
+        tangent_prev(0.5, -1.0),
+        tangent_prev(0.05, -1.0),
+        tangent_prev(0.5, 1.0),
+    ];
     for (name, i) in [
         ("edge_trace_tangent_curve_point_to_corner", 0),
         ("edge_trace_tangent_curve_point_near_corner", 1),

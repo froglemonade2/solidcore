@@ -1046,6 +1046,7 @@ fn edge_interval<O>(_edge: &O) -> Result<Extent1d> {
 /// `SmCurve::EvaluatePoint` at `t` (its status is ignored upstream: `SE`).
 fn evaluate_curve<O>(_curve: &O, _t: f64) -> Result<Point3> {
     // UNPORTED(curve.curve_p2): SmCurve::EvaluatePoint
+    // (justified: findings.md "stubs naming green units": the curve is an opaque handle `O`)
     Err(SolidError::Unported {
         upstream: "SmCurve::EvaluatePoint",
         unit: "curve.curve_p2",
@@ -1058,7 +1059,7 @@ fn curve_natural_interval<O: SolutionObject>(curve: &O) -> Result<Extent1d> {
         return Ok(ivl);
     }
     // UNPORTED(curve.curve_p2): SmCurve::GetNaturalInterval (a handle that cannot
-    // reach its curve)
+    // reach its curve) (justified: findings.md "stubs naming green units": opaque handle)
     Err(SolidError::Unported {
         upstream: "SmCurve::GetNaturalInterval",
         unit: "curve.curve_p2",
@@ -1117,7 +1118,7 @@ fn surface_natural_uv_domain<O: SolutionObject>(
 /// opaque handle `O` with no way to reach it yet.
 fn volume_natural_param_domain<O>(_volume: &O) -> Result<crate::geom::extent3d::Extent3d> {
     // UNPORTED(surface.volume_p1): SmVolume::GetNaturalParamDomain (needs a handle-to-volume
-    // lookup on SolutionObject)
+    // lookup on SolutionObject) (justified: findings.md "stubs naming green units")
     Err(SolidError::Unported {
         upstream: "SmVolume::GetNaturalParamDomain",
         unit: "surface.volume_p1",

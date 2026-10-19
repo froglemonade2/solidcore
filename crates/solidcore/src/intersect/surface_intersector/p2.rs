@@ -368,7 +368,9 @@ impl SurfaceIntersector<'_> {
                         if trim_ivl1.length() > EFF_ZERO {
                             // copy and trim the Surf1->NaturalBoundaryCurve (status
                             // ignored; may snap the interval to knots)
-                            let mut bsc = bsc1.clone();
+                            // (`new SmBSplineCurve(*pBSC1)`: a plain B-spline copy)
+                            let mut bsc =
+                                crate::surface::surface_cache::p1::copy_as_bspline(&bsc1)?;
                             ignored(bsc.trim(k, &mut trim_ivl1, TrimMode::Notify))?;
 
                             // get SurfacePoints for each interval endPoint

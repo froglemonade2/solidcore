@@ -298,16 +298,12 @@
       "values_compared": 66
     },
     {
-      "deferred": {
-        "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
-      },
       "max_rel_err": 0.0,
       "name": "gen0037",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=17500105236801824813",
-      "values_compared": 0
+      "values_compared": 1219
     },
     {
       "max_rel_err": 0.0,
@@ -606,16 +602,12 @@
       "values_compared": 384
     },
     {
-      "deferred": {
-        "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
-      },
       "max_rel_err": 0.0,
       "name": "gen0075",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=17500105236801824851",
-      "values_compared": 0
+      "values_compared": 85
     },
     {
       "max_rel_err": 0.0,
@@ -722,16 +714,12 @@
       "values_compared": 719
     },
     {
-      "deferred": {
-        "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
-      },
       "max_rel_err": 0.0,
       "name": "gen0089",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=17500105236801824865",
-      "values_compared": 0
+      "values_compared": 1639
     },
     {
       "max_rel_err": 0.0,
@@ -2070,16 +2058,12 @@
       "values_compared": 66
     },
     {
-      "deferred": {
-        "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
-      },
       "max_rel_err": 0.0,
       "name": "gen0257",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=17500105236801825033",
-      "values_compared": 0
+      "values_compared": 854333
     },
     {
       "max_rel_err": 0.0,
@@ -2162,16 +2146,12 @@
       "values_compared": 28669
     },
     {
-      "deferred": {
-        "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
-      },
       "max_rel_err": 0.0,
       "name": "gen0268",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=17500105236801825044",
-      "values_compared": 0
+      "values_compared": 131
     },
     {
       "max_rel_err": 0.0,
@@ -2358,16 +2338,12 @@
       "values_compared": 136
     },
     {
-      "deferred": {
-        "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
-      },
       "max_rel_err": 0.0,
       "name": "gen0292",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=17500105236801825068",
-      "values_compared": 0
+      "values_compared": 111511
     },
     {
       "max_rel_err": 0.0,
@@ -2898,16 +2874,12 @@
       "values_compared": 246
     },
     {
-      "deferred": {
-        "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
-      },
       "max_rel_err": 0.0,
       "name": "gen0359",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=17500105236801825135",
-      "values_compared": 0
+      "values_compared": 3383
     },
     {
       "max_rel_err": 0.0,
@@ -4558,16 +4530,12 @@
       "values_compared": 146
     },
     {
-      "deferred": {
-        "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
-      },
       "max_rel_err": 0.0,
       "name": "gen0566",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=17500105236801825342",
-      "values_compared": 0
+      "values_compared": 12069
     },
     {
       "max_rel_err": 0.0,
@@ -4835,17 +4803,15 @@
     }
   ],
   "cases_both_errored": 0,
-  "cases_deferred": 8,
+  "cases_deferred": 0,
   "cases_failed": 0,
-  "cases_passed": 592,
+  "cases_passed": 600,
   "cases_total": 600,
-  "deferred_by_unit": {
-    "surface.surface_cache_p1": 8
-  },
+  "deferred_by_unit": {},
   "max_rel_err": 0.0,
   "pass": true,
   "rel_tol": 1e-9,
   "seeds": 16,
-  "status": "partial",
+  "status": "green",
   "unit": "surface.surface_cache_p3"
 }
