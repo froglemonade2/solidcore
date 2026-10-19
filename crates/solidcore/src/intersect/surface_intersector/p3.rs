@@ -368,19 +368,21 @@ impl SurfaceIntersector<'_> {
 
                 // BoundaryCurve BBox + Tol
                 let boxes = tgt.calculate_bounding_box(
+                    k,
                     &bsc_ivl,
                     BoundingBoxRequest {
                         normal: true,
                         pseudo: false,
                         polar: false,
                     },
+                    true,
                 )?;
                 let mut bbox = boxes.normal.unwrap_or_default();
                 bbox.expand_absolute(self.this_approx_tol_3d);
 
                 // when the intersection box meets the boundary curve box, intersect
                 // OtherSurface with ThisSurface->BoundaryCurve
-                let tgt_curve = Curve::from(tgt.clone());
+                let tgt_curve = tgt.clone();
                 let solutions = if bbox.are_disjoint(intersection_box, 0.0) {
                     Vec::new()
                 } else {
@@ -610,7 +612,7 @@ impl SurfaceIntersector<'_> {
     fn use_boundary_point(
         &mut self,
         k: &Kernel,
-        tgt: &BSplineCurve,
+        tgt: &Curve,
         sol: &Solution<()>,
         uvs: [Point2; 2],
         mut tsp: TsectPnt,
@@ -661,7 +663,7 @@ impl SurfaceIntersector<'_> {
     fn add_boundary_curve(
         &mut self,
         k: &Kernel,
-        tgt: &BSplineCurve,
+        tgt: &Curve,
         sol: &Solution<()>,
         l_side: usize,
         out: &mut TsectCurves,
@@ -670,7 +672,7 @@ impl SurfaceIntersector<'_> {
         let tol = self.this_approx_tol_3d;
 
         // copy and trim the boundary curve (may snap the interval to knots)
-        let mut result = Curve::from(tgt.clone());
+        let mut result = tgt.clone();
         let mut trim_ivl = Extent1d::from_min_max(par(&sol.start, 0), par(&sol.end, 0));
         result.trim(k, &mut trim_ivl, TrimMode::Notify)?;
         out.curves_3d.push(result);

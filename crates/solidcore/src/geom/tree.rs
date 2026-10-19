@@ -1230,7 +1230,8 @@ impl<O: Copy + PartialEq> Tree<O> {
                 // but the surface behind the opaque handle `O` is held by the surface
                 // cache (SurfaceCache::first_bezier_patch resolves it there); the tree
                 // reaches it once the tree construction hands it over.
-                // DISPATCH GAP: SmBSplineSurface::GetGwNurbPointer
+                // DISPATCH GAP: SmBSplineSurface::GetGwNurbPointer (justified: findings.md
+                // "stubs naming green units": the surface is an opaque handle of the tree)
                 // (nurbs.b_spline_surface_p1, ported; no UNPORTED marker: the callee is ported, the tree cannot reach the cache's data yet)
                 return Err(SolidError::Unported {
                     upstream: "SmBSplineSurface::GetGwNurbPointer",

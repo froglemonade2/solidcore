@@ -324,8 +324,8 @@ impl SurfaceIntersector<'_> {
                 // Intersect Curves
                 let ivl1 = bsc1.natural_interval();
                 let ivl2 = bsc2.natural_interval();
-                let crv1 = Curve::from(bsc1.clone());
-                let crv2 = Curve::from(bsc2);
+                let crv1 = bsc1.clone();
+                let crv2 = bsc2;
                 let opts = CurveIntersectOptions {
                     skip_global_coincidence_check: false,
                     handles: [
@@ -427,7 +427,7 @@ impl SurfaceIntersector<'_> {
                             };
 
                             // output the curve
-                            out.curves_3d.push(Curve::from(bsc));
+                            out.curves_3d.push(bsc);
                             out.curve_types.push(ty);
                             out.deviations
                                 .push(max2(sol.start.solution_value, sol.end.solution_value));

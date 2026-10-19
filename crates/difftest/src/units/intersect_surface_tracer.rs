@@ -26,7 +26,9 @@ use solidcore::curve::curve::{Curve, CurveKind};
 use solidcore::curve::line::Line;
 use solidcore::geom::extent1d::Extent1d;
 use solidcore::geom::extent2d::Extent2d;
-use solidcore::geom::solution_array::{ObjectKind, Solution, SolutionArray, SolutionObject, SolutionType};
+use solidcore::geom::solution_array::{
+    ObjectKind, Solution, SolutionArray, SolutionObject, SolutionType,
+};
 use solidcore::geom::vector2d::{Point2, Vec2};
 use solidcore::geom::vector3d::{Point3, Vec3};
 use solidcore::intersect::surface_tracer::{
@@ -324,8 +326,15 @@ fn rust_curve(c: &CurveIn) -> Result<Curve, HarnessError> {
             .map_err(|e| harness(format!("segment: {e}"))),
         CurveIn::Bspline(d) => {
             let pw: Vec<CPoint> = d.cpts.iter().map(cpoint).collect();
-            let n = pw.len().checked_sub(1).ok_or_else(|| harness("empty curve"))?;
-            let m = d.knots.len().checked_sub(1).ok_or_else(|| harness("no knots"))?;
+            let n = pw
+                .len()
+                .checked_sub(1)
+                .ok_or_else(|| harness("empty curve"))?;
+            let m = d
+                .knots
+                .len()
+                .checked_sub(1)
+                .ok_or_else(|| harness("no knots"))?;
             BSplineCurve::from_data(3, n, m, d.p, &pw, &d.knots)
                 .map(Curve::from)
                 .map_err(|e| harness(format!("B-spline: {e}")))
@@ -471,7 +480,7 @@ impl<'s> SurfaceTrace<'s> for SectionTracer<'s> {
     fn find_solutions_on_boundary_curve(
         &self,
         _k: &Kernel,
-        boundary: &BSplineCurve,
+        boundary: &Curve,
         interval: &Extent1d,
         _side: usize,
         _param: SurfParamType,

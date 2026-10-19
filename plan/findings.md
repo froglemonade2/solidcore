@@ -7839,3 +7839,27 @@ Difftest (`fixtures/heal.stitch_p1/constructed.json`: the SM_API_test box tests,
   unchanged with 0 flips: 300/206/0/94, 1000 seeds 1284/868/0/410, perturb 333/333, fuzz 2000 pass.
   valgrind with `harness/valgrind/ub11.supp` gives 0 errors on the simple, unify, select and split
   samples.
+
+## stubs naming green units (audit of #254; PR "wire stubs that name already-ported units")
+
+AGENTS.md section 4 step 5 item 9: no `UNPORTED(<unit>)` stub may stay for a callee whose owner is
+green or partial unless it cannot be wired. This PR wired the ones that can be (see its body). These
+stay, because the caller holds the object only as an opaque handle (`ObjectRef`, `O: ...`), with no
+`Brep`, `Kernel` or cache to resolve it through, so there is nothing to call the ported function on:
+
+- **`GetGenDirParamExtent` on a generator's owner** (`SmSurfOfExtrusion` and `SmSurfOfRevolution`
+  owners; `Ellipse::make_nurb_owned`, the hyperbola, line and parabola `MakeNurb` owner steps in
+  `curve/{ellipse/p1,hyperbola,line,parabola}.rs`). The curve stores its owner as an `ObjectRef`
+  (type code and key). `SurfOfRevolution::gen_dir_param_extent` and the extrusion's are ported;
+  wiring needs an owner model that hands a curve its owning surface (see also the "Generator owner
+  stubs not wired" bullet in `surface.surf_of_revolution_p1`). The Rust surfaces leave their
+  generators unowned, so no ported path reaches them.
+- **`SmSurface::DropPoint` in `proto_topology/p2.rs` (`surface_drop_point`)**: the proto topology sees
+  surfaces as handles of the `ProtoBrep` trait, as for `edgeuse_evaluate_binormal` (see
+  `topology.proto_topology_p2 stub kept (justified)` under `topology.edgeuse_p3`). Wiring means a
+  `ProtoBrep` method with a surface-backed implementation.
+- **`SmBSplineSurface::GetGwNurbPointer` in `geom/tree.rs` (`propagate_to_parents`)**: the surface
+  behind the tree's owner handle is held by the surface cache; the tree has no way to reach it.
+- **Iso curves of the surface cache** were the opposite case and are wired: the cache now holds its
+  iso boundary curves as `Curve` (an `SmLine` for a plane, an `SmCircle` for a sweep) instead of
+  `BSplineCurve`, so the derived classes' overrides apply.

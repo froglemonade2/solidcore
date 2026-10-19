@@ -377,6 +377,8 @@ fn classify_param_on_faces<O: Copy>(
 fn surface_drop_point<O: Copy>(surface: Option<O>, point: Point3) -> Result<Option<Point2>> {
     let _ = (surface, point);
     // UNPORTED(surface.surface_p5): SmSurface::DropPoint
+    // (justified: findings.md "stubs naming green units": the surface is an opaque handle of
+    // the proto topology, as for edgeuse_evaluate_binormal below)
     Err(SolidError::unported(
         "SmSurface::DropPoint",
         "surface.surface_p5",

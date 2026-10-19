@@ -1597,40 +1597,33 @@ impl Surface {
     ///
     /// # Errors
     ///
-    /// Those of the length; [`SolidError::Unported`] for kinds other than B-splines
-    /// (the ported `SmIsoCurve` holds a B-spline surface).
+    /// Those of the iso curves (a copy of the surface) and of the length.
     pub fn approximate_size(&self, domain: Option<&Extent2d>) -> Result<Vec2> {
         let dom = domain.copied().unwrap_or_else(|| self.natural_uv_domain());
         let param = 0.5;
         let uv_mid = dom.evaluate(param, param);
 
-        let SurfaceKind::BSpline(bs) = self.kind() else {
-            // DISPATCH GAP: SmIsoCurve::SmIsoCurve (curve.iso_curve, ported; no UNPORTED
-            // marker: the ported iso curve holds an SmBSplineSurface, not any surface)
-            return Err(SolidError::unported(
-                "SmIsoCurve over a non-B-spline surface",
-                "curve.iso_curve",
-            ));
+        // `SmIsoCurve(*this, dir, value, TRUE)` (input clamped): a B-spline is used as it
+        // is, any other kind through a copy that keeps its evaluation dispatch
+        let iso_curve = |dir: SurfParamType, value: f64| -> Result<Curve> {
+            if let SurfaceKind::BSpline(bs) = self.kind() {
+                return Ok(Curve::from(IsoCurve::new(
+                    bs.clone(),
+                    dir,
+                    value,
+                    true,
+                    true,
+                )));
+            }
+            super::p6::boundary_iso_curve(self, dir, value, true)
         };
 
-        let iso1 = Curve::from(IsoCurve::new(
-            bs.clone(),
-            SurfParamType::U,
-            uv_mid.x,
-            true,
-            true,
-        ));
+        let iso1 = iso_curve(SurfParamType::U, uv_mid.x)?;
         let size_v = iso1
             .approximate_length(&iso1.natural_interval(), 5, false)?
             .0;
 
-        let iso2 = Curve::from(IsoCurve::new(
-            bs.clone(),
-            SurfParamType::V,
-            uv_mid.y,
-            true,
-            true,
-        ));
+        let iso2 = iso_curve(SurfParamType::V, uv_mid.y)?;
         let size_u = iso2
             .approximate_length(&iso2.natural_interval(), 5, false)?
             .0;

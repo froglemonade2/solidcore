@@ -556,6 +556,7 @@ impl Parabola {
             // when a SmSurfOfExtrusion GenCurve, look for Parent Surface NURB Interval constraint
             if o.type_code == SURF_OF_EXTRUSION_TYPE {
                 // UNPORTED(surface.surf_of_extrusion_p1): SmSurfOfExtrusion::GetGenDirParamExtent
+                // (justified: findings.md "stubs naming green units": the owner is an opaque handle)
                 return Err(SolidError::Unported {
                     upstream: "SmSurfOfExtrusion::GetGenDirParamExtent",
                     unit: "surface.surf_of_extrusion_p1",
@@ -568,6 +569,7 @@ impl Parabola {
                 SURF_OF_REVOLUTION_TYPE | CONE_TYPE | CYLINDER_TYPE | SPHERE_TYPE | TORUS_TYPE
             ) {
                 // UNPORTED(surface.surf_of_revolution_p1): SmSurfOfRevolution::GetGenDirParamExtent
+                // (justified: findings.md "stubs naming green units": the owner is an opaque handle)
                 return Err(SolidError::Unported {
                     upstream: "SmSurfOfRevolution::GetGenDirParamExtent",
                     unit: "surface.surf_of_revolution_p1",

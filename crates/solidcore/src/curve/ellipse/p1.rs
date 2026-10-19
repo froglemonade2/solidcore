@@ -1483,6 +1483,7 @@ impl Ellipse {
         // Interval constraint.
         if owner.is_some_and(|o| o.type_code == SURF_OF_EXTRUSION_TYPE) {
             // UNPORTED(surface.surf_of_extrusion_p1): SmSurfOfExtrusion::GetGenDirParamExtent
+            // (justified: findings.md "stubs naming green units": the owner is an opaque handle)
             return Err(SolidError::Unported {
                 upstream: "SmSurfOfExtrusion::GetGenDirParamExtent",
                 unit: "surface.surf_of_extrusion_p1",
@@ -1491,6 +1492,7 @@ impl Ellipse {
 
         if owner.is_some_and(|o| o.type_code == SURF_OF_REVOLUTION_TYPE) {
             // UNPORTED(surface.surf_of_revolution_p1): SmSurfOfRevolution::GetGenDirParamExtent
+            // (justified: findings.md "stubs naming green units": the owner is an opaque handle)
             return Err(SolidError::Unported {
                 upstream: "SmSurfOfRevolution::GetGenDirParamExtent",
                 unit: "surface.surf_of_revolution_p1",

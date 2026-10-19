@@ -625,7 +625,7 @@ pub trait SurfaceTrace<'s> {
     fn find_solutions_on_boundary_curve(
         &self,
         k: &Kernel,
-        boundary: &BSplineCurve,
+        boundary: &Curve,
         interval: &Extent1d,
         side: usize,
         param: SurfParamType,
@@ -1731,7 +1731,7 @@ where
                 }
 
                 // Add a copy of this solution curve to r3DCurves.
-                let result = Curve::from(new_bsc.clone());
+                let result = new_bsc.clone();
                 let result_ivl = result.natural_interval();
                 out.curves_3d.push(result.clone());
 

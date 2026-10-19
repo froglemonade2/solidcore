@@ -1844,21 +1844,20 @@ pub(super) fn boundary_iso_curve(
             from_left,
             true,
         ))),
+        // the other kinds: the iso curve keeps a copy of the surface and evaluates through
+        // the surface's own dispatch (`IsoCurve::from_surface`, as `implicit_iso` does)
         SurfaceKind::OffsetSurface(_)
         | SurfaceKind::Plane(_)
         | SurfaceKind::SurfOfRevolution(_)
         | SurfaceKind::CurveBounded(_)
         | SurfaceKind::SrfInVolume(_)
-        | SurfaceKind::Step(_) => {
-            // DISPATCH GAP: SmIsoCurve over a surface that is not a B-spline (the ported
-            // IsoCurve holds an SmBSplineSurface and would drop the kind's evaluation
-            // overrides). No UNPORTED marker: SmIsoCurve is ported; the error names its
-            // unit.
-            Err(SolidError::unported(
-                "SmIsoCurve::SmIsoCurve (non-B-spline surface)",
-                "curve.iso_curve",
-            ))
-        }
+        | SurfaceKind::Step(_) => Ok(Curve::from(IsoCurve::from_surface(
+            surface.clone_for_evaluation()?,
+            dir,
+            value,
+            from_left,
+            true,
+        )?)),
     }
 }
 

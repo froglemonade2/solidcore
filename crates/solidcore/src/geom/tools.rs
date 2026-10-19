@@ -25,15 +25,16 @@
 //! - [`find_edge`] and [`find_face`] report "nothing found" (upstream `SM_ERR`) as
 //!   `Ok(None)`. Faces are returned as [`FaceId`]s.
 //! - **Edge and vertex queries** are those of `topology::edge` and `topology::vertex`.
-//! - **Unported callees.** Curve evaluation of the opaque target
-//!   curve, point drops, curve/curve distance,
-//!   `SmBrep::GetEdges` and exact B-rep cache dependencies
-//!   belong to units not ported yet; those calls return [`SolidError::Unported`]
-//!   (see the `UNPORTED` markers). The target curve of [`find_coincident_edge`] is
-//!   an opaque `C` until the curve units land (`curve.curve_p2`).
+//! - **Curve calls.** `GetOwner`, `Evaluate`, `DropPoint` and
+//!   `CurveMaxDistanceBetween` are the [`Curve`] methods (`curve.curve_p2`,
+//!   `curve.curve_p6`); they take the `&Kernel` upstream gets from the context, and
+//!   [`find_coincident_edge`] compares the curve's owner with the edge's key
+//!   (`keys`, as [`find_face`]) where upstream compares pointers.
 
+use crate::curve::curve::Curve;
 use crate::error::{Result, SolidError};
 use crate::geom::extent1d::Extent1d;
+use crate::geom::global_solver::SolverOperation;
 use crate::geom::object::ObjectRef;
 use crate::geom::vector3d::sqrt;
 use crate::kernel::Kernel;
@@ -46,7 +47,7 @@ use crate::topology::{Brep, BrepId, EdgeId, FaceId, VertexId};
 pub const NO_VERTEX_INDEX: usize = 99_999;
 
 /// Sample count of the curve/edge distance check in [`find_coincident_edge`].
-const COINCIDENCE_SAMPLES: u32 = 30;
+const COINCIDENCE_SAMPLES: u64 = 30;
 
 /// Result of [`find_first_point_within_tol_to_pnt`].
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -80,13 +81,13 @@ pub struct VertexMatch {
 
 /// Target of [`find_coincident_edge`]: a curve between two known vertices.
 #[derive(Debug, Clone, Copy)]
-pub struct CoincidentEdgeQuery<'a, C: ?Sized> {
+pub struct CoincidentEdgeQuery<'a> {
     /// Vertex at the curve start (`pV1`).
     pub start_vertex: VertexId,
     /// Vertex at the curve end (`pV2`).
     pub end_vertex: VertexId,
-    /// The target curve (`pCurve`).
-    pub curve: &'a C,
+    /// The target curve (`pCurve`); an edge owning it is skipped.
+    pub curve: &'a Curve,
     /// Parameter range of the curve or its edge (`rCurveIvl`).
     pub interval: Extent1d,
     /// Tolerance of the curve and its end points (`d3dTolerance`).
@@ -111,14 +112,6 @@ pub struct EdgePick {
     pub index: usize,
     /// Edge curve parameter of the closest point (`dParam`).
     pub parameter: f64,
-}
-
-/// Point drop result (`bGoodDrop`, drop parameter, drop distance of
-/// `SmCurve::DropPoint`).
-struct Drop {
-    good: bool,
-    parameter: f64,
-    distance: f64,
 }
 
 /// Finds the point of `points` nearest to `points[target]` (`SmTools::FindFirstPointWithinTolToPnt`).
@@ -230,21 +223,29 @@ pub fn find_first_vertex_within_tol_to_pnt(
 /// onto the curve and the curve/edge distance is sampled at 30 points. The edge
 /// owning the curve is skipped. Returns the first coincident edge, or `None`.
 ///
+/// `keys` names the edges the way the curve's owner link does (the owner of
+/// `query.curve` is compared with each edge's key, upstream `pE == pCurve->GetOwner()`),
+/// as for [`find_face`].
+///
 /// # Errors
-/// [`SolidError::Unported`] while edge geometry and curve evaluation are not
-/// ported; errors of the edge / curve queries are propagated.
-pub fn find_coincident_edge<C: ?Sized>(
+/// Errors of the edge / curve queries (`SER` upstream: a failed mid point
+/// evaluation, drop or tangent evaluation) are propagated; a failed
+/// `CurveMaxDistanceBetween` skips the edge unless it is
+/// [`SolidError::Unported`].
+pub fn find_coincident_edge(
+    kernel: &Kernel,
     brep: &Brep,
-    query: &CoincidentEdgeQuery<'_, C>,
+    query: &CoincidentEdgeQuery<'_>,
     edges: &[EdgeId],
     start: usize,
+    keys: &dyn Fn(CacheObject) -> ObjectRef,
 ) -> Result<Option<CoincidentEdge>> {
     let curve_ivl = query.interval;
     let guess = curve_ivl.mid();
     let (v1, v2) = (query.start_vertex, query.end_vertex);
 
     for (ii, &e) in edges.iter().enumerate().skip(start) {
-        if curve_owner(query.curve)? == Some(e) {
+        if query.curve.owner() == Some(keys(CacheObject::Edge(e))) {
             continue;
         }
 
@@ -261,13 +262,26 @@ pub fn find_coincident_edge<C: ?Sized>(
         let edge_mid_param = edge_ivl.evaluate(0.5);
         let mid_pt = edge_curve_point(brep, e, edge_mid_param)?;
 
-        let drop = drop_point(query.curve, &curve_ivl, mid_pt, tol, guess)?;
-        if !drop.good || drop.distance > tol {
+        let drop = query.curve.drop_point(
+            kernel,
+            &curve_ivl,
+            mid_pt,
+            None,
+            tol,
+            Some(guess),
+            SolverOperation::Minimize,
+        )?;
+        if !drop.success || drop.distance > tol {
             continue;
         }
 
         let edge_tangent = edge_curve_derivative(brep, e, edge_mid_param)?;
-        let curve_tangent = curve_derivative(query.curve, drop.parameter)?;
+        let curve_tangent = query
+            .curve
+            .evaluate(drop.parameter, 1, true, true)?
+            .get(1)
+            .copied()
+            .ok_or(SolidError::null_pointer("geom::tools::curve_derivative"))?;
         let same_orientation = curve_tangent.dot(edge_tangent) > 0.0;
 
         // the edge range in the curve's direction
@@ -276,16 +290,16 @@ pub fn find_coincident_edge<C: ?Sized>(
         } else {
             (edge_ivl.max(), edge_ivl.min())
         };
-        let dist = match curve_max_distance_between(
-            query.curve,
+        let dist = match query.curve.curve_max_distance_between(
+            kernel,
             &curve_ivl,
-            brep,
-            e,
-            other_range,
+            edge_curve(brep, e)?,
+            other_range.0,
+            other_range.1,
             COINCIDENCE_SAMPLES,
-            tol,
+            Some(tol),
         ) {
-            Ok(d) => d,
+            Ok(d) => d.distance,
             Err(err @ SolidError::Unported { .. }) => return Err(err),
             Err(_) => continue,
         };
@@ -309,15 +323,25 @@ pub fn find_coincident_edge<C: ?Sized>(
 /// Returns `None` when no drop succeeds (upstream `SM_ERR`).
 ///
 /// # Errors
-/// [`SolidError::Unported`] while `SmBrep::GetEdges` and point drops are not ported.
-pub fn find_edge(brep: &Brep, point: Point3) -> Result<Option<EdgePick>> {
+/// A missing edge curve (upstream dereferences null) and the errors of the point
+/// drops (`SER` upstream).
+pub fn find_edge(kernel: &Kernel, brep: &Brep, point: Point3) -> Result<Option<EdgePick>> {
     let edges = brep_edges(brep)?;
     let mut best: Option<EdgePick> = None;
     let mut best_dist = BIG_DOUBLE;
     for (i, &e) in edges.iter().enumerate() {
         let ivl = edge_interval(brep, e)?;
-        let drop = edge_drop_point(brep, e, &ivl, point, edge_tolerance(brep, e)? * 10.0)?;
-        if drop.good && drop.distance < best_dist {
+        // the global solve (no guess), SM_SO_MINIMIZE
+        let drop = edge_curve(brep, e)?.drop_point(
+            kernel,
+            &ivl,
+            point,
+            None,
+            edge_tolerance(brep, e)? * 10.0,
+            None,
+            SolverOperation::Minimize,
+        )?;
+        if drop.success && drop.distance < best_dist {
             best_dist = drop.distance;
             best = Some(EdgePick {
                 index: i,
@@ -358,15 +382,6 @@ fn vertex_tolerance(brep: &Brep, v: VertexId) -> Result<f64> {
     crate::topology::vertex::tolerance(brep, v)
 }
 
-/// `SmCurve::GetOwner`, as the owning edge (if any).
-fn curve_owner<C: ?Sized>(_curve: &C) -> Result<Option<EdgeId>> {
-    // UNPORTED(curve.curve_p2): SmCurve::GetOwner
-    Err(SolidError::Unported {
-        upstream: "SmCurve::GetOwner",
-        unit: "curve.curve_p2",
-    })
-}
-
 /// `SmEdge::GetVertex`.
 fn edge_vertex(brep: &Brep, e: EdgeId) -> Result<Option<VertexId>> {
     crate::topology::edge::vertex(brep, e)
@@ -388,7 +403,7 @@ fn edge_interval(brep: &Brep, e: EdgeId) -> Result<Extent1d> {
 }
 
 /// `pE->GetCurve()`, `NER` on a missing curve.
-fn edge_curve(brep: &Brep, e: EdgeId) -> Result<&crate::curve::curve::Curve> {
+fn edge_curve(brep: &Brep, e: EdgeId) -> Result<&Curve> {
     crate::topology::edge::curve(brep, e)?
         .ok_or(SolidError::null_pointer("geom::tools::edge_curve"))
 }
@@ -404,66 +419,6 @@ fn edge_curve_derivative(brep: &Brep, e: EdgeId, t: f64) -> Result<Vec3> {
     pv.get(1).copied().ok_or(SolidError::null_pointer(
         "geom::tools::edge_curve_derivative",
     ))
-}
-
-/// First derivative from `pCurve->Evaluate(t, 1, TRUE, ...)`.
-fn curve_derivative<C: ?Sized>(_curve: &C, _t: f64) -> Result<Vec3> {
-    // UNPORTED(curve.curve_p2): SmCurve::Evaluate
-    Err(SolidError::Unported {
-        upstream: "SmCurve::Evaluate",
-        unit: "curve.curve_p2",
-    })
-}
-
-/// `pCurve->DropPoint(ivl, pt, NULL, tol, &guess, ...)` (local solve, `SM_SO_MINIMIZE`).
-fn drop_point<C: ?Sized>(
-    _curve: &C,
-    _ivl: &Extent1d,
-    _pt: Point3,
-    _tol: f64,
-    _guess: f64,
-) -> Result<Drop> {
-    // UNPORTED(curve.curve_p6): SmCurve::DropPoint
-    Err(SolidError::Unported {
-        upstream: "SmCurve::DropPoint",
-        unit: "curve.curve_p6",
-    })
-}
-
-/// `pE->GetCurve()->DropPoint(ivl, pt, NULL, tol, NULL, ...)` (global solve,
-/// `SM_SO_MINIMIZE`).
-fn edge_drop_point(
-    brep: &Brep,
-    e: EdgeId,
-    _ivl: &Extent1d,
-    _pt: Point3,
-    _tol: f64,
-) -> Result<Drop> {
-    edge_curve(brep, e)?;
-    // UNPORTED(curve.curve_p6): SmCurve::DropPoint
-    Err(SolidError::Unported {
-        upstream: "SmCurve::DropPoint",
-        unit: "curve.curve_p6",
-    })
-}
-
-/// `pCurve->CurveMaxDistanceBetween(ivl, *pE->GetCurve(), t0, t1, samples, &tol,
-/// dist, NULL, NULL)`.
-fn curve_max_distance_between<C: ?Sized>(
-    _curve: &C,
-    _ivl: &Extent1d,
-    brep: &Brep,
-    e: EdgeId,
-    _other_range: (f64, f64),
-    _samples: u32,
-    _tol: f64,
-) -> Result<f64> {
-    brep.edge(e)?;
-    // UNPORTED(curve.curve_p6): SmCurve::CurveMaxDistanceBetween
-    Err(SolidError::Unported {
-        upstream: "SmCurve::CurveMaxDistanceBetween",
-        unit: "curve.curve_p6",
-    })
 }
 
 /// `SmBrep::GetEdges`.
@@ -574,7 +529,9 @@ mod tests {
     }
 
     #[test]
-    fn unported_paths() {
+    fn curve_paths() {
+        let k = Kernel::default();
+        let keys = &crate::topology::brep_cache::arena_identity;
         let mut brep = Brep::new();
         let a = brep.add_vertex(p(0.0, 0.0, 0.0)).unwrap();
         let b = brep.add_vertex(p(1.0, 0.0, 0.0)).unwrap();
@@ -583,28 +540,45 @@ mod tests {
         let r = find_first_vertex_within_tol_to_pnt(&brep, &[a], p(0.0, 0.0, 0.0), 1.0).unwrap();
         assert!(r.found);
         assert_eq!(r.index, 0);
+        let line = || {
+            Curve::from(crate::curve::line::Line::from_points(
+                p(0.0, 0.0, 0.0),
+                p(1.0, 0.0, 0.0),
+                3,
+            ))
+        };
+        let target = line();
         let q = CoincidentEdgeQuery {
             start_vertex: a,
             end_vertex: b,
-            curve: &(),
+            curve: &target,
             interval: Extent1d::from_min_max(0.0, 1.0),
             tolerance: 1e-6,
         };
-        let r = find_coincident_edge(&brep, &q, &[e], 0);
-        assert!(matches!(r, Err(SolidError::Unported { .. })));
-        assert_eq!(find_coincident_edge(&brep, &q, &[e], 1).unwrap(), None);
-        // SmBrep::GetEdges is ported (topology.brep_p1): the edge is reached and its
-        // drop (curve.curve_p6) is what defers
-        brep.edge_mut(e).unwrap().curve = Some(crate::curve::curve::Curve::from(
-            crate::curve::line::Line::from_points(p(0.0, 0.0, 0.0), p(1.0, 0.0, 0.0), 3),
-        ));
-        assert!(matches!(
-            find_edge(&brep, p(0.0, 0.0, 0.0)),
-            Err(SolidError::Unported {
-                unit: "curve.curve_p6",
-                ..
-            })
-        ));
+        // an edge without a curve (upstream dereferences null)
+        assert!(find_coincident_edge(&k, &brep, &q, &[e], 0, keys).is_err());
+        assert_eq!(
+            find_coincident_edge(&k, &brep, &q, &[e], 1, keys).unwrap(),
+            None
+        );
+        brep.edge_mut(e).unwrap().curve = Some(line());
+        let found = find_coincident_edge(&k, &brep, &q, &[e], 0, keys)
+            .unwrap()
+            .unwrap();
+        assert_eq!((found.index, found.same_orientation), (0, true));
+        assert!(found.max_deviation <= 1e-9);
+        // the edge owning the target curve is skipped
+        let mut owned = line();
+        owned.set_owner(Some(keys(CacheObject::Edge(e))), None);
+        let q = CoincidentEdgeQuery { curve: &owned, ..q };
+        assert_eq!(
+            find_coincident_edge(&k, &brep, &q, &[e], 0, keys).unwrap(),
+            None
+        );
+        // the nearest edge to a point and its parameter
+        let pick = find_edge(&k, &brep, p(0.25, 0.1, 0.0)).unwrap().unwrap();
+        assert_eq!(pick.index, 0);
+        assert!((pick.parameter - 0.25).abs() < 1e-9);
         assert!(matches!(
             find_face(
                 &Kernel::default(),

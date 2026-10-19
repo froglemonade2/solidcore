@@ -923,7 +923,14 @@ pub fn make_face_with_curves(
                         interval: ivl,
                         tolerance: zone_tol,
                     };
-                    if let Some(c) = find_coincident_edge(b, &query, &edges, 0)? {
+                    if let Some(c) = find_coincident_edge(
+                        k,
+                        b,
+                        &query,
+                        &edges,
+                        0,
+                        &crate::topology::brep_cache::arena_identity,
+                    )? {
                         if c.max_deviation < zone_tol * 1.0e-3 {
                             // share the coincident edge (the curve is dropped)
                             let coin = *at(&edges, c.index)?;

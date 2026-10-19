@@ -16,16 +16,15 @@
 //!
 //! `coincident` uses the curve, interval and end vertices of edge `edge` of the B-rep
 //! (`SmBrep::GetEdges` order) as the target and searches every edge from `start`. The
-//! Rust side cannot read `.smb` files yet, so it searches `n_edges` placeholder edges
-//! (the C++ side checks the count): cases with `start >= n_edges` compare the
-//! "nothing searched" result, the others are deferred until the topology and curve
-//! units land. `edge` / `face` are deferred on the Rust side for the same reason.
+//! Rust side imports the same file through the `topology.brep_p1` export and builds the
+//! shim's target: a copy of the edge's curve (no owner) when `copy_curve`, else the
+//! edge's own curve (owned by the edge, so that edge is skipped), the end vertices
+//! swapped when `swap`.
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use solidcore::error::SolidError;
-use solidcore::geom::extent1d::Extent1d;
 use solidcore::geom::tools::{self, CoincidentEdgeQuery};
 use solidcore::math::{Point3, BIG_DOUBLE};
 use solidcore::topology::{Brep, EdgeId, VertexId};
@@ -198,32 +197,63 @@ fn rust(i: &Inputs) -> Result<Output, HarnessError> {
             }
         }
         Inputs::Coincident {
+            file,
             n_edges,
             tol,
             start,
             edge,
-            ..
+            copy_curve,
+            swap,
         } => {
-            if edge >= n_edges {
-                return Err(harness(&format!("edge {edge} of {n_edges}")));
+            // the shim's target: the curve of edge `edge` (a copy has no owner, the edge's
+            // own curve is owned by the edge) over the edge interval, between its vertices
+            // (swapped when asked), searched over every edge in `SmBrep::GetEdges` order
+            let kernel = solidcore::kernel::Kernel::default();
+            let brep = file_brep(file)?;
+            let edges: Vec<EdgeId> =
+                solidcore::topology::brep::p1::edges(&brep, None).map_err(|e| harness(&e))?;
+            if edges.len() != *n_edges {
+                return Err(harness(&format!(
+                    "B-rep has {} edges, case says {n_edges}",
+                    edges.len()
+                )));
             }
-            let mut brep = Brep::new();
-            let a = brep.add_vertex(p3([0.0; 3])).map_err(|e| harness(&e))?;
-            let b = brep
-                .add_vertex(p3([1.0, 0.0, 0.0]))
-                .map_err(|e| harness(&e))?;
-            let edges: Vec<EdgeId> = (0..*n_edges)
-                .map(|_| brep.add_edge(a, b))
-                .collect::<Result<_, _>>()
-                .map_err(|e| harness(&e))?;
+            let e = *edges
+                .get(*edge)
+                .ok_or_else(|| harness(&format!("edge {edge} of {n_edges}")))?;
+            let own = solidcore::topology::edge::curve(&brep, e)
+                .map_err(|e| harness(&e))?
+                .ok_or_else(|| harness(&"edge without a curve"))?;
+            let keys = &solidcore::topology::brep_cache::arena_identity;
+            let curve = if *copy_curve {
+                let mut c = own.copy(&kernel).map_err(|e| harness(&e))?;
+                c.set_owner(None, None);
+                c
+            } else {
+                let mut c = own.clone();
+                c.set_owner(
+                    Some(keys(solidcore::topology::brep_cache::CacheObject::Edge(e))),
+                    None,
+                );
+                c
+            };
+            let v1 = solidcore::topology::edge::vertex(&brep, e)
+                .map_err(|e| harness(&e))?
+                .ok_or_else(|| harness(&"edge without a vertex"))?;
+            let v2 = solidcore::topology::edge::other_vertex(&brep, e, Some(v1))
+                .map_err(|e| harness(&e))?
+                .ok_or_else(|| harness(&"edge without an other vertex"))?;
+            let (v1, v2) = if *swap { (v2, v1) } else { (v1, v2) };
+            let interval =
+                solidcore::topology::edge::interval(&brep, e).map_err(|e| harness(&e))?;
             let query = CoincidentEdgeQuery {
-                start_vertex: a,
-                end_vertex: b,
-                curve: &(),
-                interval: Extent1d::from_min_max(0.0, 1.0),
+                start_vertex: v1,
+                end_vertex: v2,
+                curve: &curve,
+                interval,
                 tolerance: *tol,
             };
-            match tools::find_coincident_edge(&brep, &query, &edges, *start) {
+            match tools::find_coincident_edge(&kernel, &brep, &query, &edges, *start, keys) {
                 Ok(Some(m)) => Ok(coincident_out(
                     true,
                     m.same_orientation,
@@ -234,7 +264,11 @@ fn rust(i: &Inputs) -> Result<Output, HarnessError> {
                 Err(e) => Ok(rust_err(&e)),
             }
         }
-        Inputs::Edge { file, pnt } => match tools::find_edge(&file_brep(file)?, p3(*pnt)) {
+        Inputs::Edge { file, pnt } => match tools::find_edge(
+            &solidcore::kernel::Kernel::default(),
+            &file_brep(file)?,
+            p3(*pnt),
+        ) {
             Ok(Some(m)) => Ok(status_only(0)
                 .int("index", index_i64(m.index)?)
                 .scalar("param", m.parameter)),
