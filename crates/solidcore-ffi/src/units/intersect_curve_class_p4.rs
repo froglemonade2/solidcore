@@ -488,7 +488,7 @@ pub fn validate(face: Option<&FaceSpec>, input: &[f64]) -> Result<(), FfiError> 
                 rd.index(MAX_SIZE)?;
                 rd.index(2)?;
                 let class = rd.index(110)?;
-                let o = obj(&mut rd)?;
+                let o = rd.object(n_pool)?;
                 // the shim's check: the class needs an object of its kind (a surface class
                 // takes a plane too); UNKNOWN / NOTHING take none; other codes are invalid
                 let want = match class {
