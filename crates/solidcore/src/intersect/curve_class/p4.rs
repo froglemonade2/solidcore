@@ -50,7 +50,8 @@
 //! - **Undefined behaviour upstream** is an error here: a classification without a face,
 //!   or a face without a surface or classification curve, where the code dereferences them
 //!   before its own `NULL` checks (UB-124); an empty classification in
-//!   `sm_SqueezeOutSmallestInterval` (`FindBestSqueezeEnd(0)` reads `m_pData[0]`); a touch
+//!   `sm_SqueezeOutSmallestInterval` (`FindBestSqueezeEnd(0)` reads `m_pData[0]`); an empty
+//!   classification in `GetLoopCrossings` past the degenerate-curve return (UB-193); a touch
 //!   whose interval index is past the intervals.
 //! - **Not ported (reporting only).** `SM_ASSERT*`, `SM_DBG_WARN`, `ERR_MSG` and `MSG`
 //!   messages and the `SM_DEBUG_CODE` blocks (the release build compiles them out).

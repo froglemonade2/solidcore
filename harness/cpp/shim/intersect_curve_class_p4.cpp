@@ -20,7 +20,8 @@
 // not its classification, a classification without face (UB-124: GetUpwardFaceuse / GetSurface
 // on NULL) and, when the end is on an edge of a face with a surface, a NULL classification or
 // edge curve (both are evaluated); for GetLoopCrossings over loops a classification without
-// curve (UB-124: GetNaturalInterval on NULL). Geometry objects live for the whole process (never
+// curve (UB-124: GetNaturalInterval on NULL) and, for a classification without intervals whose
+// curve is not degenerate, GetPointClassifiesConnectedTo reading m_pData[0] (UB-193). Geometry objects live for the whole process (never
 // deleted); the B-rep is deleted at the end of the run.
 
 #include "sc_shim.h"
@@ -875,22 +876,34 @@ int32_t run(Rd& rd, std::vector<double>& o)
             if (rd.bad || n_seeds < 0 || n_seeds > 32)
                 return SC_ERR_ARG;
             SmFaceProps props(&ctx);
+            SmFaceProps probe(&ctx); // the props GetLoopCrossings sees, for the degeneracy test below
             for (int64_t i = 0; i < n_seeds; i++)
             {
                 int64_t field = rd.idx();
                 int64_t idx = rd.idx();
                 double v = rd.num();
                 sc_one_face::seed(props, of.face, field, idx, v);
+                if (with_props)
+                    sc_one_face::seed(probe, of.face, field, idx, v);
             }
             // UB-124: the classification curve's GetNaturalInterval() before its NULL check
             if (rd.bad || (n > 0 && cc.GetCurve() == NULL))
                 return SC_ERR_ARG;
-            // GetPointClassifiesConnectedTo reads m_pData[0] of a classification without
-            // intervals (the array of a squeezed-out or never sized one is stale or NULL);
-            // a degenerate classification curve returns before that read and is over-refused
-            // here, deliberately (the degeneracy test needs the face's tolerance)
+            // UB-193: GetPointClassifiesConnectedTo reads m_pData[0] of a classification without
+            // intervals (the array of a squeezed-out or never sized one is stale or NULL). A
+            // degenerate classification curve returns before that read (defined), so refuse only
+            // a curve that is not degenerate: the test of GetLoopCrossings on its own props (a
+            // probe with the same seeds, run through SetProps_Stage2 as GetLoopCrossings does)
             if (n > 0 && cc.GetSize() == 0)
-                return SC_ERR_ARG;
+            {
+                if (probe.m_ePropStage < SM_PROPSTAGE_2a)
+                    probe.SetProps_Stage2(loops[0]->GetFace(),
+                                          probe.m_lFaceIndx == SM_UNDEF_ULONG ? 0 : probe.m_lFaceIndx, SM_HO_ALL);
+                SmXSectTol3d xtol = SmTol::GetXSectTol3d(probe.m_sZoneTol3d, probe.m_sZoneTol3d);
+                const SmCurve* crv = cc.GetCurve();
+                if (!SmTol::IsDegenerate(crv, crv->GetNaturalInterval(), &xtol))
+                    return SC_ERR_ARG;
+            }
             SmTArray<ULONG> counts;
             SmTArray<SmTouchData> raw, done;
             SmStatus s = cc.GetLoopCrossings(loops, with_props ? &props : NULL, &counts, &raw, &done);
