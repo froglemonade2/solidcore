@@ -65,7 +65,7 @@ Anything `todo` can be claimed. These need stubs for, or co-porting of, the list
 - [ ] 🔨 `blend.fillet_geom_p4` (2074 lines) — in progress: #252 @bherbruck (ready for review)
 - [ ] 🔨 `blend.fillet_geom_p6` (1813 lines) — in progress: #247 @brett19 (ready for review)
 - [ ] 🔨 `offset.offset_executive_p2` (1846 lines) — in progress: #201 @altvnk (ready for review)
-- [ ] 🔨 `blend.fillet_corner_p3` (1697 lines) — in progress: #256 @bherbruck (draft)
+- [ ] 🔨 `blend.fillet_corner_p3` (1697 lines) — in progress: #256 @bherbruck (ready for review)
 
 ## By module
 
@@ -365,7 +365,7 @@ Anything `todo` can be claimed. These need stubs for, or co-porting of, the list
 - [ ] 🔨 `blend.fillet_geom_p4` (2074 lines) — in progress: #252 @bherbruck (ready for review)
 - [ ] 🔨 `blend.fillet_geom_p6` (1813 lines) — in progress: #247 @brett19 (ready for review)
 - [ ] ⏳ `blend.fillet_standard_solver_p2` (1989 lines) — waiting
-- [ ] 🔨 `blend.fillet_corner_p3` (1697 lines) — in progress: #256 @bherbruck (draft)
+- [ ] 🔨 `blend.fillet_corner_p3` (1697 lines) — in progress: #256 @bherbruck (ready for review)
 - [ ] ⏳ `blend.fillet_executive_p2` (1152 lines) — waiting
 - [ ] ⏳ `blend.fillet_geom_p2` (2077 lines) — waiting
 - [ ] ⏳ `blend.fillet_geom_p5` (1952 lines) — waiting
