@@ -5764,6 +5764,15 @@ mutated scales and accepted/reduced step counts are compared.
   `Curve::knots` virtual is out of this unit's scope. Their stubs name what blocks them first,
   `UNPORTED(intersect.curve_class_p2): SmCurveClassification::ReSet` (then `intersect.curve_class_p8`); the
   porter of `intersect.curve_class_p2` must also bring a `Kernel` to those two sites.
+- **`topology::brep::p7` stubs (`classify_on_faces`, `set_curve_and_merge`).** The B-rep self-intersection
+  merge classifies a UV curve held by value (`&Curve`) against `FaceId`s of one `Brep`, then runs
+  `SmFace::CurveOnClassify` and `MergeIntervals` on that classification. Wiring `with_curve` needs a
+  `ClassObject` handle type that names the curve, UV curve, surface and faces of a `Brep`, and the
+  `CurveOnClassifyObjects` adapter of `query::face::p2` for the later calls; p7 has neither (its stand-in
+  interval type is `(Extent1d, Option<EdgeId>)`). The constructor defers on `ReSet`
+  (`intersect.curve_class_p2`) first in any case, so the result is the same `Unported` error; the porter of
+  `intersect.curve_class_p2` replaces the two stubs together with the stand-in type. They keep the owner tag
+  `intersect.curve_class_p4` (justified here) because the classification type is this unit's.
 - **Upstream defect** UB-124 (`plan/upstream-issues.md`): the face, surface and curve are dereferenced
   before the functions' own `NULL` checks.
 

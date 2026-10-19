@@ -356,8 +356,9 @@ fn classify_on_faces(
     _ivl: Extent1d,
     _tol: f64,
 ) -> Result<Vec<ClassifiedInterval>> {
-    // UNPORTED(intersect.curve_class_p4): SmCurveClassification::SmCurveClassification
-    // (then SmFace::CurveOnClassify, unit query.face_p2)
+    // UNPORTED(intersect.curve_class_p4): SmCurveClassification::SmCurveClassification -- justified: plan/findings.md "intersect.curve_class_p4"
+    // (then SmFace::CurveOnClassify, unit query.face_p2; no ClassObject handle for the
+    // B-rep's curve and faces here; the constructor defers on ReSet first)
     Err(SolidError::unported(
         "SmCurveClassification::SmCurveClassification",
         "intersect.curve_class_p4",
@@ -373,9 +374,9 @@ fn set_curve_and_merge(
     _curve_3d: &Curve,
     _face: FaceId,
 ) -> Result<Vec<FaceId>> {
-    // UNPORTED(intersect.curve_class_p4): SmCurveClassification::MergeIntervals over a
+    // UNPORTED(intersect.curve_class_p4): SmCurveClassification::MergeIntervals over a -- justified: plan/findings.md "intersect.curve_class_p4"
     // classification of B-rep faces (the ported MergeIntervals needs the classification
-    // the unported constructor makes)
+    // the unported constructor makes; same handle gap as classify_on_faces)
     Err(SolidError::unported(
         "SmCurveClassification::MergeIntervals (B-rep classification)",
         "intersect.curve_class_p4",
