@@ -282,8 +282,8 @@ pub struct VertexCopy<'a> {
     pub attributes: &'a mut AttributeStore,
     /// Notification identity of each other-operand vertex.
     pub source_key: &'a dyn Fn(VertexId) -> ObjectRef,
-    /// Notification identity of each primary vertex, including freshly created ids.
-    pub destination_key: &'a dyn Fn(VertexId) -> ObjectRef,
+    /// Notification identity of each primary topology entity, including newly created vertices and vertex uses.
+    pub destination_key: &'a dyn Fn(crate::EntityRef) -> ObjectRef,
 }
 
 /// Reuse a mated primary vertex or create a shell vertex, relate it and notify
@@ -300,7 +300,7 @@ pub fn merge_vertex(
     region: Option<RegionId>,
     relations: &mut Relations,
     copy: &mut VertexCopy<'_>,
-    context: Option<&mut Context>,
+    mut context: Option<&mut Context>,
 ) -> Result<Option<VertexId>> {
     let Some(source) = source else {
         return Ok(None);
@@ -309,7 +309,15 @@ pub fn merge_vertex(
     let dest = if let Some(dest) = relations.vertices.primary(source) {
         dest
     } else {
-        let dest = make_shell_vertex(brep, other, source, region)?;
+        let point = other.vertex(source)?.point;
+        let mut env = edge::NotifyEnv {
+            records: copy.records,
+            attributes: copy.attributes,
+            context: context.as_deref_mut(),
+            key_of: copy.destination_key,
+        };
+        let (_, dest) =
+            crate::topology::brep::p9::make_shell_vertex(brep, region, point, &mut env)?;
         relations.relate_vertices(brep, dest, other, source)?;
         dest
     };
@@ -324,25 +332,11 @@ pub fn merge_vertex(
         context,
         NotifyOperation::Copy,
         (copy.source_key)(source),
-        Some((copy.destination_key)(dest)),
+        Some((copy.destination_key)(crate::EntityRef::Vertex(dest))),
         None, // SM_NO_GET_BREP(pBrepVertex) is NULL in pinned SmTypes.h.
         None, // SM_NO_GET_BREP(pVertexInOther) is NULL as well.
     )?;
     Ok(Some(dest))
-}
-
-fn make_shell_vertex(
-    brep: &mut Brep,
-    other: &Brep,
-    source: VertexId,
-    region: Option<RegionId>,
-) -> Result<VertexId> {
-    if let Some(region) = region {
-        brep.region(region)?;
-    }
-    other.vertex(source)?;
-    // UNPORTED(topology.brep_p9): SmBrep::MakeShellVertex
-    unavailable("SmBrep::MakeShellVertex", "topology.brep_p9")
 }
 
 /// The intersection lists and live primary-to-other mate lookups used by cleanup.
@@ -370,9 +364,10 @@ fn brep_shells(k: &mut Kernel, brep: &Brep) -> Result<Vec<ShellId>> {
     crate::topology::brep::p1::shells(k, brep, None)
 }
 
-fn set_face_tolerance(_brep: &mut Brep, _face: FaceId, _tolerance: f64) -> Result<()> {
-    // UNPORTED(topology.face_p3): SmFace::SetTolerance
-    unavailable("SmFace::SetTolerance", "topology.face_p3")
+/// `pFace->SetTolerance(tol)` with the upstream defaults (update only if larger, cascade
+/// to the boundaries).
+fn set_face_tolerance(brep: &mut Brep, face: FaceId, tolerance: f64) -> Result<()> {
+    crate::topology::face::p3::set_tolerance(brep, face, tolerance, true, true)
 }
 
 /// Remove topological intersection edges and redundant vertices. `check_all_edges`
@@ -461,10 +456,13 @@ pub fn boolean_post_process(
             continue;
         }
         if vertex::is_topological_vertex(k, brep, v)? {
-            // UNPORTED(topology.brep_p5): SmBrep::DeleteTopologicalVertex
-            ignore_failure(unavailable::<()>(
-                "SmBrep::DeleteTopologicalVertex",
-                "topology.brep_p5",
+            let editing = crate::topology::brep::p5::editing_enabled(brep)?;
+            ignore_failure(crate::topology::brep::p5::delete_topological_vertex(
+                k,
+                brep,
+                editing,
+                Some(v),
+                None,
             ))?;
         }
     }

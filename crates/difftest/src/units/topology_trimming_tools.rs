@@ -25,13 +25,15 @@
 //! Rust side reports [`SolidError::InvalidInput`] or fails the same guard), `-3` a call
 //! the shim skips because the Rust side defers it to an unported unit.
 //!
-//! Deferred: everything past `SmFace::ComputeLoopOrientation` (`topology.face_p3`:
-//! `CheckFace` after its first loop check, `FixTrimLoopOrientation`, `FixTrimLoopOrder`),
+//! Deferred: `SmFace::ComputeLoopOrientation` (`CheckFace` after its first loop check,
+//! `FixTrimLoopOrientation`, `FixTrimLoopOrder`) at its `sm_AreConnected` /
+//! `GetOrCreateUVTrimCurve` / `NormalizedEvaluate` calls (`topology.edgeuse_p3`),
 //! `SplitAtSeams`, `ClearUVTrimCurves`, `CreateUVTrimCurves` (`topology.face_p1` /
-//! `topology.face_p3` / `topology.face_p4`), `SmEdgeuse::GetOrCreateUVTrimCurve`
+//! `topology.face_p4`, and the face-owned surface's `SmFace::GetTolerance` stub of
+//! `GetSingularities`, `topology.face_p2`), `SmEdgeuse::GetOrCreateUVTrimCurve`
 //! (`topology.edgeuse_p3`), and the vertex-use UV points some B-reps need
 //! (`ComputeUVPoint`'s own deferrals). Last run: 3263 cases, 2842 pass, 421 deferred
-//! (`topology.edgeuse_p3` 193, `topology.face_p3` 219, `topology.face_p4` 9).
+//! (`topology.edgeuse_p3` 409, `topology.face_p2` 3, `topology.face_p4` 9).
 //!
 //! The UV curve ops (`mirror`, `iso_at`, `iso`, `iso_seam`) take every curve kind: an
 //! `SmLine` or `SmEllipse` is an `SmBSplineCurve` (`rv_ellipse.json`).
@@ -1207,8 +1209,21 @@ fn run_rust_geom(k: &Kernel, op: &OpIn) -> Result<Vec<f64>, Fail> {
                 surface_orientation: OrientType::Same,
             };
             let mut b = Brep::new();
+            let mut records = std::collections::BTreeMap::new();
+            let mut attributes = solidcore::geom::attribute::AttributeStore::default();
+            let key_of = |_| solidcore::geom::object::ObjectRef {
+                type_code: 0,
+                key: solidcore::geom::attribute::ObjectKey(0),
+            };
+            let mut env = solidcore::topology::edge::NotifyEnv {
+                records: &mut records,
+                attributes: &mut attributes,
+                context: None,
+                key_of: &key_of,
+            };
+            // Without a region the call returns before any notification.
             let r = tt::trim_surface_with_model_space_curves(
-                k, &mut b, None, 1e-5, input, true, true, false,
+                k, &mut b, None, 1e-5, input, true, true, false, &mut env,
             );
             o.push(status(&r)?);
         }
