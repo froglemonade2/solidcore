@@ -58,6 +58,7 @@ use solidcore::boolean::topology_intersector::p1::{
 };
 use solidcore::curve::curve::p2::{CurveKind, BSPLINE_CURVE_TYPE};
 use solidcore::curve::curve::Curve as SmCurve;
+use solidcore::geom::a_object::BREP_TYPE;
 use solidcore::geom::attribute::{AttributeStore, ObjectKey};
 use solidcore::geom::extent1d::Extent1d;
 use solidcore::geom::extent2d::Extent2d;
@@ -83,6 +84,9 @@ use solidcore::query::face::p2::{
 use solidcore::surface::surface::p2::TsectCurveType;
 use solidcore::surface::surface::Surface;
 use solidcore::surface::volume::Volume;
+use solidcore::topology::brep::p1 as bp1;
+use solidcore::topology::brep::p7;
+use solidcore::topology::brep_cache::{arena_identity, BrepCache, CacheObject, CacheSource};
 use solidcore::topology::edge as ed;
 use solidcore::topology::edgeuse::p1 as eu1;
 use solidcore::topology::face::p2 as fp2;
@@ -673,6 +677,9 @@ struct Two {
     extra: Vec<SmCurve>,
     editing: [bool; 2],
     env: [NotifyEnv; 2],
+    /// Each B-rep's cache (`SmBrep::GetBrepCache`), built on first use as the C++
+    /// topology solver builds it on demand.
+    caches: [std::cell::OnceCell<BrepCache<H>>; 2],
 }
 
 fn invalid(reason: &'static str) -> SolidError {
@@ -698,6 +705,7 @@ impl Two {
             extra: Vec::new(),
             editing: [false, false],
             env,
+            caches: [std::cell::OnceCell::new(), std::cell::OnceCell::new()],
         }
     }
 
@@ -1012,6 +1020,20 @@ impl ProtoTopology<H> for Two {
 }
 
 impl IntersectorBrep<H> for Two {
+    fn brep_edges(&self, brep: H) -> solidcore::Result<Vec<H>> {
+        let b = self.brep_r(brep)?;
+        Ok(bp1::edges(b, None)?
+            .into_iter()
+            .map(|e| hd(brep.b, K_EDGE, e.index()))
+            .collect())
+    }
+    fn brep_vertices(&self, brep: H) -> solidcore::Result<Vec<H>> {
+        let b = self.brep_r(brep)?;
+        Ok(bp1::vertices(b, None)?
+            .into_iter()
+            .map(|v| hd(brep.b, K_VERTEX, v.index()))
+            .collect())
+    }
     fn vertex_brep(&self, vertex: H) -> solidcore::Result<Option<H>> {
         let b = self.brep_r(vertex)?;
         Ok(vx::brep(b, vid(vertex))?.map(|_| brep_h(vertex.b)))
@@ -1185,9 +1207,118 @@ impl IntersectorBrep<H> for Two {
     fn topology_objects(&self) -> &dyn TopologyObjects<H> {
         self
     }
+    fn brep_glue_edges_general(
+        &mut self,
+        k: &mut Kernel,
+        brep: H,
+        surviving: Option<H>,
+        relative_orientation: OrientType,
+        edge_gap: f64,
+        do_region_nesting: bool,
+        to_delete: Option<H>,
+        inside_faceuses: Option<&[H]>,
+    ) -> solidcore::Result<()> {
+        if brep.kind != K_BREP {
+            return Err(invalid("not a B-rep handle"));
+        }
+        let slot = usize::try_from(brep.b).map_err(|_| invalid("bad B-rep"))?;
+        let edge = |h: Option<H>| -> solidcore::Result<Option<EdgeId>> {
+            match h {
+                None => Ok(None),
+                Some(h) if h.kind == K_EDGE && h.b == brep.b => Ok(Some(eid(h))),
+                Some(_) => Err(invalid("not an edge of this B-rep")),
+            }
+        };
+        let (surviving, to_delete) = (edge(surviving)?, edge(to_delete)?);
+        // (no face-use handles exist here: the only caller passes NULL)
+        let inside: Option<&[solidcore::topology::FaceuseId]> = match inside_faceuses {
+            None => None,
+            Some([]) => Some(&[]),
+            Some(_) => return Err(invalid("face-use handles are not modelled")),
+        };
+        let (breps, envs) = (&mut self.breps, &mut self.env);
+        let b = breps
+            .get_mut(slot)
+            .and_then(Option::as_mut)
+            .ok_or_else(|| invalid("handle names an absent B-rep"))?;
+        let env = envs.get_mut(slot).ok_or_else(|| invalid("bad B-rep"))?;
+        let mut notify = ed::NotifyEnv {
+            records: &mut env.records,
+            attributes: &mut env.attributes,
+            context: None,
+            key_of: &glue_key_of,
+        };
+        p7::glue_edges_general(
+            k,
+            b,
+            surviving,
+            relative_orientation,
+            edge_gap,
+            do_region_nesting,
+            to_delete,
+            inside,
+            &mut notify,
+        )
+    }
+}
+
+/// The identity a glue notification runs under: vertex uses as the vertex
+/// environment's, edges, faces and edge uses by kind and index.
+fn glue_key_of(e: EntityRef) -> ObjectRef {
+    let (type_code, key) = match e {
+        EntityRef::Vertexuse(vu) => return vertexuse_ref(vu),
+        EntityRef::Face(f) => (fp2::TYPE, 1 + u64::from(f.index())),
+        EntityRef::Edge(x) => (ed::TYPE, 1 << 40 | u64::from(x.index())),
+        EntityRef::Edgeuse(x) => (16005, 2 << 40 | u64::from(x.index())),
+        _ => (0, 3 << 40),
+    };
+    ObjectRef {
+        type_code,
+        key: ObjectKey(key),
+    }
 }
 
 impl TopologyObjects<H> for Two {
+    /// The B-rep's cache (`SmBrep::GetBrepCache`), built from the B-rep on first use (the
+    /// C++ topology solver builds it on demand) with this adapter's handles. The build
+    /// starts with `SmBrep::CalculateBoundingBox` (unit `query.brep`), so until that
+    /// lands the solves needing a cache defer there.
+    fn brep_cache(&self, brep: H) -> solidcore::Result<&BrepCache<H>> {
+        let slot = usize::try_from(brep.b).map_err(|_| invalid("bad B-rep"))?;
+        let cell = self.caches.get(slot).ok_or_else(|| invalid("bad B-rep"))?;
+        if let Some(cache) = cell.get() {
+            return Ok(cache);
+        }
+        let b = self
+            .breps
+            .get(slot)
+            .and_then(Option::as_ref)
+            .ok_or_else(|| invalid("handle names an absent B-rep"))?;
+        let bi = brep.b;
+        let mut cache = BrepCache::new(BREP_TYPE)?;
+        cache.build_trees(
+            &Kernel::default(),
+            CacheSource::Brep(b),
+            |o| match o {
+                CacheObject::Vertex(v) => hd(bi, K_VERTEX, v.index()),
+                CacheObject::Edge(e) => hd(bi, K_EDGE, e.index()),
+                CacheObject::Face(f) => hd(bi, K_FACE, f.index()),
+                CacheObject::Curve(e) => b
+                    .edge(e)
+                    .ok()
+                    .and_then(|x| x.curve.as_ref())
+                    .map_or(hd(bi, K_EDGE_CURVE, e.index()), |c| {
+                        curve_h(bi, K_EDGE_CURVE, e.index(), c)
+                    }),
+                CacheObject::Surface(f) => hd(bi, K_FACE_SURFACE, f.index()),
+                CacheObject::Brep => brep_h(bi),
+                _ => hd(bi, K_NULL as u8, 0),
+            },
+            &arena_identity,
+        )?;
+        let _ = cell.set(cache);
+        cell.get().ok_or_else(|| invalid("B-rep cache not stored"))
+    }
     fn curve(&self, object: H) -> solidcore::Result<&SmCurve> {
         ClassGeometry::curve(self, object).ok_or_else(|| invalid("not a curve handle"))
     }
@@ -2140,13 +2271,13 @@ fn run_rust_script(i: &Inputs, p: Prepared) -> Result<Vec<f64>, Fail> {
             }
             OpIn::CommonEdges => {
                 o.push(7.0);
-                let (a, b) = ti.common_edges()?;
+                let (a, b) = ti.common_edges(&two)?;
                 put_hs(&mut o, &a);
                 put_hs(&mut o, &b);
             }
             OpIn::CommonVertices => {
                 o.push(8.0);
-                let (a, b) = ti.common_vertices()?;
+                let (a, b) = ti.common_vertices(&two)?;
                 put_hs(&mut o, &a);
                 put_hs(&mut o, &b);
             }
@@ -2454,7 +2585,7 @@ fn run_rust_script(i: &Inputs, p: Prepared) -> Result<Vec<f64>, Fail> {
                     continue;
                 }
                 let vs: Vec<H> = vs.into_iter().flatten().collect();
-                let r = ti.face_face_intersect(&k, &mut two, &vs, &f1, &f2, *ignore, *nesting);
+                let r = ti.face_face_intersect(&mut k, &mut two, &vs, &f1, &f2, *ignore, *nesting);
                 let Some(r) = status(r, &mut o)? else {
                     continue;
                 };

@@ -46,7 +46,9 @@ pub const MAX_OBJECTS: usize = 32;
 pub const MAX_OPS: usize = 256;
 /// Largest number of intervals set.
 pub const MAX_SIZE: usize = 64;
-/// Largest coordinate / parameter magnitude.
+/// Largest coordinate / parameter magnitude. A harness cap that keeps the generated
+/// geometry well conditioned, not a bound of undefined behaviour: the C++ handles larger
+/// coordinates with a defined result.
 pub const MAX_COORD: f64 = 1e6;
 /// Largest magnitude of a tolerance, gap, deviation or pre-snap value (`SM_USE_DEFAULT` and
 /// `SM_BIG_DOUBLE` fit).
@@ -418,8 +420,11 @@ pub fn validate(face: Option<&FaceSpec>, input: &[f64]) -> Result<(), FfiError> 
     }
     let mut rd = Reader { input, at: 0 };
     let n_obj = rd.index(MAX_OBJECTS)?;
+    // the kind of each pool object, as the shim records them (objects, then the topology)
+    let mut kinds: Vec<usize> = Vec::new();
     for _ in 0..n_obj {
         let k = rd.index(kind::OTHER)?;
+        kinds.push(k);
         match k {
             kind::CURVE => curve_block(&mut rd)?,
             kind::PLANE => {
@@ -436,6 +441,20 @@ pub fn validate(face: Option<&FaceSpec>, input: &[f64]) -> Result<(), FfiError> 
         }
     }
     let n_pool = n_obj + topology_count(face);
+    if let Some(f) = face {
+        match &f.loops {
+            Loops::Vertex(_) => kinds.extend([kind::FACE, kind::LOOP, kind::VERTEX]),
+            Loops::Edges(loops) => {
+                kinds.push(kind::FACE);
+                for l in loops {
+                    kinds.push(kind::LOOP);
+                    for _ in 0..l.len() {
+                        kinds.extend([kind::EDGE, kind::VERTEX, kind::EDGEUSE]);
+                    }
+                }
+            }
+        }
+    }
     let n_ops = rd.index(MAX_OPS)?;
     for _ in 0..n_ops {
         let code = rd.index(op::LAST)?;
@@ -468,8 +487,28 @@ pub fn validate(face: Option<&FaceSpec>, input: &[f64]) -> Result<(), FfiError> 
             op::PC_SET_CLASS => {
                 rd.index(MAX_SIZE)?;
                 rd.index(2)?;
-                rd.index(110)?;
-                obj(&mut rd)?;
+                let class = rd.index(110)?;
+                let o = obj(&mut rd)?;
+                // the shim's check: the class needs an object of its kind (a surface class
+                // takes a plane too); UNKNOWN / NOTHING take none; other codes are invalid
+                let want = match class {
+                    100 | 110 => None,
+                    102 => Some(kind::FACE),
+                    103 => Some(kind::EDGE),
+                    104 => Some(kind::VERTEX),
+                    105 => Some(kind::POINT),
+                    106 => Some(kind::CURVE),
+                    107 => Some(kind::BSURF),
+                    _ => return Err(bad("point class: invalid class code")),
+                };
+                if let Some(i) = o {
+                    let k = kinds.get(i).copied();
+                    let ok = k.is_some()
+                        && (k == want || (want == Some(kind::BSURF) && k == Some(kind::PLANE)));
+                    if !ok {
+                        return Err(bad("point class: object kind does not match the class"));
+                    }
+                }
             }
             op::PC_SET_UV => {
                 rd.index(MAX_SIZE)?;

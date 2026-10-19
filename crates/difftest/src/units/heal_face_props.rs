@@ -46,16 +46,16 @@ use solidcore::heal::face_props::{
     PropStage,
 };
 use solidcore::intersect::point_class::{ClassObject, ClassObjectKind};
-use solidcore::nurbs::b_spline_surface_n_lib::p2::OrientType;
 use solidcore::kernel::Kernel;
+use solidcore::nurbs::b_spline_surface_n_lib::p2::OrientType;
 use solidcore::surface::plane::Plane;
 use solidcore::surface::surf_of_revolution::SurfOfRevolution;
 use solidcore::surface::surface::Surface;
 use solidcore::topology::face::p2 as fp2;
 use solidcore::topology::{
     Brep, Edge, EdgeId, Edgeuse, EdgeuseId, EdgeuseOwner, Face, FaceId, Faceuse, FaceuseId, Loop,
-    LoopId, Loopuse, LoopuseId, LoopuseStart, Region, Shell, VertexId, Vertexuse,
-    VertexuseId, VertexuseOwner,
+    LoopId, Loopuse, LoopuseId, LoopuseStart, Region, Shell, VertexId, Vertexuse, VertexuseId,
+    VertexuseOwner,
 };
 use solidcore_ffi::units::heal_face_props as ffi;
 
@@ -126,9 +126,13 @@ pub(crate) enum SurfIn {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub(crate) enum LoopsIn {
-    Vertex { at: [f64; 3] },
+    Vertex {
+        at: [f64; 3],
+    },
     /// Edge loops (the first one outer, the others holes): corner points joined by lines.
-    Edges { loops: Vec<Vec<[f64; 3]>> },
+    Edges {
+        loops: Vec<Vec<[f64; 3]>>,
+    },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -664,7 +668,13 @@ fn loop_snapshot(
     Ok((loops.len() as f64, o))
 }
 
-pub(crate) fn seed<O: LoopObject>(p: &mut FaceProps<O>, face: FaceId, field: i64, idx: i64, v: f64) {
+pub(crate) fn seed<O: LoopObject>(
+    p: &mut FaceProps<O>,
+    face: FaceId,
+    field: i64,
+    idx: i64,
+    v: f64,
+) {
     use solidcore::heal::face_props::{MixedLinkType as M, Tri};
     let tri = |x: f64| match x as i64 {
         0 => Tri::False,
@@ -678,7 +688,10 @@ pub(crate) fn seed<O: LoopObject>(p: &mut FaceProps<O>, face: FaceId, field: i64
         2 => p.orig_zone_tol_3d = v,
         3 => p.poles = v as u64,
         4 => {
-            if let Some(pt) = usize::try_from(idx).ok().and_then(|i| p.pole_points.get_mut(i)) {
+            if let Some(pt) = usize::try_from(idx)
+                .ok()
+                .and_then(|i| p.pole_points.get_mut(i))
+            {
                 *pt = Vec3::new(v, v * 0.5, -v);
             }
         }
@@ -743,7 +756,8 @@ fn rust_props(f: &FaceIn, ops: &[[f64; 5]]) -> Result<Output, HarnessError> {
                 2 => status(p.set_props_stage2(&k, &b, face, o[3] as u64, heal)),
                 _ => status(p.set_props_stage3(&k, &b, face, o[3] as u64, heal)),
             },
-            7 => Ok(f64::from(u8::from(p.is_periodic_u())) + 2.0 * f64::from(u8::from(p.is_periodic_v()))),
+            7 => Ok(f64::from(u8::from(p.is_periodic_u()))
+                + 2.0 * f64::from(u8::from(p.is_periodic_v()))),
             8 => match loop_snapshot(&k, &b, &p, face) {
                 Ok((n, snap)) => {
                     out.push(n);
@@ -788,7 +802,8 @@ fn rust_tree(
     let mut t = Looptree::new();
     let mut ids: Vec<ItemId> = Vec::new();
     for i in items {
-        let mut item = LooptreeItem::with_loop(if i[0] < 0 { None } else { Some(lid(i[0])) }, None, None);
+        let mut item =
+            LooptreeItem::with_loop(if i[0] < 0 { None } else { Some(lid(i[0])) }, None, None);
         if i[1] != -2 {
             item.add_partner(if i[1] < 0 { None } else { Some(lid(i[1])) }, None, None);
         }
@@ -802,7 +817,11 @@ fn rust_tree(
     };
     for l in links {
         let (a, c) = (id(l[1])?, id(l[2])?);
-        let r = if l[0] == 0 { t.add_child(a, c) } else { t.add_sibling(a, c) };
+        let r = if l[0] == 0 {
+            t.add_child(a, c)
+        } else {
+            t.add_sibling(a, c)
+        };
         r.map_err(|e| harness(e.to_string()))?;
     }
     let mut out: Vec<f64> = Vec::new();
@@ -821,7 +840,9 @@ fn rust_tree(
     }
     for i in &ids {
         out.push(f64::from(u8::from(
-            t.item(*i).map_err(|e| harness(e.to_string()))?.is_no_area_pair(),
+            t.item(*i)
+                .map_err(|e| harness(e.to_string()))?
+                .is_no_area_pair(),
         )));
     }
     Ok(Output::new().values("v", out))
@@ -897,7 +918,13 @@ fn gen_revolution(rng: &mut Rng) -> SurfIn {
         }
         // a sphere: the arc reaches the axis at none, one or both ends (poles)
         2 => {
-            let ends = [[-90.0, 90.0], [-90.0, 40.0], [-30.0, 90.0], [-30.0, 70.0], [-90.0, 90.0]];
+            let ends = [
+                [-90.0, 90.0],
+                [-90.0, 40.0],
+                [-30.0, 90.0],
+                [-30.0, 70.0],
+                [-90.0, 90.0],
+            ];
             let d = *rng.choose(&ends).unwrap_or(&[-90.0, 90.0]);
             GenIn::Circle {
                 c: [0.0, 0.0, 0.0],
@@ -1045,7 +1072,13 @@ fn gen_op(rng: &mut Rng) -> [f64; 5] {
             let p = rng.point3(-2.0, 2.0);
             [4.0, p[0], p[1], p[2], 0.0]
         }
-        6 => [6.0, rng.range_i64(1, 3) as f64, heal, rng.range_i64(0, 5) as f64, 0.0],
+        6 => [
+            6.0,
+            rng.range_i64(1, 3) as f64,
+            heal,
+            rng.range_i64(0, 5) as f64,
+            0.0,
+        ],
         7 => [7.0, 0.0, 0.0, 0.0, 0.0],
         8 | 9 => [8.0, 0.0, 0.0, 0.0, 0.0],
         _ => {
@@ -1117,7 +1150,11 @@ fn gen_tree(rng: &mut Rng) -> CaseIn {
     for i in 0..n {
         let loop_ = if rng.chance(0.1) { -1 } else { i };
         let partner = if rng.chance(0.3) {
-            if rng.chance(0.2) { -1 } else { 20 + i }
+            if rng.chance(0.2) {
+                -1
+            } else {
+                20 + i
+            }
         } else {
             -2
         };

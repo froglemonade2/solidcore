@@ -223,8 +223,12 @@ pub(crate) fn push_surface(v: &mut Vec<f64>, s: &SrfIn) -> Result<(), HarnessErr
                 m as f64,
                 b.p as f64,
                 b.q as f64,
-                (b.u.len() - 1) as f64,
-                (b.v.len() - 1) as f64,
+                b.u.len()
+                    .checked_sub(1)
+                    .ok_or_else(|| harness("empty u knots"))? as f64,
+                b.v.len()
+                    .checked_sub(1)
+                    .ok_or_else(|| harness("empty v knots"))? as f64,
             ]);
             for row in &b.net {
                 for p in row {
@@ -1196,13 +1200,16 @@ fn inexact_geometry(b: &Brep, types: &ImportTypes, op: &OpIn) -> Option<Output> 
             15014 => ("surface.sphere", "SmSphere"),
             15015 => ("surface.torus", "SmTorus (no SurfaceKind)"),
             15030 => ("surface.surf_of_extrusion_p2", "SurfaceKind::SurfOfExtrusion"),
-            _ => ("topology.brep_p7", "SmBrep::ReadFromFile"),
+            _ => ("topology.brep_p10", "SmBrep::MakeTopologyFromData"),
         };
         return Some(Output::deferred(unit, symbol));
     }
     for t in [curve_of(Some(e)), curve_of(other)] {
         if t >= 0 && !EXACT_CURVES.contains(&t) {
-            return Some(Output::deferred("topology.brep_p7", "SmBrep::ReadFromFile"));
+            return Some(Output::deferred(
+                "topology.brep_p10",
+                "SmBrep::MakeTopologyFromData",
+            ));
         }
     }
     None
