@@ -238,7 +238,7 @@ meantime, whoever merges renumbers the new entry and every reference to it (here
 - **Severity:** crash/UB (use after free).
 - **Rust port:** Builds a local matrix when the caller's is null. Callers wanting reuse build it first.
 
-#### UB-191. `N_BasisInsertKnots` writes past its output for knot vectors shorter than `2p+2`
+#### UB-196. `N_BasisInsertKnots` writes past its output for knot vectors shorter than `2p+2`
 - **Location:** `NL_BasisAdv.cpp:253`, `N_BasisInsertKnots` (copies at `:275-276` and `:302-303`).
 - **What happens:** The routine always copies `R[0..=p]` and `R[mr-p..=mr]` into `S`. With fewer than `2p+2` knots these ranges overlap, so it writes `2p+2+mx+1` knots instead of the documented `mr+mx+2` and overruns a caller buffer of that size (heap corruption).
 - **Trigger:** `mr < 2p+1` with `X[0] > R[p]` and `X[mx] < R[mr-p]`, which needs an unsorted `R` (e.g. `p = 1`, `R = [4294967296, 0]`, `X = [1e300, 1.5, 2.5, 3.5]`). The range check rejects such `R` when it is sorted.
