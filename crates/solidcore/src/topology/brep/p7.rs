@@ -358,7 +358,7 @@ fn classify_on_faces(
 ) -> Result<Vec<ClassifiedInterval>> {
     // UNPORTED(intersect.curve_class_p4): SmCurveClassification::SmCurveClassification -- justified: plan/findings.md "intersect.curve_class_p4"
     // (then SmFace::CurveOnClassify, unit query.face_p2; no ClassObject handle for the
-    // B-rep's curve and faces here; the constructor defers on ReSet first)
+    // B-rep's curve and faces here)
     Err(SolidError::unported(
         "SmCurveClassification::SmCurveClassification",
         "intersect.curve_class_p4",

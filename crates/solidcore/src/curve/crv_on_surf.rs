@@ -215,7 +215,7 @@ fn classify_against_surface(
 ) -> Result<Vec<Extent1d>> {
     // The constructor (CurveClassification::with_curve) needs a Kernel, which the Curve::knots
     // virtual does not carry (plan/findings.md "intersect.curve_class_p4"); it defers on ReSet.
-    // UNPORTED(intersect.curve_class_p2): SmCurveClassification::ReSet
+    // UNPORTED(intersect.curve_class_p2): SmCurveClassification::ReSet -- justified: plan/findings.md "intersect.curve_class_p4" (no Kernel under Curve::knots)
     // `SmCurveClassification::IntersectUVDiscontinuties` follows ReSet upstream; it is ported
     // (CurveClassification::intersect_uv_discontinuities) and runs once ReSet and the Kernel are available.
     // (then the intervals: intersect::curve_class::CurveClassification::size / at)

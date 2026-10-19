@@ -5821,8 +5821,9 @@ mutated scales and accepted/reduced step counts are compared.
   returns propagates instead of leaving partial outputs: the port's `compute_uv_sector` reports evaluation
   failures as errors). Only `SmEdgeuse::EvaluateBinormal` (`topology.edgeuse_p3`) remains a stub: part 4 calls
   the existing stub in `topology::edge` (now `pub(crate)`).
-- **Other stubs.** `intersect.curve_class_p2` (PR #85, still open: `ReSet`, so the whole
-  constructor; `ConnectIntervals`, so every squeeze; `GetMinUV` / `GetMaxUV`). `intersect.curve_class_p7`
+- **Other stubs.** `intersect.curve_class_p2` (PR #85, merged) is wired: `ReSet` in the constructor,
+  `ConnectIntervals` in every squeeze, `GetMinUV` / `GetMaxUV` in `GetIvlBound_EdgeuseObj`.
+  `intersect.curve_class_p7`
   (PR #65, merged) is wired: `GetLoopCrossings` calls `CurveClassification::point_classifies_connected_to`
   (review round 2 of PR #137: 1076 -> 1318 passing, 2125 -> 1883 deferred, 0 failed).
 - **UB-131 in `GetLoopCrossings`.** With face props seeded at stage `GAPSa` or `GAPS` and no face pointer
@@ -5868,16 +5869,19 @@ mutated scales and accepted/reduced step counts are compared.
   `CurveClassification::with_curve` needs one for its default tolerances; threading a kernel through the
   `Curve::knots` virtual is out of this unit's scope. Their stubs name what blocks them first,
   `UNPORTED(intersect.curve_class_p2): SmCurveClassification::ReSet` (then `intersect.curve_class_p8`); the
-  porter of `intersect.curve_class_p2` must also bring a `Kernel` to those two sites.
+  porter of `intersect.curve_class_p2` must also bring a `Kernel` to those two sites. (`intersect.curve_class_p2`
+  has since merged: p4 now calls its `reset`, `connect_intervals`, `interval_min_uv` / `interval_max_uv`. The two
+  sites stay stubs only for the missing `Kernel`, and keep the p2 tag with `justified:`; the stub text after
+  `ReSet` is now this Kernel gap, not an unported callee.)
 - **`topology::brep::p7` stubs (`classify_on_faces`, `set_curve_and_merge`).** The B-rep self-intersection
   merge classifies a UV curve held by value (`&Curve`) against `FaceId`s of one `Brep`, then runs
   `SmFace::CurveOnClassify` and `MergeIntervals` on that classification. Wiring `with_curve` needs a
   `ClassObject` handle type that names the curve, UV curve, surface and faces of a `Brep`, and the
   `CurveOnClassifyObjects` adapter of `query::face::p2` for the later calls; p7 has neither (its stand-in
-  interval type is `(Extent1d, Option<EdgeId>)`). The constructor defers on `ReSet`
-  (`intersect.curve_class_p2`) first in any case, so the result is the same `Unported` error; the porter of
-  `intersect.curve_class_p2` replaces the two stubs together with the stand-in type. They keep the owner tag
-  `intersect.curve_class_p4` (justified here) because the classification type is this unit's.
+  interval type is `(Extent1d, Option<EdgeId>)`), and `CurveOnClassify` (`query.face_p2`) follows the
+  constructor. The porter of `topology.brep_p7`'s remaining work replaces the two stubs together with the
+  stand-in type. They keep the owner tag `intersect.curve_class_p4` (justified here) because the
+  classification type is this unit's.
 - **Upstream defect** UB-124 (`plan/upstream-issues.md`): the face, surface and curve are dereferenced
   before the functions' own `NULL` checks.
 
