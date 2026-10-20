@@ -18,6 +18,7 @@
 //! | `Drop` (implicit)                                 | `~SmPointClassification`                         |
 //! | [`PointClassification::reset`]                    | `ReSet`                                          |
 //! | `Clone` / `Copy` (derived)                        | `operator=`                                      |
+//! | [`PointClassification::map_objects`]             | complete state copy with translated Rust handles (data-model bridge) |
 //! | [`PointClassification::copy_classification_only`] | `CopyClassificationOnly`                         |
 //! | [`PointClassification::copy_sss_point`]           | `CopySSSPoint`                                   |
 //! | [`PointClassification::brep`]                     | `GetBrep`                                        |
