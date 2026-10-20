@@ -903,6 +903,31 @@ pub(crate) fn notify_ref(e: EntityRef) -> ObjectRef {
     }
 }
 
+/// The entity [`notify_ref`] gives the key `key`, if any (its inverse on keys). A
+/// caller decoding notification keys (the heal path's topology tracker) relies on every
+/// event of the edit being keyed by [`notify_ref`], as
+/// [`ArenaNotifyState`](crate::topology::brep::p2::ArenaNotifyState) does; a change of
+/// that scheme changes this decoder with it.
+pub(crate) fn entity_of_notify_key(key: ObjectKey) -> Option<EntityRef> {
+    let raw = key.0.checked_sub(1)?;
+    let kind = raw >> 32;
+    let index = u32::try_from(raw & u64::from(u32::MAX)).ok()?;
+    Some(match kind {
+        0 => EntityRef::Brep(crate::topology::BrepId::from_index(index)),
+        1 => EntityRef::Region(crate::topology::RegionId::from_index(index)),
+        2 => EntityRef::Shell(ShellId::from_index(index)),
+        3 => EntityRef::Faceuse(FaceuseId::from_index(index)),
+        4 => EntityRef::Face(FaceId::from_index(index)),
+        5 => EntityRef::Loopuse(LoopuseId::from_index(index)),
+        6 => EntityRef::Loop(LoopId::from_index(index)),
+        7 => EntityRef::Edgeuse(EdgeuseId::from_index(index)),
+        8 => EntityRef::Edge(EdgeId::from_index(index)),
+        9 => EntityRef::Vertexuse(VertexuseId::from_index(index)),
+        10 => EntityRef::Vertex(VertexId::from_index(index)),
+        _ => return None,
+    })
+}
+
 /// `SmFace::Notify(SM_NO_PRE_EDIT / SM_NO_POST_EDIT, pFace, SM_NO_GET_BREP(pFace) (0), NULL)`: the
 /// face itself is the first argument. The B-rep
 /// carries no attribute store, topology records, context callbacks or trimmed surface
