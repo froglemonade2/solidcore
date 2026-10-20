@@ -6028,7 +6028,7 @@ mutated scales and accepted/reduced step counts are compared.
 - **Harness limits.** `GetIvlBound_EdgeuseObj` of an interval whose back pointer is another classification is
   refused (the port addresses intervals in their classification and has no back pointer). The C++ side runs
   the whole of `GetLoopCrossings`, including the parts Rust defers; the shim refuses (UB-124) loop crossings
-  over loops of a classification without curve, and (UB-211) over loops of a classification without intervals
+  over loops of a classification without curve, and (UB-216) over loops of a classification without intervals
   whose curve is not degenerate (`GetPointClassifiesConnectedTo` reads `m_pData[0]`). With a degenerate curve
   `GetLoopCrossings` returns before that read, so the `degenerate_no_intervals_*` edge cases run on both
   sides and compare. Rust returns `InvalidInput` in exactly the refused case.
@@ -6062,7 +6062,7 @@ mutated scales and accepted/reduced step counts are compared.
   stand-in type. They keep the owner tag `intersect.curve_class_p4` (justified here) because the
   classification type is this unit's.
 - **Upstream defect** UB-124 (`plan/upstream-issues.md`): the face, surface and curve are dereferenced
-  before the functions' own `NULL` checks. UB-211: `GetPointClassifiesConnectedTo` reads `m_pData[0]` of a
+  before the functions' own `NULL` checks. UB-216: `GetPointClassifiesConnectedTo` reads `m_pData[0]` of a
   classification without intervals.
 
 ## query.api_queries
