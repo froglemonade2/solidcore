@@ -46,20 +46,23 @@
 //!   [`SolidError::InvalidInput`] there. Its rescan of a vertex after gluing a closer
 //!   one is bounded by `4 * (n1 + n2) + 16` passes (each glue empties a slot, so
 //!   upstream needs at most `n1 + 2 * n2`).
-//! - `SmVertex::SetPoint`'s change notification runs on a record set local to the call
-//!   (no attributes are attached by the stitch).
+//! - `SmVertex::SetPoint`'s and `SmBrep::MakeVertexSplitEdge`'s notifications run on
+//!   record sets local to the call (no attributes are attached by the stitch). The
+//!   split's refusal (`SM_ERR` with the nearby endpoint) is reported as `SM_ERR`, the
+//!   only distinction its caller makes.
 //! - Uninitialised reads upstream: `DoSimpleFaceStitch` ignores `CurveMaxDistanceBetween`'s
 //!   status (`SE`) and reads the unset `dDistToCurve` after a failure (the port reads 0).
 //! - `UnifyNormals` ignores `NormalizedEvaluate`'s status and goes on with `sPnt` / `sDir`
 //!   as they were: `SmVector3d`'s default `SM_UNDEF_DOUBLE` (defined; the 3D evaluation
 //!   writes them only after its last status), [`Point3::UNDEF`] / [`Vec3::UNDEF`] here.
-//! - The calls into `SmBrep::GlueVertices`, `RemoveFaces`, `StitchAndOrient`
-//!   (`topology.brep_p5`), `GlueEdgesGeneral` (`topology.brep_p7`), `SqueezeEdge`
-//!   (`topology.brep_p3`), `MakeVertexSplitEdge` (`topology.brep_p9`), `Notify`
+//! - `SmBrep::GlueVertices`, `RemoveFaces` (with the B-rep's own editing flag) and
+//!   `StitchAndOrient` call `topology.brep_p5`, which defers at its own barriers.
+//! - The calls into `GlueEdgesGeneral` (`topology.brep_p7`), `SqueezeEdge`
+//!   (`topology.brep_p3`), `Notify`
 //!   (`topology.brep_p2`), `CalculateBoundingBox` (`query.brep`), `SmFace::GetBrep`,
-//!   `GetVertices`, `GetEdges` (`topology.face_p4`), `SmMerge::MergeAddedFace`
-//!   (`boolean.merge_p2`) and `SmStitch::DoStitching`, `StitchIntoSolid`,
-//!   `StitchIntoShell` (`heal.stitch_p2`) return [`SolidError::Unported`].
+//!   `GetVertices`, `GetEdges` (`topology.face_p4`) and `SmMerge::MergeAddedFace`
+//!   (`boolean.merge_p2`) return [`SolidError::Unported`]. The API entry points call
+//!   `DoStitching`, `StitchIntoSolid` and `StitchIntoShell` in [`super::p2`].
 
 use std::collections::BTreeMap;
 
@@ -546,7 +549,7 @@ pub struct EdgeSplitTest {
 /// `SM_ERR_NULL_POINTER` for an edge without curve or a split without new vertex;
 /// those of the drop (`SER`).
 pub fn test_and_split_edge(
-    k: &Kernel,
+    k: &mut Kernel,
     b: &mut Brep,
     e: EdgeId,
     point: Point3,
@@ -590,7 +593,7 @@ pub fn test_and_split_edge(
     }
 
     // Must have a point which can split the Edge.
-    let (e1, e2, new_v) = match make_vertex_split_edge(b, e, dropped.parameter) {
+    let (e1, e2, new_v) = match make_vertex_split_edge(k, b, e, dropped.parameter) {
         Ok(r) => r,
         Err(err) if err.is_unported() => return Err(err),
         Err(_) => {
@@ -962,7 +965,7 @@ impl<'c> Stitch<'c> {
                 ignore_status(brep_notify_pre_edit(b))?;
 
                 // glue the coincident vertices
-                let mut wire_edges = bp1::wire_edges(b, None)?;
+                let wire_edges = bp1::wire_edges(b, None)?;
                 for (&kv, &dv) in k_vertices.iter().zip(&d_vertices) {
                     let (v0, v1) = (kv, dv);
                     if making_manifold_solid
@@ -1018,7 +1021,7 @@ impl<'c> Stitch<'c> {
                     if do_squeeze {
                         squeeze_edge_to(b, squeeze_edge, keep)?;
                     } else if do_glue {
-                        glue_vertices(b, keep, other, Some(&mut wire_edges))?;
+                        glue_vertices(k, b, keep, other, Some(&wire_edges))?;
                     }
                 }
 
@@ -1578,7 +1581,7 @@ impl<'c> Stitch<'c> {
             let old_tol = vertex::tolerance(b, vtx2_to_glue)?;
             let s_lii = at1(&sorted1, lii_to_glue)?;
             let s_ljj = at1(&sorted2, ljj_to_glue)?;
-            match glue_vertices(b, vtx1, vtx2_to_glue, None) {
+            match glue_vertices(k, b, vtx1, vtx2_to_glue, None) {
                 Ok(()) => {}
                 Err(e) if e.is_unported() => return Err(e),
                 Err(e) => {
@@ -1944,29 +1947,24 @@ pub(crate) fn update_object_tolerance(
     tol::update_object_tolerance(k, b, topo, gap, this_tol, check_gaps)
 }
 
-/// `SmBrep::GlueVertices(keep, delete, pOptWireEdges)` (unit `topology.brep_p5`).
+/// `SmBrep::GlueVertices(keep, delete, pOptWireEdges)` (unit `topology.brep_p5`):
+/// [`crate::topology::brep::p5::glue_vertices`]. Upstream only reads the wire list.
 pub(crate) fn glue_vertices(
+    k: &mut Kernel,
     b: &mut Brep,
     keep: VertexId,
     delete: VertexId,
-    wire_edges: Option<&mut Vec<EdgeId>>,
+    wire_edges: Option<&[EdgeId]>,
 ) -> Result<()> {
-    let _ = (b, keep, delete, wire_edges);
-    // UNPORTED(topology.brep_p5): SmBrep::GlueVertices
-    Err(SolidError::unported(
-        "SmBrep::GlueVertices",
-        "topology.brep_p5",
-    ))
+    crate::topology::brep::p5::glue_vertices(k, b, Some(keep), Some(delete), wire_edges)
 }
 
-/// `SmBrep::RemoveFaces` (unit `topology.brep_p5`).
+/// `SmBrep::RemoveFaces` (unit `topology.brep_p5`):
+/// [`crate::topology::brep::p5::remove_faces`], with the B-rep's own editing flag
+/// (`m_bEditingEnabled`).
 pub(crate) fn remove_faces(k: &mut Kernel, b: &mut Brep, faces: &[FaceId]) -> Result<()> {
-    let _ = (k, b, faces);
-    // UNPORTED(topology.brep_p5): SmBrep::RemoveFaces
-    Err(SolidError::unported(
-        "SmBrep::RemoveFaces",
-        "topology.brep_p5",
-    ))
+    let editing = b.editing_enabled();
+    crate::topology::brep::p5::remove_faces(k, b, editing, faces)
 }
 
 /// `SmBrep::StitchAndOrient(dStitchTol3d, bAllowSpineEdges, pOptFacesToSwap,
@@ -1979,19 +1977,17 @@ fn stitch_and_orient(
     faces_to_swap: Option<&[FaceId]>,
     just_unify: Option<bool>,
 ) -> Result<()> {
-    let _ = (
-        k,
+    // The part 5 body reaches no kernel state before its stitching dependency.
+    let _ = k;
+    crate::topology::brep::p5::stitch_and_orient(
         b,
-        stitch_tol_3d,
-        allow_spine_edges,
-        faces_to_swap,
-        just_unify,
-    );
-    // UNPORTED(topology.brep_p5): SmBrep::StitchAndOrient
-    Err(SolidError::unported(
-        "SmBrep::StitchAndOrient",
-        "topology.brep_p5",
-    ))
+        &crate::topology::brep::p5::StitchAndOrientOptions {
+            stitch_tolerance: stitch_tol_3d,
+            allow_spine_edges,
+            faces_to_swap: faces_to_swap.map(<[FaceId]>::to_vec),
+            just_unify,
+        },
+    )
 }
 
 /// `SmBrep::GlueEdgesGeneral(keep, orientation, dist, bDoRegionNesting, delete,
@@ -2031,18 +2027,52 @@ pub(crate) fn squeeze_edge_to(b: &mut Brep, e: Option<EdgeId>, keep: VertexId) -
     ))
 }
 
-/// `SmBrep::MakeVertexSplitEdge(edge, t, rpE1, rpE2, rpNewV)` (unit `topology.brep_p9`).
+/// `SmBrep::MakeVertexSplitEdge(edge, t, rpE1, rpE2, rpNewV)` (unit `topology.brep_p9`),
+/// with its notifications on records local to the call (as [`set_point`]). A refused
+/// split (`SM_ERR` with the nearby endpoint) is an `SM_ERR` error: the caller only
+/// tests for `SM_SUCCESS`.
 pub(crate) fn make_vertex_split_edge(
+    k: &mut Kernel,
     b: &mut Brep,
     e: EdgeId,
     t: f64,
 ) -> Result<(Option<EdgeId>, Option<EdgeId>, Option<VertexId>)> {
-    let _ = (b, e, t);
-    // UNPORTED(topology.brep_p9): SmBrep::MakeVertexSplitEdge
-    Err(SolidError::unported(
-        "SmBrep::MakeVertexSplitEdge",
-        "topology.brep_p9",
-    ))
+    let mut records: BTreeMap<ObjectKey, Topology> = BTreeMap::new();
+    let mut attributes = AttributeStore::default();
+    let key_of = |entity: EntityRef| match entity {
+        EntityRef::Edge(id) => arena_identity(CacheObject::Edge(id)),
+        EntityRef::Face(id) => arena_identity(CacheObject::Face(id)),
+        EntityRef::Vertex(id) => arena_identity(CacheObject::Vertex(id)),
+        EntityRef::Edgeuse(id) => local_identity(crate::topology::edgeuse::p1::TYPE, id.index()),
+        EntityRef::Vertexuse(id) => local_identity(vertexuse::TYPE, id.index()),
+        EntityRef::Loopuse(id) => local_identity(crate::topology::loopuse::TYPE, id.index()),
+        _ => local_identity(crate::topology::topology::TYPE, 0),
+    };
+    // The kernel's context is the split's own `k`; no separate object context.
+    let mut env = edge::NotifyEnv {
+        records: &mut records,
+        attributes: &mut attributes,
+        context: None,
+        key_of: &key_of,
+    };
+    let out =
+        crate::topology::brep::p9::make_vertex_split_edge(k, b, e, t, &mut env, &|edge, kind| {
+            local_identity(kind, edge.index())
+        })?;
+    if !out.split {
+        return Err(SolidError::sm_err(OP));
+    }
+    let [e1, e2] = out.edges.ok_or_else(|| ner("split without edges"))?;
+    Ok((Some(e1), Some(e2), out.vertex))
+}
+
+/// A call-local identity: the type code above the index, outside the arena identities'
+/// key space (bare indices).
+fn local_identity(type_code: i64, index: u32) -> ObjectRef {
+    ObjectRef {
+        type_code,
+        key: ObjectKey((type_code.unsigned_abs() << 32) | u64::from(index)),
+    }
 }
 
 /// `SmBrep::Notify(SM_NO_PRE_EDIT, this, NULL, NULL)` (unit `topology.brep_p2`).
@@ -2195,12 +2225,7 @@ pub struct AdvancedStitch {
 pub fn api_stitch_into_solid(k: &mut Kernel, b: Option<&mut Brep>) -> Result<AdvancedStitch> {
     let b =
         b.ok_or_else(|| SolidError::invalid_input(API_OP, "SmApiStitchIntoSolid: null B-rep"))?;
-    let _ = (k, b);
-    // UNPORTED(heal.stitch_p2): SmStitch::StitchIntoSolid
-    Err(SolidError::unported(
-        "SmStitch::StitchIntoSolid",
-        "heal.stitch_p2",
-    ))
+    super::p2::stitch_into_solid(k, b)
 }
 
 /// `SmApiStitchIntoShell`: `SmStitch::StitchIntoShell`.
@@ -2216,12 +2241,7 @@ pub fn api_stitch_into_shell(
 ) -> Result<AdvancedStitch> {
     let b =
         b.ok_or_else(|| SolidError::invalid_input(API_OP, "SmApiStitchIntoShell: null B-rep"))?;
-    let _ = (k, b, shell_is_well_formed, max_stitching_ratio);
-    // UNPORTED(heal.stitch_p2): SmStitch::StitchIntoShell
-    Err(SolidError::unported(
-        "SmStitch::StitchIntoShell",
-        "heal.stitch_p2",
-    ))
+    super::p2::stitch_into_shell(k, b, shell_is_well_formed, max_stitching_ratio)
 }
 
 /// `SmApiUnifyNormals`: [`Stitch::unify_normals`] with the default callback and the
@@ -2304,12 +2324,14 @@ pub fn api_stitch_advanced(
     stitch.split_edges_with_vertices = options.split_edges_with_vertices;
     stitch.making_manifold_solid = options.making_manifold_solid;
     stitch.remove_laminar_slivers = options.remove_laminar_slivers;
-    let _ = (k, b, stitch);
-    // UNPORTED(heal.stitch_p2): SmStitch::DoStitching
-    Err(SolidError::unported(
-        "SmStitch::DoStitching",
-        "heal.stitch_p2",
-    ))
+    let r = stitch.do_stitching(k, b, None, None, super::p2::MinGapRequest::default())?;
+    Ok(AdvancedStitch {
+        produces_a_solid: false,
+        stitched_edges: r.stitched_edges,
+        lamina_edges: r.lamina_edges,
+        max_vertex_gap: r.max_vertex_gap,
+        max_edge_gap: r.max_edge_gap,
+    })
 }
 
 #[cfg(test)]

@@ -7,7 +7,12 @@
 //! few standalone helpers (`smsurf_EvaluateNormalSection`, `sm_CrossedSeamOrPole`, the
 //! tree node validity tests).
 //!
-//! Deviations: compound evaluation copies carry a depth counter capped at 64 by Surface.
+//! Deviations: compound evaluation copies carry a depth counter capped at 64 by Surface. The caches
+//! hold an exact copy of their surface (`clone_for_evaluation`) where upstream holds a
+//! pointer to it: `Clone` is the copy constructor, whose second knot fixup changed a
+//! knot vector the first fixup had left non-monotone (PR #147 round 4). Unlike `Clone`
+//! the copy keeps the surface's owner, so the cache sees the owning face as upstream's
+//! pointer does.
 //!
 //! Upstream: `source/SMLib/src/SmSurface.cpp`, `source/SMLib/inc/SmSurface.h`,
 //! `source/SMLib/src/SmSTEPSurface.cpp`, `source/SMLib/inc/SmSTEPSurface.h`.
@@ -870,7 +875,13 @@ pub fn make_surface_cache<O: Copy + PartialEq>(
 
     // construct new SurfaceCache Object
     let uv_domain = surface.natural_uv_domain();
-    let mut cache = SurfaceCache::new(surface.clone(), uv_domain, cache_options(tol));
+    // the cache refers to the surface itself upstream (`m_cpSurface`): an exact copy,
+    // not `Clone` (the copy constructor, which fixes the knot vectors up again)
+    let mut cache = SurfaceCache::new(
+        surface.clone_for_evaluation()?,
+        uv_domain,
+        cache_options(tol),
+    );
     cache.set_surface_handle(handle);
 
     // build the surface subdivision tree
@@ -894,7 +905,9 @@ pub fn make_trim_srf_cache<O: Copy + PartialEq>(
     let tol = cache_tolerances(surface)?;
 
     // construct new SurfaceCache Object
-    let mut cache = TrimSrfCache::new(surface.clone(), cache_options(tol));
+    // the cache refers to the surface itself upstream (`m_cpSurface`): an exact copy,
+    // not `Clone` (the copy constructor, which fixes the knot vectors up again)
+    let mut cache = TrimSrfCache::new(surface.clone_for_evaluation()?, cache_options(tol));
     cache.base_mut().set_surface_handle(handle);
 
     // when we are not doing a boolean operation
@@ -1669,7 +1682,8 @@ impl Surface {
 
     /// The silhouette curves of the surface over `uv_domain` for a parallel
     /// (`eye_point_or_view_vector` the view vector) or perspective projection
-    /// (`CreateSilhouetteCurves`).
+    /// (`CreateSilhouetteCurves`), with the walk tolerances `pOptApproxTol3d` and
+    /// `cpdOptAngleTolRadians`.
     ///
     /// # Errors
     ///
@@ -1681,6 +1695,8 @@ impl Surface {
         uv_domain: &Extent2d,
         _eye_point_or_view_vector: Point3,
         _perspective: bool,
+        _approx_tol_3d: Option<f64>,
+        _ang_tol_rad: Option<f64>,
     ) -> Result<(Vec<Curve>, Vec<Curve>)> {
         let cache = get_surface_cache::<()>(k, self, None)?;
 

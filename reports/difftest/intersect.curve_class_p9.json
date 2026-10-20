@@ -11,6 +11,30 @@
     },
     {
       "max_rel_err": 0.0,
+      "name": "fuzz_degenerate_source_no_curve_cache_empty_vertices",
+      "outcome": "pass",
+      "pass": true,
+      "source": "fixture:fixtures/intersect.curve_class_p9/fuzz_regressions.json#1 (upstream source/SMLib/src/SmCurveClass.cpp:16215 (IntersectTSBound, NER(pCC) when the source curve cache cannot be built); found by difftest --fuzz 30000 (fuzz02411))",
+      "values_compared": 54
+    },
+    {
+      "max_rel_err": 0.0,
+      "name": "fuzz_degenerate_source_no_curve_cache_state1",
+      "outcome": "pass",
+      "pass": true,
+      "source": "fixture:fixtures/intersect.curve_class_p9/fuzz_regressions.json#2 (upstream source/SMLib/src/SmCurveClass.cpp:16215 (IntersectTSBound, NER(pCC)); found by difftest --fuzz 30000 (fuzz14891))",
+      "values_compared": 54
+    },
+    {
+      "max_rel_err": 0.0,
+      "name": "fuzz_degenerate_source_no_curve_cache_one_vertex",
+      "outcome": "pass",
+      "pass": true,
+      "source": "fixture:fixtures/intersect.curve_class_p9/fuzz_regressions.json#3 (upstream source/SMLib/src/SmCurveClass.cpp:16215 (IntersectTSBound, NER(pCC)); found by difftest --fuzz 30000 (fuzz12956))",
+      "values_compared": 54
+    },
+    {
+      "max_rel_err": 0.0,
       "name": "isolated_vertex_uv",
       "outcome": "pass",
       "pass": true,
@@ -139,8 +163,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::SmCurveClassification",
-        "unit": "intersect.curve_class_p4"
+        "symbol": "SmCurveClassification::ReSet",
+        "unit": "intersect.curve_class_p2"
       },
       "max_rel_err": 0.0,
       "name": "uv_hit_but_3d_gap_rejected",
@@ -167,8 +191,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::SmCurveClassification",
-        "unit": "intersect.curve_class_p4"
+        "symbol": "SmCurveClassification::ReSet",
+        "unit": "intersect.curve_class_p2"
       },
       "max_rel_err": 0.0,
       "name": "singular_vertex_3d_drop",
@@ -179,8 +203,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::SmCurveClassification",
-        "unit": "intersect.curve_class_p4"
+        "symbol": "SmCurveClassification::ReSet",
+        "unit": "intersect.curve_class_p2"
       },
       "max_rel_err": 0.0,
       "name": "singular_vertex_checked",
@@ -199,8 +223,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::SmCurveClassification",
-        "unit": "intersect.curve_class_p4"
+        "symbol": "SmCurveClassification::ReSet",
+        "unit": "intersect.curve_class_p2"
       },
       "max_rel_err": 0.0,
       "name": "lifted_uv_source_to_3d",
@@ -231,8 +255,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::SmCurveClassification",
-        "unit": "intersect.curve_class_p4"
+        "symbol": "SmCurveClassification::ReSet",
+        "unit": "intersect.curve_class_p2"
       },
       "max_rel_err": 0.0,
       "name": "tiny_vertex_check_3d_explicit_zone",
@@ -307,8 +331,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::SmCurveClassification",
-        "unit": "intersect.curve_class_p4"
+        "symbol": "SmCurveClassification::ReSet",
+        "unit": "intersect.curve_class_p2"
       },
       "max_rel_err": 0.0,
       "name": "vertex_gap_over_one",
@@ -636,8 +660,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::SmCurveClassification",
-        "unit": "intersect.curve_class_p4"
+        "symbol": "SmCurveClassification::ReSet",
+        "unit": "intersect.curve_class_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0028",
@@ -2184,8 +2208,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::SmCurveClassification",
-        "unit": "intersect.curve_class_p4"
+        "symbol": "SmCurveClassification::ReSet",
+        "unit": "intersect.curve_class_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0191",
@@ -2888,8 +2912,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::SmCurveClassification",
-        "unit": "intersect.curve_class_p4"
+        "symbol": "SmCurveClassification::ReSet",
+        "unit": "intersect.curve_class_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0266",
@@ -3968,8 +3992,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurveClassification::SmCurveClassification",
-        "unit": "intersect.curve_class_p4"
+        "symbol": "SmCurveClassification::ReSet",
+        "unit": "intersect.curve_class_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0380",
@@ -4014,12 +4038,12 @@
   "cases_both_errored": 0,
   "cases_deferred": 149,
   "cases_failed": 0,
-  "cases_passed": 274,
+  "cases_passed": 277,
   "cases_rejected": 2,
-  "cases_total": 425,
+  "cases_total": 428,
   "deferred_by_unit": {
     "curve.crv_on_surf": 24,
-    "intersect.curve_class_p4": 10,
+    "intersect.curve_class_p2": 10,
     "topology.edge": 115
   },
   "max_rel_err": 0.0,

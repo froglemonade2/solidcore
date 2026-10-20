@@ -25,8 +25,8 @@
 //! `GetUVCornerBoundaries` of an edge loop runs `GetOrCreateUVTrimCurve` on both sides
 //! (`topology.edgeuse_p3`; creating a curve defers on its own callees).
 //!
-//! Deferred: `FlipLoopOrientation` of a loop on a face (`SmFace::Notify`,
-//! `topology.face_p3`), and `IsMissingSeamAtVertices` past
+//! Deferred: `FlipLoopOrientation` of a loop on a face (the post-edit `SmFace::Notify`
+//! reaches `SmFace::GetUpwardEdgeuses`, `topology.face_p4`), and `IsMissingSeamAtVertices` past
 //! the closure test (the sector computation's own deferrals). `IsClosed3d` on edges
 //! whose curve the export holds only as its B-spline part (ellipses and other
 //! `SmBSplineCurve` subclasses of the `.smb` files) and `IsMissingSeamAtVertices` on such
@@ -818,9 +818,12 @@ fn inexact_geometry(s: &Setup) -> Option<Output> {
         let t = s.types.face_surface_types.get(f.index() as usize).copied().unwrap_or(-1);
         if t >= 0 && !EXACT_SURFACES.contains(&t) {
             let (unit, symbol) = match t {
-                15012 | 15013 => ("surface.cone_p1", "SmCone (no SurfaceKind)"),
-                15014 => ("surface.sphere", "SmSphere"),
-                15015 => ("surface.torus", "SmTorus (no SurfaceKind)"),
+                // the DISPATCH GAP of `Surface::read_from_db` (issue #76) belongs to
+                // `surface.surface_p2`, not to the analytic surface units (all green)
+                15012 => ("surface.surface_p2", "SurfaceKind::Cone (SmCone dispatch)"),
+                15013 => ("surface.surface_p2", "SurfaceKind::Cone (SmCylinder dispatch)"),
+                15014 => ("surface.surface_p2", "SurfaceKind::Sphere (SmSphere dispatch)"),
+                15015 => ("surface.surface_p2", "SurfaceKind::Torus (SmTorus dispatch)"),
                 15030 => ("surface.surf_of_extrusion_p2", "SurfaceKind::SurfOfExtrusion"),
                 _ => ("topology.brep_p10", "SmBrep::MakeTopologyFromData"),
             };

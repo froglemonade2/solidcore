@@ -154,7 +154,7 @@ use crate::topology::{Brep, EdgeId, FaceId, VertexId};
 // SmTol::GetSrcZoneTol3d / GetObjZoneTol3d of SmLineSegClassification /
 // SmPolyPointClassification / SmLineSegInterval: those classes have no Rust type (their
 // constructors are outside the in-scope call graph).
-// UNPORTED(blend.fillet_solver_p1): SmTol::GetAngTolRad(const SmFilletSolver*);
+// SmTol::GetAngTolRad(const SmFilletSolver*) is blend::fillet_solver::p1::tol_ang_tol_rad.
 // UNPORTED(blend.fillet_corner_p1): the SmFilletCorner branch of GetApproxTol3d(SmObject*);
 // the other GetApproxTol3d / GetAngTolRad overloads of algorithm objects (SmHCR,
 // SmPolyIntersector, SmSurfaceIntersector, SmSurfaceTracer, SmTopologyIntersector,
@@ -1167,17 +1167,19 @@ fn ignore_soft<T>(r: Result<T>) -> Result<Option<T>> {
 
 /// `SmFace::SetTolerance(tol)`.
 fn face_set_tolerance(
-    _b: &mut Brep,
-    _f: FaceId,
-    _tol: f64,
-    _update_only_if_larger: bool,
-    _cascade_to_boundaries: bool,
+    b: &mut Brep,
+    f: FaceId,
+    tol: f64,
+    update_only_if_larger: bool,
+    cascade_to_boundaries: bool,
 ) -> Result<()> {
-    // UNPORTED(topology.face_p3): SmFace::SetTolerance
-    Err(SolidError::unported(
-        "SmFace::SetTolerance",
-        "topology.face_p3",
-    ))
+    crate::topology::face::p3::set_tolerance(
+        b,
+        f,
+        tol,
+        update_only_if_larger,
+        cascade_to_boundaries,
+    )
 }
 
 /// `SmFace::GetEdges(rEdges)`.
@@ -1210,8 +1212,8 @@ pub enum TopologyToUpdate {
 /// # Errors
 ///
 /// `SM_ERR_INVALID_INPUT` (as [`SolidError::Upstream`]) when the tolerance to use is
-/// below `SM_EFF_ZERO`; [`SolidError::Unported`] for `SmFace::SetTolerance`
-/// (`topology.face_p3`) and `SmFace::GetEdges` (`topology.face_p4`); those of the
+/// below `SM_EFF_ZERO`; [`SolidError::Unported`] for `SmFace::GetEdges`
+/// (`topology.face_p4`); those of `SmFace::SetTolerance`, the
 /// setters and gap queries.
 pub fn update_object_tolerance(
     k: &Kernel,
