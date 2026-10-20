@@ -21,7 +21,7 @@
 // on NULL) and, when the end is on an edge of a face with a surface, a NULL classification or
 // edge curve (both are evaluated); for GetLoopCrossings over loops a classification without
 // curve (UB-124: GetNaturalInterval on NULL) and, for a classification without intervals whose
-// curve is not degenerate, GetPointClassifiesConnectedTo reading m_pData[0] (UB-199). Geometry objects live for the whole process (never
+// curve is not degenerate, GetPointClassifiesConnectedTo reading m_pData[0] (UB-211). Geometry objects live for the whole process (never
 // deleted); the B-rep is deleted at the end of the run.
 
 #include "sc_shim.h"
@@ -889,7 +889,7 @@ int32_t run(Rd& rd, std::vector<double>& o)
             // UB-124: the classification curve's GetNaturalInterval() before its NULL check
             if (rd.bad || (n > 0 && cc.GetCurve() == NULL))
                 return SC_ERR_ARG;
-            // UB-199: GetPointClassifiesConnectedTo reads m_pData[0] of a classification without
+            // UB-211: GetPointClassifiesConnectedTo reads m_pData[0] of a classification without
             // intervals (the array of a squeezed-out or never sized one is stale or NULL). A
             // degenerate classification curve returns before that read (defined), so refuse only
             // a curve that is not degenerate: the test of GetLoopCrossings on its own props (a

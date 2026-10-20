@@ -98,7 +98,7 @@
 //!   `CoincidenceCheck` (`surface.surface_p8`), `SmCurveClassification::Homogenize`
 //!   (`intersect.curve_class_p6`), `InsertTopologyIntersections`
 //!   (`intersect.curve_class_p5`), the `SmCurveClassification` constructor
-//!   (`intersect.curve_class_p4`; it defers on `ReSet`, `intersect.curve_class_p2`) and `SmFace::CalculateUVDomainFromUVTrimCurves`
+//!   (`intersect.curve_class_p4`; its `ReSet` is wired to `intersect.curve_class_p2`) and `SmFace::CalculateUVDomainFromUVTrimCurves`
 //!   (`topology.face_p1`, through [`IntersectorBrep`]; its `CreateUVTrimCurves` is
 //!   `topology.face_p3`'s), `SmFace::FaceIntersect` and `SmFace::SetTolerance`
 //!   (`topology.face_p3`, through [`IntersectorBrep`]) are the ported calls.
@@ -3365,8 +3365,7 @@ pub fn intersect_shell_vertices<O: ClassObject + SolutionObject + Ord>(
 /// # Errors
 ///
 /// `SM_ERR` when a `Homogenize` fails; [`SolidError::Unported`] for the
-/// deferrals of the `SmCurveClassification` constructor (`ReSet`,
-/// `intersect.curve_class_p2`), `InsertTopologyIntersections`
+/// deferrals of `InsertTopologyIntersections`
 /// (`intersect.curve_class_p5`), `Homogenize` (`intersect.curve_class_p6`) and the
 /// callees of the solver and manager; [`SolidError::InvalidInput`] for null handles
 /// upstream dereferences.

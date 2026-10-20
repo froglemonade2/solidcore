@@ -2395,7 +2395,7 @@ fn crossings(t: usize, loops: Vec<usize>, with_props: bool, seeds: Vec<[f64; 3]>
 
 /// Edge cases: the loop crossings over the real loop of every fixture face (a degenerate
 /// classification curve with computed, preset and no face props, also squeezed to no interval
-/// (returns before the UB-199 read); a regular curve), and of
+/// (returns before the UB-211 read); a regular curve), and of
 /// empty loop lists over every classification shape (empty, without curve, closed, short
 /// intervals); the squeeze over equal, zero-length and single intervals; the
 /// interval-bounding edge use of every end class (edge, vertex, curve, unknown) on every
@@ -2435,7 +2435,7 @@ fn edge_cases() -> Vec<(String, Value)> {
                     script(Some(face), ops),
                 ));
                 // the same degenerate curve squeezed to no interval: GetLoopCrossings returns
-                // before the m_pData[0] read of UB-199, so it runs on both sides and compares
+                // before the m_pData[0] read of UB-211, so it runs on both sides and compares
                 let mut ops = edge_setup(0, Some(6), &[0.0, 0.01], 1e-5 * scale);
                 ops.push(OpIn::Squeeze { t: 0 });
                 ops.push(crossings(0, vec![EDGE_LOOP], with_props, seeds));
@@ -2655,7 +2655,7 @@ fn edge_cases() -> Vec<(String, Value)> {
 /// classification, the bounding edge use without face, of an interval past the intervals and
 /// of an edge end without classification curve, the loop crossings over a loop without
 /// classification curve (UB-124), the loop crossings of a classification without intervals whose
-/// curve is not degenerate (UB-199; with a degenerate curve they run, see `edge_cases`). The flag is true for a script the ffi guard itself rejects
+/// curve is not degenerate (UB-211; with a degenerate curve they run, see `edge_cases`). The flag is true for a script the ffi guard itself rejects
 /// (the seeded face props of UB-131: `SetProps_Stage2` after `SetProps_Gaps` returned early
 /// dereferences the null `m_pFace`; a point class on an object of another kind), false for one
 /// the shim rejects at run time.
@@ -2714,7 +2714,7 @@ fn rejected_cases() -> Vec<(String, Script, bool)> {
     let mut ops = edge_setup(0, None, &bounds, 1e-5);
     ops.push(crossings(0, vec![EDGE_LOOP], false, Vec::new()));
     out.push(("loop_crossings_no_curve".into(), script(ops), false));
-    // UB-199: the loop crossings of a classification squeezed to no interval, curve not degenerate
+    // UB-211: the loop crossings of a classification squeezed to no interval, curve not degenerate
     // (GetPointClassifiesConnectedTo reads m_pData[0]; the Rust side reports InvalidInput)
     let mut ops = edge_setup(0, Some(0), &[0.0, 1.0], 1e-5);
     ops.push(OpIn::Squeeze { t: 0 });

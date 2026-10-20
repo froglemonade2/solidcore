@@ -36,7 +36,7 @@
 //! edge end on a face with a surface when the classification or edge curve is `NULL` (both are
 //! evaluated); `GetLoopCrossings` over loops for a classification without curve (UB-124:
 //! `GetNaturalInterval` on `NULL`) and over loops for a classification without intervals whose
-//! curve is not degenerate (UB-199: `GetPointClassifiesConnectedTo` reads `m_pData[0]`, stale or
+//! curve is not degenerate (UB-211: `GetPointClassifiesConnectedTo` reads `m_pData[0]`, stale or
 //! `NULL`; a degenerate curve returns before the read and runs). The Rust side returns
 //! `InvalidInput` for exactly those two cases (`get_loop_crossings`, `point_classifies_connected_to`).
 
