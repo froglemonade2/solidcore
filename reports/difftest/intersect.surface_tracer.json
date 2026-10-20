@@ -212,7 +212,7 @@
     {
       "deferred": {
         "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
+        "unit": "surface.plane_p1"
       },
       "max_rel_err": 0.0,
       "name": "do_trace_plane",
@@ -728,7 +728,7 @@
     {
       "deferred": {
         "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
+        "unit": "surface.plane_p1"
       },
       "max_rel_err": 0.0,
       "name": "gen0063",
@@ -920,7 +920,7 @@
     {
       "deferred": {
         "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
+        "unit": "surface.plane_p1"
       },
       "max_rel_err": 0.0,
       "name": "gen0086",
@@ -1140,7 +1140,7 @@
     {
       "deferred": {
         "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
+        "unit": "surface.plane_p1"
       },
       "max_rel_err": 0.0,
       "name": "gen0113",
@@ -2972,7 +2972,7 @@
     {
       "deferred": {
         "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
+        "unit": "surface.plane_p1"
       },
       "max_rel_err": 0.0,
       "name": "gen0339",
@@ -3469,7 +3469,7 @@
   "cases_total": 427,
   "deferred_by_unit": {
     "intersect.surface_drop_lib_p3": 6,
-    "surface.surface_cache_p1": 5
+    "surface.plane_p1": 5
   },
   "max_rel_err": 0.0,
   "pass": true,

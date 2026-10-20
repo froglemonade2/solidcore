@@ -900,7 +900,7 @@
     {
       "deferred": {
         "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
+        "unit": "surface.plane_p1"
       },
       "max_rel_err": 0.0,
       "name": "gsi_plane_coincident",
@@ -912,7 +912,7 @@
     {
       "deferred": {
         "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
+        "unit": "surface.plane_p1"
       },
       "max_rel_err": 0.0,
       "name": "gsi_bspline",
@@ -8708,7 +8708,7 @@
     {
       "deferred": {
         "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
+        "unit": "surface.plane_p1"
       },
       "max_rel_err": 0.0,
       "name": "gen0869",
@@ -8896,7 +8896,7 @@
     {
       "deferred": {
         "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
+        "unit": "surface.plane_p1"
       },
       "max_rel_err": 0.0,
       "name": "gen0892",
@@ -13604,7 +13604,7 @@
     {
       "deferred": {
         "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
+        "unit": "surface.plane_p1"
       },
       "max_rel_err": 0.0,
       "name": "gen1480",
@@ -14256,7 +14256,7 @@
     {
       "deferred": {
         "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
+        "unit": "surface.plane_p1"
       },
       "max_rel_err": 0.0,
       "name": "gen1561",
@@ -15548,7 +15548,7 @@
     {
       "deferred": {
         "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
+        "unit": "surface.plane_p1"
       },
       "max_rel_err": 0.0,
       "name": "gen1722",
@@ -17168,7 +17168,7 @@
     {
       "deferred": {
         "symbol": "SmPlane::CreateIsoParametricCurve",
-        "unit": "surface.surface_cache_p1"
+        "unit": "surface.plane_p1"
       },
       "max_rel_err": 0.0,
       "name": "gen1924",
@@ -17784,7 +17784,7 @@
   "cases_passed": 2210,
   "cases_total": 2218,
   "deferred_by_unit": {
-    "surface.surface_cache_p1": 8
+    "surface.plane_p1": 8
   },
   "max_rel_err": 0.0,
   "pass": true,
