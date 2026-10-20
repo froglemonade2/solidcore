@@ -1718,7 +1718,7 @@ mod tests {
     }
 
     #[test]
-    fn plane_boundary_test_needs_plane_iso_curves() {
+    fn plane_boundary_test_of_perpendicular_planes_is_unknown() {
         let (a, b) = two_planes();
         let d = Extent2d::from_bounds(0.0, 0.0, 1.0, 1.0);
         let si = SurfaceIntersector::new(&a, &d, &b, &d, false).unwrap();
@@ -1728,6 +1728,8 @@ mod tests {
         let mut out = TsectCurves::default();
         let bbox = Extent3d::from_bounds(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
         let r = si.do_boundary_plane_test(&k, &mut p1, &mut p2, 1e-3, &bbox, &mut out);
-        assert!(matches!(r, Err(e) if e.is_unported()));
+        // (the bounding planes of a plane go through `SmPlane::CreateIsoParametricCurve`,
+        // surface.plane_p1, ported): no pair of boundary planes has opposite normals
+        assert_eq!(r.unwrap(), BoundaryPlaneTestResult::Unknown);
     }
 }

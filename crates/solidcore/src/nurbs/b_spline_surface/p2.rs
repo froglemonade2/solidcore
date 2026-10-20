@@ -1731,11 +1731,13 @@ mod tests {
     }
 
     #[test]
-    fn back_edges_are_unported() {
+    fn back_edges_are_wired() {
         let s = patch(false);
-        let unported = |r: Result<()>| matches!(r, Err(SolidError::Unported { .. }));
-        assert!(unported(
-            s.copy_and_add_analytics(&Kernel::default()).map(|_| ())
+        // none of the recognisers (plane, cone, sphere, revolution, extrusion) finds this
+        // patch: it is copied, as upstream
+        assert!(matches!(
+            s.copy_and_add_analytics(&Kernel::default()).unwrap().kind(),
+            crate::surface::surface::p2::SurfaceKind::BSpline(_)
         ));
         // (wired through surface.surface_p1 / surface.surface_p7)
         assert!(s.max_analytic_domain().is_ok());

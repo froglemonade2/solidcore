@@ -536,6 +536,34 @@ mod tests {
         let a = brep.add_vertex(p(0.0, 0.0, 0.0)).unwrap();
         let b = brep.add_vertex(p(1.0, 0.0, 0.0)).unwrap();
         let e = brep.add_edge(a, b).unwrap();
+        // the edge's two edge uses (a wire edge: the vertex queries need the primary one)
+        let mut eus = Vec::new();
+        for (i, v) in [a, b].into_iter().enumerate() {
+            let vu = brep
+                .add_vertexuse_record(crate::topology::Vertexuse {
+                    vertex: Some(v),
+                    ..crate::topology::Vertexuse::default()
+                })
+                .unwrap();
+            let eu = brep
+                .add_edgeuse_record(crate::topology::Edgeuse {
+                    edge: Some(e),
+                    owner: crate::topology::EdgeuseOwner::Shell(None),
+                    vertexuse: Some(vu),
+                    orientation: if i == 0 {
+                        crate::nurbs::b_spline_surface_n_lib::p2::OrientType::Same
+                    } else {
+                        crate::nurbs::b_spline_surface_n_lib::p2::OrientType::Opposite
+                    },
+                    ..crate::topology::Edgeuse::default()
+                })
+                .unwrap();
+            brep.vertexuse_mut(vu).unwrap().owner =
+                crate::topology::VertexuseOwner::Edgeuse(Some(eu));
+            eus.push(eu);
+        }
+        brep.edge_mut(e).unwrap().edgeuses = eus;
+        brep.edge_mut(e).unwrap().interval = Extent1d::from_min_max(0.0, 1.0);
         // vertex tolerances are ported (topology.vertex): the vertex at the point is found
         let r = find_first_vertex_within_tol_to_pnt(&brep, &[a], p(0.0, 0.0, 0.0), 1.0).unwrap();
         assert!(r.found);

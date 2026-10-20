@@ -1353,10 +1353,13 @@ mod tests {
 
         let b = plane([0.0, 0.5, -0.5], [1.0, 0.0, 0.0], [0.0, 0.0, 1.0]);
         let mut si = SurfaceIntersector::new(&a, &unit(), &b, &unit(), false).unwrap();
-        assert!(matches!(
-            si.find_interior_curves(&k, &mut out),
-            Err(SolidError::Unported { .. })
-        ));
+        // the node pairs of the global solve reach the local intersection (ported, with the
+        // plane iso curves): it succeeds, or stops at an unported callee; the curves it
+        // found are not those of the check below
+        let mut first = TsectCurves::default();
+        if let Err(e) = si.find_interior_curves(&k, &mut first) {
+            assert!(e.is_unported(), "{e}");
+        }
         // a pair next to a curve already found is skipped
         out.curves_3d.push(Curve::from(
             crate::curve::line::Line::create_line_segment(
