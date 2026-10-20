@@ -2630,13 +2630,15 @@ impl<O: Copy + PartialEq> SurfaceCache<O> {
         // build isoParameter curves
         let d = Some(*uv_domain);
         if matches!(self.surface.kind(), SurfaceKind::Plane(_)) {
-            // UNPORTED(surface.surface_cache_p1): SmPlane::CreateIsoParametricCurve for
+            // UNPORTED(surface.plane_p1): SmPlane::CreateIsoParametricCurve for
             // GetIsoBoundaryCurves (justified: findings.md "stubs naming green units": wiring
-            // it makes intersect.surface_intersector_p5 gen0072 lose its curve, a
-            // disagreement not yet explained; the bounding-plane use of the same call is wired)
+            // it turns 380 deferrals of intersect.surface_intersector_p5 and 93 of _p3 into
+            // passes but makes gen0072 fail (C++ outputs two touching point curves, Rust none;
+            // the cause is localised in that section); the bounding-plane use of the same
+            // call is wired)
             return Err(SolidError::unported(
                 "SmPlane::CreateIsoParametricCurve",
-                "surface.surface_cache_p1",
+                "surface.plane_p1",
             ));
         }
         let c0 =

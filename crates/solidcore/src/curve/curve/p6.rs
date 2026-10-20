@@ -40,11 +40,11 @@
 //! - **Object identity.** `&crOtherCurve == this` is [`core::ptr::eq`].
 //! - **`DeformToEndPointTargets`.** `ppOptNewCurve` is `want_new_curve`; the new curve
 //!   is returned. The `SmCrvOnSurf` branch (editing the UV curve when
-//!   `pOptSurfCrvOnSurf` is its base surface) is not here: it is taken only with
-//!   that surface argument, which the port drops with `pOptCrvOrientation` (every
-//!   caller here passes `NULL`), and it needs `SmSurface::DropPoint` (unit
-//!   `surface.surface_p5`). A curve on surface takes the approximation path, through
-//!   its `ApproximateCurve` override.
+//!   `pOptSurfCrvOnSurf` is its base surface) takes `pOptSurfCrvOnSurf` and
+//!   `pOptCrvOrientation` as arguments; the pointer test of the base surface is the
+//!   equality of the surface with the curve's own copy of its base (a `CrvOnSurf`
+//!   holds a B-spline surface by value). Without that surface a curve on surface takes
+//!   the approximation path, through its `ApproximateCurve` override.
 //! - **Handles.** The global point solves of `DropPoint` and `CurveMaxDistanceBetween`
 //!   name a private handle of the curve (with its natural interval, as upstream's
 //!   `this`); those solutions are not returned.
@@ -66,6 +66,7 @@
 //!   curve: the split solutions name `[this, other]`, so it is when the coincidence
 //!   check split the other curve, or `this` and the other are the same curve.
 
+use crate::curve::crv_on_surf::CrvOnSurf;
 use crate::curve::curve::p1::{ApproximateCurveOptions, GlobalPointSolveOptions};
 use crate::curve::curve::p2::{
     at, snap_sol_to_specified_endpoint, Curve, CurveKind, CurvePropertyType,
@@ -86,11 +87,16 @@ use crate::geom::solution_array::{
     ObjectKind, Solution, SolutionArray, SolutionObject, SolutionType, SortKey,
 };
 use crate::geom::tol::{approx_tol_3d, are_same, is_zero, SmallTopoType, ZONE_TOL_3D};
+use crate::geom::vector2d::Point2;
 use crate::geom::vector3d::{Point3, Vec3};
 use crate::kernel::Kernel;
 use crate::math::{max2, min2, BIG_DOUBLE, EFF_ZERO, EFF_ZERO_SQRT, PI};
 use crate::nurbs::b_spline_curve::{BSplineCurve, BoundingBoxRequest, BoundingBoxes};
 use crate::nurbs::b_spline_curve_n_lib::InValueType;
+use crate::nurbs::b_spline_surface_n_lib::p2::OrientType;
+use crate::surface::surface::p4::NoObject;
+use crate::surface::surface::p5::DropPointOptions;
+use crate::surface::surface::Surface;
 
 const OP_BOX: &str = "curve::curve::p6::calculate_bounding_box";
 const OP_DEFORM: &str = "curve::curve::p6::deform_to_end_point_targets";
@@ -1816,6 +1822,12 @@ impl Curve {
     /// of the line and B-spline deformations; [`SolidError::Unported`] for the
     /// approximation of curves not derived from B-splines (`SmCurve::ApproximateCurve`,
     /// unit `curve.curve_p1`).
+    ///
+    /// `surf_crv_on_surf` and `crv_orientation` are `pOptSurfCrvOnSurf` and
+    /// `pOptCrvOrientation`: for a curve on surface whose base surface equals
+    /// `surf_crv_on_surf`, the targets are dropped onto that surface and its UV curve
+    /// is deformed instead (the ends swapped for `OrientType::Opposite`); nothing is
+    /// returned then.
     pub fn deform_to_end_point_targets(
         &mut self,
         k: &Kernel,
@@ -1826,6 +1838,8 @@ impl Curve {
         start_tan_type: InValueType,
         end_tan: Option<Vec3>,
         end_tan_type: InValueType,
+        surf_crv_on_surf: Option<&Surface>,
+        crv_orientation: Option<OrientType>,
     ) -> Result<Option<Self>> {
         let same_or_free =
             |t: InValueType| t == InValueType::Same || t == InValueType::Unconstrained;
@@ -1837,6 +1851,23 @@ impl Curve {
             && same_or_free(end_tan_type)
         {
             return Ok(None);
+        }
+
+        // a curve on surface whose base surface agrees with pOptSurfCrvOnSurf: edit the
+        // UV curve (after the line and B-spline kinds, and the ppOptNewCurve check)
+        if let (CurveKind::CrvOnSurf(c), Some(surface)) = (self.kind_mut(), surf_crv_on_surf) {
+            if !want_new_curve {
+                return Err(SolidError::invalid_input(
+                    OP_DEFORM,
+                    "ppOptNewCurve must be NonNULL for non SmBSplineCurve_TYPE curves",
+                ));
+            }
+            // (the pointer test of `pOptSurfCrvOnSurf == GetBaseSurface()` is the equality
+            // of the surface with its own copy here)
+            if surface.approx_eq(&Surface::from(c.surface().clone()))? {
+                deform_uv_curve(k, c, surface, tgt_start, tgt_end, crv_orientation)?;
+                return Ok(None);
+            }
         }
 
         let dim = self.dim();
@@ -1878,9 +1909,9 @@ impl Curve {
                 ));
             }
 
-            // NOT PORTED (this unit's own limit, see plan/findings.md, surface.surface_p5): the
-            // SmCrvOnSurf branch needs the dropped pOptSurfCrvOnSurf and pOptCrvOrientation
-            // arguments of SmSurface::DropPoint
+            // (the SmCrvOnSurf branch of pOptSurfCrvOnSurf is taken above; a curve on
+            // surface with another surface, or none, is approximated like any other
+            // curve not derived from B-splines)
 
             // for derived BSpline types: copy the Nurb curve as a plain BSplineCurve
             CurveKind::Hyperbola(h) => {
@@ -1939,6 +1970,85 @@ impl Curve {
         )?;
         Ok(Some(Self::from(new_curve)))
     }
+}
+
+/// The `pOptSurfCrvOnSurf` branch of `SmCurve::DeformToEndPointTargets`: drops the
+/// targets onto `surface` (from the current UV ends) and deforms the UV curve of `c`
+/// to the dropped points (their ends swapped when `orientation` is opposite), with
+/// the default tangent types. A UV curve edited in place keeps its object; a new
+/// one is converted to 2D and replaces it.
+fn deform_uv_curve(
+    k: &Kernel,
+    c: &mut CrvOnSurf,
+    surface: &Surface,
+    tgt_start: Option<Point3>,
+    tgt_end: Option<Point3>,
+    orientation: Option<OrientType>,
+) -> Result<()> {
+    // pUVCurve->GetEnds(..) (status ignored)
+    let (current_start, current_end) = match ignored(c.uv_curve().ends())? {
+        Some(e) => (e.start, e.end),
+        None => (Point3::UNDEF, Point3::UNDEF),
+    };
+    let domain = surface.natural_uv_domain();
+
+    // DropPoint(tgt, domain, &uvCurrent, ..) (status ignored), then Set(u, v, 0)
+    let drop = |tgt: Point3, current: Point3| -> Result<Point3> {
+        let opts = DropPointOptions {
+            guess_uv: Some(Point2::new(current.x, current.y)),
+            ..DropPointOptions::default()
+        };
+        let uv = match ignored(surface.drop_point::<NoObject>(k, tgt, &domain, &opts))? {
+            Some(d) => d.result_uv,
+            None => Point2::UNDEF,
+        };
+        Ok(Point3::new(uv.x, uv.y, 0.0))
+    };
+    let uv_start = tgt_start.map(|t| drop(t, current_start)).transpose()?;
+    let uv_end = tgt_end.map(|t| drop(t, current_end)).transpose()?;
+
+    // (SM_ASSERT(IsKindOf(SmBSplineCurve_TYPE)) then a cast: other kinds are undefined)
+    let mut uv_curve = c.uv_curve().clone();
+    if !matches!(
+        uv_curve.kind(),
+        CurveKind::BSpline(_)
+            | CurveKind::Line(_)
+            | CurveKind::Hyperbola(_)
+            | CurveKind::Ellipse(_)
+            | CurveKind::Parabola(_)
+    ) {
+        return Err(SolidError::invalid_input(
+            OP_DEFORM,
+            "the UV curve is not an SmBSplineCurve",
+        ));
+    }
+
+    // Deform UV curve. Switch end points if orientation is opposite.
+    let (first, second) = if orientation == Some(OrientType::Opposite) {
+        (uv_end, uv_start)
+    } else {
+        (uv_start, uv_end)
+    };
+    let deformed = uv_curve.deform_to_end_point_targets(
+        k,
+        first,
+        second,
+        true,
+        None,
+        InValueType::Same,
+        None,
+        InValueType::Same,
+        None,
+        None,
+    )?;
+    match deformed {
+        Some(mut d) => {
+            ignore_status(d.convert_to_2d(k))?;
+            c.set_uv_curve(d);
+        }
+        None => c.set_uv_curve(uv_curve),
+    }
+    Ok(())
 }
 
 /// `interval` split at 37.5% and 62.5% (`sIvl1`, `sIvl2`, `sIvl3`).
@@ -2081,6 +2191,8 @@ mod tests {
                 InValueType::Same,
                 None,
                 InValueType::Same,
+                None,
+                None,
             )
             .unwrap_err();
         assert!(matches!(e, SolidError::InvalidInput { .. }));

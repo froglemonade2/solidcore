@@ -211,7 +211,9 @@ fn resolve(c: &CurveIn) -> Result<CurveIn, HarnessError> {
         solidcore::nurbs::b_spline_curve::NurbCircleParam::Quadratic,
     )
     .map_err(|e| harness(format!("circle: {e}")))?;
-    let cur = arc.gw_nurb().ok_or_else(|| harness("circle without NURB"))?;
+    let cur = arc
+        .gw_nurb()
+        .ok_or_else(|| harness("circle without NURB"))?;
     Ok(CurveIn::Bspline(BSplineIn {
         dim: 3,
         oob: false,
@@ -447,7 +449,10 @@ fn build(c: &CurveIn) -> Result<Curve, HarnessError> {
                 .len()
                 .checked_sub(1)
                 .ok_or_else(|| harness("no points"))?;
-            let m = bs.u.len().checked_sub(1).ok_or_else(|| harness("no knots"))?;
+            let m =
+                bs.u.len()
+                    .checked_sub(1)
+                    .ok_or_else(|| harness("no knots"))?;
             let mut cur =
                 allocate_nurb_curve(n, bs.p, m).map_err(|e| harness(format!("curve: {e}")))?;
             for (d, s) in cur.cpts_mut().iter_mut().zip(&bs.cpts) {
@@ -560,11 +565,7 @@ fn put_sol<O: Copy>(o: &mut Vec<f64>, s: &Solution<O>, id: impl Fn(Option<O>) ->
         second(&s.start),
     ]);
     if s.solution_type == SolutionType::RangeOfValues {
-        o.extend([
-            s.end.solution_value,
-            s.end.parameters[0],
-            second(&s.end),
-        ]);
+        o.extend([s.end.solution_value, s.end.parameters[0], second(&s.end)]);
     }
 }
 
@@ -638,7 +639,10 @@ fn rust(op: &OpIn) -> Result<Output, HarnessError> {
                 pseudo: *pseudo,
                 polar: *polar,
             };
-            let bx = tri!(o, c.calculate_bounding_box(&Kernel::default(), &ivl_of(*ivl), req, *expand));
+            let bx = tri!(
+                o,
+                c.calculate_bounding_box(&Kernel::default(), &ivl_of(*ivl), req, *expand)
+            );
             o.push(0.0);
             if let Some(nb) = bx.normal {
                 o.extend((0..3).map(|i| nb.min_at(i)));
@@ -778,12 +782,20 @@ fn rust(op: &OpIn) -> Result<Output, HarnessError> {
                 polar: false,
             };
             let box1 = if *pb1 {
-                tri!(o, a.calculate_bounding_box(&Kernel::default(), &i1, req, true)).pseudo
+                tri!(
+                    o,
+                    a.calculate_bounding_box(&Kernel::default(), &i1, req, true)
+                )
+                .pseudo
             } else {
                 None
             };
             let box2 = if *pb2 {
-                tri!(o, bb.calculate_bounding_box(&Kernel::default(), &i2, req, true)).pseudo
+                tri!(
+                    o,
+                    bb.calculate_bounding_box(&Kernel::default(), &i2, req, true)
+                )
+                .pseudo
             } else {
                 None
             };
@@ -860,6 +872,8 @@ fn rust(op: &OpIn) -> Result<Output, HarnessError> {
                     in_value(*st_type)?,
                     et.map(v3),
                     in_value(*et_type)?,
+                    None,
+                    None,
                 )
             );
             o.extend([0.0, b(nc.is_some())]);
@@ -951,7 +965,11 @@ fn gen_hermite(rng: &mut Rng) -> HermiteIn {
         p1,
         d1,
         p2,
-        d2: if rng.chance(0.08) { [0.0; 3] } else { rp(rng, s) },
+        d2: if rng.chance(0.08) {
+            [0.0; 3]
+        } else {
+            rp(rng, s)
+        },
     };
     if h.dim == 2 {
         for v in [&mut h.p1, &mut h.d1, &mut h.p2, &mut h.d2] {
@@ -1263,7 +1281,9 @@ fn gen_drop_point(rng: &mut Rng) -> OpIn {
     let ivl = gen_ivl(rng, &curve);
     let t = gen_t(rng, &curve);
     let base = point_at(&curve, t);
-    let off = *rng.choose(&[0.0, 1e-8, 1e-4, 0.01, 0.5, 3.0]).unwrap_or(&0.0);
+    let off = *rng
+        .choose(&[0.0, 1e-8, 1e-4, 0.01, 0.5, 3.0])
+        .unwrap_or(&0.0);
     let p = add(base, scale3(gen_dir(rng), off));
     let tol = gen_tol(rng);
     let sop = *rng.choose(&[3, 3, 3, 0, 0, 5, 5, 4, 6, 1]).unwrap_or(&3);
@@ -1316,7 +1336,10 @@ fn gen_gps_step(rng: &mut Rng) -> OpIn {
     let t = gen_t(rng, &curve);
     let p = add(
         point_at(&curve, t),
-        scale3(gen_dir(rng), *rng.choose(&[0.0, 1e-6, 0.3, 4.0]).unwrap_or(&0.0)),
+        scale3(
+            gen_dir(rng),
+            *rng.choose(&[0.0, 1e-6, 0.3, 4.0]).unwrap_or(&0.0),
+        ),
     );
     OpIn::GpsStep {
         curve,
@@ -1337,7 +1360,11 @@ fn gen_max_dist(rng: &mut Rng) -> OpIn {
     let c1 = gen_curve(rng);
     let ivl = gen_ivl(rng, &c1);
     let same = rng.chance(0.1);
-    let c2 = if same { None } else { Some(gen_partner(rng, &c1)) };
+    let c2 = if same {
+        None
+    } else {
+        Some(gen_partner(rng, &c1))
+    };
     let other = c2.as_ref().unwrap_or(&c1);
     let oi = if same && rng.chance(0.6) {
         ivl
@@ -1349,9 +1376,7 @@ fn gen_max_dist(rng: &mut Rng) -> OpIn {
     } else {
         (oi[0], oi[1])
     };
-    let nsamp = *rng
-        .choose(&[2u64, 3, 5, 6, 8, 10, 20, 0, 4])
-        .unwrap_or(&5);
+    let nsamp = *rng.choose(&[2u64, 3, 5, 6, 8, 10, 20, 0, 4]).unwrap_or(&5);
     OpIn::MaxDist {
         c1,
         ivl,
@@ -1533,7 +1558,10 @@ mod tests {
         let mut stats: BTreeMap<String, [usize; 4]> = BTreeMap::new();
         for _ in 0..2000 {
             let op = gen_case(&mut rng);
-            let name = serde_json::to_value(&op).unwrap()["op"].as_str().unwrap().to_string();
+            let name = serde_json::to_value(&op).unwrap()["op"]
+                .as_str()
+                .unwrap()
+                .to_string();
             let out = rust(&op);
             let e = stats.entry(name).or_default();
             e[0] += 1;
@@ -1545,7 +1573,10 @@ mod tests {
             }
         }
         for (k, v) in &stats {
-            eprintln!("{k}: total {} ok {} err {} deferred/harness {}", v[0], v[1], v[2], v[3]);
+            eprintln!(
+                "{k}: total {} ok {} err {} deferred/harness {}",
+                v[0], v[1], v[2], v[3]
+            );
         }
         assert_eq!(stats.len(), 8);
     }
