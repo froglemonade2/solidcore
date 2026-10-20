@@ -929,8 +929,9 @@ fn run_rust(i: &Inputs) -> Result<Output, HarnessError> {
 }
 
 /// `MergeCurvesOnSurface` with editing enabled: every curve shorter than `tol` is
-/// skipped (no new faces or edges); a longer one reaches the unported curve
-/// classification constructor.
+/// skipped (no new faces or edges); a longer one is classified against the face
+/// (`CurveOnClassify` over the face's real loops, edges and vertices) and reaches
+/// `MergeIntervals`.
 fn merge_rust(
     k: &mut Kernel,
     b: &mut Brep,
@@ -942,8 +943,16 @@ fn merge_rust(
         .iter()
         .map(|c| rust_curve(c).map(SmCurve::from))
         .collect::<Result<_, _>>()?;
-    let objects = MergeObjects { curves: &crvs };
-    let handles: Vec<H> = (0..crvs.len()).map(H).collect();
+    // The classification handles resolve against a copy of the B-rep taken before the
+    // call: `merge_curves_on_surface` holds `b` mutably, and nothing on its path edits
+    // the B-rep before `MergeIntervals` (whose imprinting is still unported), so the
+    // copy is the B-rep upstream's classification reads.
+    let snapshot = b.clone();
+    let objects = MergeObjects {
+        brep: &snapshot,
+        curves: &crvs,
+    };
+    let handles: Vec<H> = (0..crvs.len()).map(H::Curve).collect();
     let r = bp2::merge_curves_on_surface(
         k,
         b,
@@ -971,57 +980,129 @@ fn merge_rust(
     }
 }
 
-/// Classification handles of a `Merge` case: curve `i` is handle `i`.
+/// The objects behind the classification handles of a `Merge` case: the case's
+/// curves, and the B-rep's topology and geometry (what upstream reaches through the
+/// `SmObject` pointers the classification stores).
 struct MergeObjects<'a> {
+    /// The B-rep of the merged face.
+    brep: &'a Brep,
+    /// The case's 3D curves.
     curves: &'a [SmCurve],
 }
 
-/// A classification handle: curve `i` of the case (`usize::MAX` the face).
+/// A classification handle of a `Merge` case.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-struct H(usize);
+enum H {
+    /// Curve `i` of the case.
+    Curve(usize),
+    /// A face.
+    Face(FaceId),
+    /// A vertex.
+    Vertex(VertexId),
+    /// A loop.
+    Loop(LoopId),
+    /// An edge.
+    Edge(EdgeId),
+    /// A face use.
+    Faceuse(FaceuseId),
+    /// An edge use.
+    Edgeuse(EdgeuseId),
+    /// A vertex use.
+    Vertexuse(VertexuseId),
+    /// The surface of a face.
+    Surface(FaceId),
+    /// The 3D curve of an edge.
+    EdgeCurve(EdgeId),
+    /// The trim curve stored on an edge use.
+    Trim(EdgeuseId),
+}
 
 impl solidcore::intersect::point_class::ClassObject for H {
     fn class_kind(&self) -> solidcore::intersect::point_class::ClassObjectKind {
-        solidcore::intersect::point_class::ClassObjectKind::Curve
+        use solidcore::intersect::point_class::ClassObjectKind as K;
+        match self {
+            Self::Face(_) => K::Face,
+            Self::Vertex(_) => K::Vertex,
+            Self::Loop(_) => K::Loop,
+            Self::Edge(_) => K::Edge,
+            Self::Faceuse(_) => K::Faceuse,
+            Self::Edgeuse(_) => K::Edgeuse,
+            Self::Vertexuse(_) => K::Vertexuse,
+            Self::Surface(_) => K::Surface,
+            Self::Curve(_) | Self::EdgeCurve(_) | Self::Trim(_) => K::Curve,
+        }
     }
 }
 
 impl solidcore::query::face::p2::CurveOnClassifyObjects<H> for MergeObjects<'_> {
-    fn face(&self, _f: FaceId) -> H {
-        H(usize::MAX)
+    fn face(&self, f: FaceId) -> H {
+        H::Face(f)
     }
-    fn vertex(&self, _v: VertexId) -> H {
-        H(usize::MAX)
+    fn vertex(&self, v: VertexId) -> H {
+        H::Vertex(v)
     }
-    fn edge(&self, _e: EdgeId) -> H {
-        H(usize::MAX)
+    fn edge(&self, e: EdgeId) -> H {
+        H::Edge(e)
     }
-    fn vertexuse(&self, _vu: VertexuseId) -> H {
-        H(usize::MAX)
+    fn vertexuse(&self, vu: VertexuseId) -> H {
+        H::Vertexuse(vu)
     }
-    fn edgeuse(&self, _eu: EdgeuseId) -> H {
-        H(usize::MAX)
+    fn edgeuse(&self, eu: EdgeuseId) -> H {
+        H::Edgeuse(eu)
     }
-    fn edge_curve(&self, _e: EdgeId) -> H {
-        H(usize::MAX)
+    fn edge_curve(&self, e: EdgeId) -> H {
+        H::EdgeCurve(e)
     }
-    fn trim_curve(&self, _eu: EdgeuseId) -> H {
-        H(usize::MAX)
+    fn trim_curve(&self, eu: EdgeuseId) -> H {
+        H::Trim(eu)
     }
-    fn face_surface(&self, _f: FaceId) -> Option<H> {
-        None
+    fn face_surface(&self, f: FaceId) -> Option<H> {
+        self.brep
+            .face(f)
+            .ok()
+            .and_then(|r| r.surface.as_ref())
+            .map(|_| H::Surface(f))
     }
-    fn loop_id(&self, _tgt_loop: H) -> Option<LoopId> {
-        None
+    fn loop_id(&self, tgt_loop: H) -> Option<LoopId> {
+        match tgt_loop {
+            H::Loop(l) => Some(l),
+            _ => None,
+        }
     }
 }
 
 impl solidcore::intersect::point_class::ClassGeometry<H> for MergeObjects<'_> {
-    fn curve(&self, o: H) -> Option<&SmCurve> {
-        self.curves.get(o.0)
+    fn classification_vertex_point(&self, o: H) -> Option<solidcore::geom::vector3d::Point3> {
+        match o {
+            H::Vertex(v) => self.brep.vertex(v).ok().map(|v| v.point),
+            _ => None,
+        }
     }
-    fn surface(&self, _o: H) -> Option<&Surface> {
-        None
+    fn topology_zone_tol_3d(&self, o: H) -> Option<f64> {
+        match o {
+            H::Vertex(v) => self.brep.vertex(v).ok().map(|v| v.tolerance),
+            H::Face(f) => self.brep.face(f).ok().map(|f| f.tolerance),
+            H::Edge(e) => self.brep.edge(e).ok().map(|e| e.tolerance),
+            _ => None,
+        }
+    }
+    fn curve(&self, o: H) -> Option<&SmCurve> {
+        match o {
+            H::Curve(i) => self.curves.get(i),
+            H::EdgeCurve(e) => self.brep.edge(e).ok()?.curve.as_ref(),
+            H::Trim(eu) => {
+                solidcore::topology::edgeuse::p1::uv_trim_curve(self.brep, eu)
+                    .ok()?
+                    .0
+            }
+            _ => None,
+        }
+    }
+    fn surface(&self, o: H) -> Option<&Surface> {
+        match o {
+            H::Surface(f) => self.brep.face(f).ok().and_then(|r| r.surface.as_ref()),
+            _ => None,
+        }
     }
     fn volume(&self, _o: H) -> Option<&solidcore::surface::volume::Volume> {
         None
@@ -1029,14 +1110,45 @@ impl solidcore::intersect::point_class::ClassGeometry<H> for MergeObjects<'_> {
     fn point(&self, _o: H) -> Option<solidcore::geom::vector3d::Point3> {
         None
     }
+    fn topology_entity(&self, o: H) -> Option<(&Brep, EntityRef)> {
+        let e = match o {
+            H::Face(f) => EntityRef::Face(f),
+            H::Vertex(v) => EntityRef::Vertex(v),
+            H::Loop(l) => EntityRef::Loop(l),
+            H::Edge(e) => EntityRef::Edge(e),
+            H::Faceuse(fu) => EntityRef::Faceuse(fu),
+            H::Edgeuse(eu) => EntityRef::Edgeuse(eu),
+            H::Vertexuse(vu) => EntityRef::Vertexuse(vu),
+            H::Curve(_) | H::Surface(_) | H::EdgeCurve(_) | H::Trim(_) => return None,
+        };
+        Some((self.brep, e))
+    }
+    fn topology_handle(&self, e: EntityRef) -> Option<H> {
+        match e {
+            EntityRef::Face(f) => Some(H::Face(f)),
+            EntityRef::Vertex(v) => Some(H::Vertex(v)),
+            EntityRef::Loop(l) => Some(H::Loop(l)),
+            EntityRef::Edge(e) => Some(H::Edge(e)),
+            EntityRef::Faceuse(fu) => Some(H::Faceuse(fu)),
+            EntityRef::Edgeuse(eu) => Some(H::Edgeuse(eu)),
+            EntityRef::Vertexuse(vu) => Some(H::Vertexuse(vu)),
+            _ => None,
+        }
+    }
 }
 
 impl bp2::MergeCurvesObjects<H> for MergeObjects<'_> {
-    fn edge_of(&self, _object: H) -> Option<EdgeId> {
-        None
+    fn edge_of(&self, object: H) -> Option<EdgeId> {
+        match object {
+            H::Edge(e) => Some(e),
+            _ => None,
+        }
     }
-    fn face_of(&self, _object: H) -> Option<FaceId> {
-        None
+    fn face_of(&self, object: H) -> Option<FaceId> {
+        match object {
+            H::Face(f) => Some(f),
+            _ => None,
+        }
     }
 }
 
