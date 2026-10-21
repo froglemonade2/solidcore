@@ -862,16 +862,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "face_kind4_op12",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/query.api_queries/queries.json#105",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "deferred": {
@@ -1090,16 +1086,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "face_kind5_op12",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/query.api_queries/queries.json#128",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "deferred": {
@@ -1310,16 +1302,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "face_kind6_op12",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/query.api_queries/queries.json#150 (upstream tests/SM_API_test/src/TestSmGeneral.cpp:707)",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "deferred": {
@@ -1806,16 +1794,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "upstream_box10_op12",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/query.api_queries/queries.json#209 (upstream tests/SM_API_test/src/TestSmGeneral.cpp:707-850)",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "deferred": {
@@ -3926,16 +3910,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0036",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337102",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "deferred": {
@@ -4174,16 +4154,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0062",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337128",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "deferred": {
@@ -4218,16 +4194,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0066",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337132",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "deferred": {
@@ -4306,16 +4278,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0075",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337141",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "deferred": {
@@ -4362,16 +4330,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0081",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337147",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "max_rel_err": 0.0,
@@ -4758,16 +4722,12 @@
       "values_compared": 3
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0124",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337190",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "max_rel_err": 0.0,
@@ -4978,16 +4938,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0148",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337214",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "deferred": {
@@ -5306,16 +5262,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0183",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337249",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "deferred": {
@@ -5642,16 +5594,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0217",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337283",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "max_rel_err": 0.0,
@@ -5670,16 +5618,12 @@
       "values_compared": 3
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0220",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337286",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "max_rel_err": 0.0,
@@ -5790,16 +5734,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0232",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337298",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "max_rel_err": 0.0,
@@ -6174,16 +6114,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0273",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337339",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "deferred": {
@@ -6550,16 +6486,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0310",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337376",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "deferred": {
@@ -6822,16 +6754,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0336",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337402",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "max_rel_err": 0.0,
@@ -7122,16 +7050,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0368",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337434",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "deferred": {
@@ -7166,16 +7090,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0372",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337438",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "max_rel_err": 0.0,
@@ -7462,16 +7382,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0405",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337471",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "max_rel_err": 0.0,
@@ -7502,28 +7418,20 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0409",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337475",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0410",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337476",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "max_rel_err": 0.0,
@@ -7534,16 +7442,12 @@
       "values_compared": 3
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0412",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337478",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "deferred": {
@@ -8602,16 +8506,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0522",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337588",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "deferred": {
@@ -9582,16 +9482,12 @@
       "values_compared": 5
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0623",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337689",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "deferred": {
@@ -10078,16 +9974,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0673",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337739",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "max_rel_err": 0.0,
@@ -10506,16 +10398,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0719",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337785",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "max_rel_err": 0.0,
@@ -10838,16 +10726,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0753",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337819",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "max_rel_err": 0.0,
@@ -11078,16 +10962,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0779",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337845",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "max_rel_err": 0.0,
@@ -11242,16 +11122,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmCurve::DropPoint",
-        "unit": "curve.curve_p6"
-      },
       "max_rel_err": 0.0,
       "name": "gen0796",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=2348217451497337862",
-      "values_compared": 0
+      "values_compared": 1
     },
     {
       "max_rel_err": 0.0,
@@ -11279,13 +11155,12 @@
     }
   ],
   "cases_both_errored": 0,
-  "cases_deferred": 413,
+  "cases_deferred": 382,
   "cases_failed": 0,
-  "cases_passed": 790,
+  "cases_passed": 821,
   "cases_total": 1203,
   "deferred_by_unit": {
     "curve.crv_on_surf": 10,
-    "curve.curve_p6": 31,
     "intersect.surface_drop_lib_p3": 28,
     "query.brep": 335,
     "topology.face_p2": 9
