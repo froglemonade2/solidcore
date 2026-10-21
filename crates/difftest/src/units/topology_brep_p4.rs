@@ -461,7 +461,7 @@ fn rust_records(b: &Brep, pre: [usize; 10]) -> Model {
         let point = f.surface.as_ref().and_then(|s| {
             let d = s.natural_uv_domain();
             let c = Point2::new((d.min().x + d.max().x) * 0.5, (d.min().y + d.max().y) * 0.5);
-            s.evaluate_point(c).ok()
+            s.evaluate_point(&Kernel::default(), c).ok()
         });
         rec.i(i64::from(point.is_some()));
         let [px, py, pz] = point.map_or([0.0; 3], |p| [p.x, p.y, p.z]);
