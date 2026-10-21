@@ -12228,10 +12228,11 @@ in `intersect::curve_class::p4` (`reset` in the full constructor `with_curve`, a
   edge-target branch (`sm_InsertSolutions` on an edge: `SmEdge::GetCurve`, vertex snapping,
   `InsertAt`, `sm_RefineCCIToSurfaces`) is not ported yet (`p5.rs:748`, tagged
   `UNPORTED(topology.edge)`). The C++ goes on to `MergeIntervals`.
-- The four squeeze cases (gen0164, gen1926, gen2544, gen2695) pass on #137's runner and shim,
-  which differ from main's copy (main carries #137's runner as merged at `41911e78`; the
-  follow-up commits since changed the runner's records and the shim's UB-216 refusal).
-  `--unit intersect.curve_class_p4`: 0 failed.
+- The four squeeze cases (gen0164, gen1926, gen2544, gen2695, default seeds) pass with values
+  compared on the tree merged with main `49384a9c` (`--unit intersect.curve_class_p4`: 3246
+  cases, 2250 passed, 0 failed, 996 deferred). The disagreement was seen with main's copy of
+  the runner and shim (#137 as merged at `41911e78`); the follow-up commits since changed the
+  runner's records and the shim's UB-216 refusal.
 
 ## query.face_p4 — `GetLoopCrossings` wiring and the `heal.heal_data_p1` regression (2026-10-21, PR #137)
 
@@ -12276,7 +12277,10 @@ set `Face::faceuse`, and the export does not carry `m_pFU`, so the Rust side rea
 classification failed (`SM_ERR`) and `IsInnerShell` returned an error for both shells. A harness
 parity gap, not a kernel defect: the importer now sets each face's primary use from its
 `SM_OT_SAME` face use (upstream asserts in `GetUpwardFaceuse` that the primary use is the upward
-one).
+one). The four cases now defer further on, at real gaps: `SmEdge::GetCurve` (`Mouse.smb`, a
+`UNPORTED(topology.edge)` stub on an opaque edge handle) and `SmCrvOnSurf` over a non-B-spline surface
+(`box_with_large_fillet.smb`, `curve.crv_on_surf`). topology.shell: 911 cases, 896 passed,
+0 failed, 15 deferred.
 
 ## topology.edge — inexact geometry import reporting (issue #294, PR #356)
 
