@@ -79,8 +79,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurve::DeformToEndPointTargets (pOptSurfCrvOnSurf)",
-        "unit": "curve.curve_p6"
+        "symbol": "SmBrep::MakeWireEdgeVertex",
+        "unit": "topology.brep_p3"
       },
       "max_rel_err": 0.0,
       "name": "gen0008",
@@ -2639,8 +2639,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCurve::DeformToEndPointTargets (pOptSurfCrvOnSurf)",
-        "unit": "curve.curve_p6"
+        "symbol": "SmBrep::MakeWireEdgeVertex",
+        "unit": "topology.brep_p3"
       },
       "max_rel_err": 0.0,
       "name": "face_curves_cos_open_loop",
@@ -2855,10 +2855,9 @@
     "boolean.merge_p2": 3,
     "cpp-guard:ub-165": 3,
     "curve.crv_on_surf": 2,
-    "curve.curve_p6": 2,
     "query.brep": 2,
     "surface.surface_p2": 12,
-    "topology.brep_p3": 30,
+    "topology.brep_p3": 32,
     "topology.brep_p4": 1,
     "topology.brep_p9": 2,
     "topology.face_p2": 18,
