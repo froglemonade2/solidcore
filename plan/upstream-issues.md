@@ -1518,6 +1518,15 @@ meantime, whoever merges renumbers the new entry and every reference to it (here
 - **Severity:** crash / out-of-range read.
 - **Rust port:** Kernel topology mutation remains deferred. Both the safe FFI validator and the C++ shim require equally sized partners for op 3 with fillets. Six `rejected_fillets_*` fixtures check rejection; 660 isolated probes independently exercise both guards at first and last indices of 1/2/3/32 intervals. Valid equal-sized pairs and non-fillet calls remain accepted.
 
+#### UB-180. `SmFace::GlobalLineIntersect` reads the first interval of an empty UV line classification
+- **Location:** `source/SMLib/src/SmFace.cpp:11769`, `SmFace::GlobalLineIntersect` (def. `:11692`).
+- **What happens:** For a range solution of the surface, `sm_FaceClassifyUVLine` classifies the UV line and, when it returns at most one interval, `sCC[0].m_vMid` is read without checking the size. An empty classification with `SM_SUCCESS` reads past the interval array.
+- **Trigger:** A line lying in the face's surface (a range solution) whose `sm_FaceClassifyUVLine` succeeds without intervals.
+- **How found:** read during porting (`topology.face_p4`).
+- **Confirmed:** no.
+- **Severity:** crash/UB (out-of-bounds read).
+- **Rust port:** Returns `InvalidInput` for an empty classification.
+
 #### UB-200. `SmApiCreateSphere` crashes for radii from about `7e9` and for a non-finite center
 - **Location:** `source/SM_API/src/SmApiPrimitives.cpp:335` `SmApiCreateSphere` -> `source/SMLib/src/SmPrimitiveCreation.cpp:894` `SmPrimitiveCreation::CreateSphere`. The API accepts any finite radius up to `SM_BIG_DOUBLE / 100` (`1e18`).
 - **What happens:** Segfault inside `CreateSphere`. A NaN or infinite center coordinate (not validated) also segfaults; `SmApiCreateTorus` (B-rep overload, no validation) segfaults on the same centers.
@@ -2254,6 +2263,24 @@ meantime, whoever merges renumbers the new entry and every reference to it (here
 - **Cause:** `s2ndUVCurves.Add(pNewUVTrimCurve)` where `sUVCurves.Add(...)` was meant.
 - **Rust port:** Reproduces it (`topology::edgeuse::p3::create_uv_trim_curve` builds the joined curve into the discarded second-half array and reports the recovery path).
 
+#### WR-176. `SmFace::HasSeamProblem` returns TRUE whenever it has to compute the face properties
+- **Location:** `source/SMLib/src/SmFace.cpp:15650`, `SmFace::HasSeamProblem` (def. `:15540`).
+- **What happens:** When `pOptFaceProps` is NULL or below `SM_PROPSTAGE_2a`, the function runs `SetProps_Stage2`, copies its seam classifications and enums to the outputs, and returns `SM_SUCCESS` (`1000`) from a function returning `SmBoolean`. The result is always TRUE ("seam problem"), even for a face whose seams are fine and whose output enums say `SM_SP_NEITHER`.
+- **Trigger:** `HasSeamProblem` without face properties on a face of a periodic surface (e.g. faces of `TestFiles/pt_TestFiles/Mouse.smb`).
+- **How found:** generated difftest case (`topology.face_p4`: a port returning FALSE there disagreed with the C++).
+- **Confirmed:** yes.
+- **Severity:** wrong result.
+- **Rust port:** Returns `has_problem = true` there, as upstream.
+
+#### WR-177. `SmFace::FindVertexSector` evaluates an empty domain for poles after its first vertex use
+- **Location:** `source/SMLib/src/SmFace.cpp:9762`, `SmFace::FindVertexSector` (def. `:9408`; the pole points `:9788`-`:9803`).
+- **What happens:** In the 3D branch (an edge use without UV trim curve), `SmExtent2d sSurfDomain` is declared inside the loop over vertex uses, but the natural domain is stored in it only on the pass that first fetches the poles (`bCheckedPoles`). On later passes a vertex at a pole gets `sEU1UV` from a default (inside-out) extent, which is then passed to `SectorClassifyCurveOn` as the singular UV point.
+- **Trigger:** A vertex at a surface pole with two or more vertex uses on the face's upward face use, their edge uses without UV trim curves, and sector validation requested.
+- **How found:** read during porting (`topology.face_p4`).
+- **Confirmed:** no.
+- **Severity:** wrong result.
+- **Rust port:** Reproduces it (the domain is only set on the pass that fetches the poles).
+
 #### WR-167. `SmTArray::FindElementInMaskedArray` tests `1<ii` instead of `1<<ii`
 - **Location:** `source/SMLib/inc/SmTArray.h:1543`, `SmTArray<TYPE>::FindElementInMaskedArray` (def. `:1531`). Called by `sms_FindAndClassifyLoopBisector` (`SmFace.cpp:2588`) on `SmFaceProps::m_sPolePoints` with the `m_lPoles` side mask.
 - **What happens:** The mask test is `lBitMask & (1<ii)`, a comparison, not a shift: elements 0 and 1 are never searched, and elements 2 and up are searched exactly when bit 0 of the mask (`SM_SS_UMIN`) is set, whatever their own bits. The bisector therefore never recognises an edge mid point on the u-min or v-min pole, and tests the u-max and v-max poles only when the u-min side is singular.
@@ -2262,6 +2289,15 @@ meantime, whoever merges renumbers the new entry and every reference to it (here
 - **Confirmed:** no (the bisector cases of the `query.face_p3` difftest defer before comparing a pole skip).
 - **Severity:** wrong result.
 - **Rust port:** Ported as is (`query::face::p3`, private `find_element_in_masked_array`).
+
+#### WR-197. `SmMerge::MergeAddedTopology`'s declared defaults shift into the wrong flags
+- **Location:** `source/SMLib/inc/SmMerge.h:357` (declaration) against `source/SMLib/src/SmMerge.cpp:5304` (definition), `SmMerge::MergeAddedTopology`.
+- **What happens:** The declaration puts `bDoGluing = TRUE` ninth, followed by `bMakingManifoldSolid = FALSE`, `bFastEdgeCompare = TRUE`, `bDoRegionNesting = TRUE`, `bIgnoreProblems = TRUE`. The definition takes the four flags ninth to twelfth and the unused gluing flag last. A call relying on the defaults therefore runs with making-manifold-solid `TRUE` and fast edge compare `FALSE`, the opposite of what the declaration documents.
+- **Trigger:** Any call that omits the trailing arguments. Both upstream callers (`MergeAddedFace`, `SmFeatureExecutive`) pass all four flags explicitly, so they are not affected.
+- **How found:** read during porting (`boolean.merge_p2`).
+- **Confirmed:** no (no upstream caller uses the defaults).
+- **Severity:** wrong result (latent).
+- **Rust port:** `MergeAddedOptions::default()` is what the declared defaults actually pass, `(TRUE, FALSE, TRUE, TRUE)`; `MERGE_ADDED_FACE_OPTIONS` is `MergeAddedFace`'s explicit `(FALSE, TRUE, TRUE, TRUE)`.
 
 ### NLib
 
@@ -3036,16 +3072,16 @@ meantime, whoever merges renumbers the new entry and every reference to it (here
 - **How found:** difftest fuzzing of `heal.stitch_p1` (PR #196): 4 crashes in 2000 programs; gdb backtrace `SmBrep::GetEdges <- SmBrep::GetMinEdgeBBoxSize <- SmMerge::SmMerge <- SmApiStitch`.
 - **Confirmed:** yes (C++ reference build, standalone reproducer under gdb).
 - **Severity:** crash/UB.
-- **Rust port:** `heal::stitch::p1::api_stitch_face` returns `Unported` (`SmMerge::SmMerge`, then `MergeAddedFace`, unit `boolean.merge_p2`; UB-167); the difftest FFI refuses `SmApiStitch` with a B-rep and a face, so only its null-argument guards are compared.
+- **Rust port:** `heal::stitch::p1::api_stitch_face` builds the merge with `MergeState::with_breps(.., None, 0.0, 0.0, None)` (PR #229), which returns `InvalidInput` where upstream dereferences the null other B-rep (after the primary's `GetMinEdgeBBoxSize`); the difftest FFIs refuse `SmApiStitch` with a B-rep and a face (`heal.stitch_p1`) and a computed tolerance without other B-rep (`boolean.merge_p2`).
 
 #### UB-176. Two-list `SmStitch::StitchVertexPairs` glues a vertex twice
 - **Location:** `source/SMLib/src/SmStitch.cpp:3242`-`3749` (the two-list `StitchVertexPairs`): each glue deletes `sUsingVerts2[...]` and nulls only its own slot.
 - **What happens:** A vertex repeated in `rVertexList2`, or present in both lists, is glued (and deleted) once per occurrence, so a later `GlueVertices` gets an already-deleted vertex (double free / use after free). The sorting loops also index `sSortedIndex1` / `sSortedIndex2` with the unfiltered counts, reading past them when a list holds `NULL` entries.
-- **Trigger:** caller-built lists with a repeated vertex, a vertex in both lists, or a `NULL` entry.
-- **How found:** source review while porting `heal.stitch_p1` (PR #196); the difftest FFI refuses repeats, shared vertices and `NULL`s.
-- **Confirmed:** no (source inspection only; the shim never runs it).
+- **Trigger:** caller-built lists with a repeated vertex, a vertex in both lists, or a `NULL` entry. `SmMerge::MergeAddedTopology` (`source/SMLib/src/SmMerge.cpp:5735`) reaches it with a vertex repeated in its caller's `pMergeVerts`, which it copies into `rVertexList2` unchecked: e.g. the ASCII `plane_square.smb` with vertices `[0, 0]`, no faces or edges, tolerance 10 (stitch tolerance 40).
+- **How found:** source review while porting `heal.stitch_p1` (PR #196); the difftest FFI refuses repeats, shared vertices and `NULL`s. The `MergeAddedTopology` route: an adversarial `boolean.merge_p2` fixture run with that unit's duplicate guard relaxed (PR #229).
+- **Confirmed:** yes (C++ reference build, through `MergeAddedTopology`: segfault, exit 139; the same request without the repeated vertex succeeds).
 - **Severity:** crash/UB.
-- **Rust port:** `heal::stitch::p1::Stitch::stitch_vertex_pairs` returns `InvalidInput` where the sorted index arrays would be read past; repeated vertices are a caller error the FFI refuses.
+- **Rust port:** `heal::stitch::p1::Stitch::stitch_vertex_pairs` returns `InvalidInput` where the sorted index arrays would be read past; repeated vertices are a caller error the FFI refuses. `boolean.merge_p2`'s FFI refuses any entity listed twice in a `MergeAddedTopology` list.
 
 #### UB-177. `SmStitch::DoSimpleFaceStitch` glues vertices that are already freed [PSIRT]
 - **Location:** `source/SMLib/src/SmStitch.cpp:680`-`681` (`sKVertices.Add` / `sDVertices.Add` across all face pairs), `:785` (`pBrepToStitch->RemoveFaces(cpFacesToDelete)`), then the glue loop at `:840`-`916` (`pV1->IsLaminaVertex()`, `SelectTopologyToKeep`, `GlueVertices` / `SqueezeEdge`).
