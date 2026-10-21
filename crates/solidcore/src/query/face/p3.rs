@@ -74,6 +74,7 @@
 //!   derivative vanishes and the step-off never clamps). The bisector tries at most 6
 //!   angles per edge use. No recursion.
 
+use std::cell::RefCell;
 use std::collections::BTreeSet;
 
 use crate::curve::crv_on_surf::CrvOnSurf;
@@ -469,10 +470,15 @@ pub trait ClassifyCurveObjects<O: ClassObject>: CurveOnClassifyObjects<O> {
 /// [`LoopObject::from_trim_curve`] name, the two classification curves those of
 /// [`LoopObject::from_classify_curve`], the target loops [`LoopObject::as_loop`].
 /// Handles resolve to the geometry and stored tolerances of `b`, as the B-rep objects
-/// upstream's pointers name.
+/// upstream's pointers name. A vertex/face gap (`SmVertexuse::GetVertexFaceGap`) is
+/// computed, when `b` has not cached it, on a copy of `b` made at the first lookup
+/// (upstream caches it in the vertex use; the value is the same).
 #[derive(Debug)]
 pub struct LoopObjectCurves<'b, O> {
+    k: &'b Kernel,
     b: &'b Brep,
+    gaps: RefCell<Option<Brep>>,
+    gap_error: RefCell<Option<SolidError>>,
     f: FaceId,
     face: O,
     surface: Option<O>,
@@ -482,7 +488,7 @@ pub struct LoopObjectCurves<'b, O> {
 }
 
 impl<'b, O: LoopObject> LoopObjectCurves<'b, O> {
-    /// The handles of face `f` of `b`.
+    /// The handles of face `f` of `b` (`k` for the vertex/face gaps).
     ///
     /// # Errors
     ///
@@ -490,7 +496,7 @@ impl<'b, O: LoopObject> LoopObjectCurves<'b, O> {
     /// the two classification curves, the B-rep topology, edge curves or trim curves (a
     /// limitation of the handle type, which callers must not mistake for an upstream
     /// status).
-    pub fn new(b: &'b Brep, f: FaceId) -> Result<Self> {
+    pub fn new(k: &'b Kernel, b: &'b Brep, f: FaceId) -> Result<Self> {
         let no = || null(OP_OBJECTS, NO_CURVE_HANDLES);
         // a handle type names every entity of a kind or none (LoopObject), so the
         // first ids answer for all
@@ -513,7 +519,10 @@ impl<'b, O: LoopObject> LoopObjectCurves<'b, O> {
             None
         };
         Ok(Self {
+            k,
             b,
+            gaps: RefCell::new(None),
+            gap_error: RefCell::new(None),
             f,
             face: O::from_face(f).ok_or_else(no)?,
             surface,
@@ -536,6 +545,26 @@ impl<'b, O: LoopObject> LoopObjectCurves<'b, O> {
     #[must_use]
     pub fn classify_uv_curve(&self) -> Option<&Curve> {
         self.uv_curve.as_ref().map(|(_, c)| c)
+    }
+
+    /// The first error of a vertex/face gap lookup ([`ClassGeometry::vertex_face_gap`]
+    /// can only answer `None`, which part 5 reports as an unresolved gap): the caller
+    /// propagates it in place of that error.
+    pub fn take_gap_error(&self) -> Option<SolidError> {
+        self.gap_error.borrow_mut().take()
+    }
+
+    /// `pVertex->GetVertexuseOfFace(pFace)->GetVertexFaceGap()`: its length, `0.0`
+    /// without a gap; [`SolidError::InvalidInput`] without a vertex use of the face
+    /// (upstream dereferences `NULL`).
+    fn gap(&self, v: crate::topology::VertexId, f: FaceId) -> Result<Option<f64>> {
+        let Some(vu) = crate::topology::vertex::vertexuse_of_face(self.b, v, Some(f))? else {
+            return Err(null(OP_OBJECTS, "vertex without a use on the face"));
+        };
+        let mut gaps = self.gaps.borrow_mut();
+        let b = gaps.get_or_insert_with(|| self.b.clone());
+        let gap = vertexuse::vertex_face_gap(self.k, b, vu, false)?;
+        Ok(Some(gap.map_or(0.0, |g| g.gap_3d)))
     }
 
     /// The handle of `t`; [`Self::new`] checked that `O` names topology, so the face
@@ -594,6 +623,35 @@ impl<O: LoopObject + PartialEq> ClassGeometry<O> for LoopObjectCurves<'_, O> {
             EntityRef::Edge(e) => self.b.edge(e).ok().map(|e| e.tolerance),
             EntityRef::Face(f) => self.b.face(f).ok().map(|f| f.tolerance),
             _ => None,
+        }
+    }
+
+    fn vertex_face_gap(&self, vertex: O, surface: &Surface, face: Option<O>) -> Option<f64> {
+        let v = match (vertex.as_vertex(), vertex.as_topology()) {
+            (Some(v), _) | (None, Some(EntityRef::Vertex(v))) => v,
+            _ => return None,
+        };
+        let f = match face {
+            Some(o) if o == self.face => self.f,
+            Some(o) => match o.as_topology()? {
+                EntityRef::Face(f) => f,
+                _ => return None,
+            },
+            // the face of `surface`: the classification's face surface
+            None => {
+                let own = self.b.face(self.f).ok()?.surface.as_ref()?;
+                if !core::ptr::eq(own, surface) {
+                    return None;
+                }
+                self.f
+            }
+        };
+        match self.gap(v, f) {
+            Ok(g) => g,
+            Err(e) => {
+                self.gap_error.borrow_mut().get_or_insert(e);
+                None
+            }
         }
     }
 
@@ -2199,7 +2257,8 @@ mod tests {
     fn loop_object_curves_resolve_the_stored_curves() {
         let mut b = Brep::new();
         let f = square(&mut b, 0.0);
-        let mut objects: LoopObjectCurves<H> = LoopObjectCurves::new(&b, f).unwrap();
+        let k = Kernel::default();
+        let mut objects: LoopObjectCurves<H> = LoopObjectCurves::new(&k, &b, f).unwrap();
         let line = |x: f64| {
             Curve::from(Line::from_points(
                 Point3::new(0.0, 0.0, 0.0),
@@ -2239,7 +2298,7 @@ mod tests {
         let mut b = Brep::new();
         let f = square(&mut b, 0.0);
         let props: FaceProps<H> = FaceProps::for_face(f, 0);
-        let mut objects: LoopObjectCurves<H> = LoopObjectCurves::new(&b, f).unwrap();
+        let mut objects: LoopObjectCurves<H> = LoopObjectCurves::new(&k, &b, f).unwrap();
         let mut cc: CurveClassification<H> = CurveClassification::new(&k);
         let r = find_and_classify_loop_bisector(
             &k,
@@ -2265,7 +2324,7 @@ mod tests {
         let mut b = Brep::new();
         let f = square(&mut b, 0.0);
         let props: FaceProps<H> = FaceProps::for_face(f, 0);
-        let mut objects: LoopObjectCurves<H> = LoopObjectCurves::new(&b, f).unwrap();
+        let mut objects: LoopObjectCurves<H> = LoopObjectCurves::new(&k, &b, f).unwrap();
         let mut cc: CurveClassification<H> = CurveClassification::new(&k);
         let mut out = LoopBisector {
             start_on_seam: true,

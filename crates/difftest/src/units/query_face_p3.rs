@@ -49,7 +49,9 @@ use solidcore::topology::{edgeuse::p1 as eu1, Brep, EdgeId, EdgeuseId, FaceId, L
 use solidcore_ffi::units::query_face_p3::{self as ffi, Kind};
 use solidcore_ffi::units::query_face_p4::split_export;
 
-use super::query_face_p4::{brep_input, brep_path, gen_scale, gen_seam_face, rect, AnySrf, BrepIn, CurveIn};
+use super::query_face_p4::{
+    brep_input, brep_path, gen_scale, gen_seam_face, rect, AnySrf, BrepIn, CurveIn,
+};
 use super::topology_edgeuse_p1::{domain, gen_surface, FILES};
 use super::topology_face_p2::{import, Exact};
 use crate::case::CaseContext;
@@ -157,8 +159,16 @@ fn input_of(i: &Inputs) -> Result<Vec<f64>, HarnessError> {
     let flag = |b: bool| f64::from(u8::from(b));
     match &i.op {
         OpIn::Tight | OpIn::Internal => {}
-        OpIn::Bisector { target, mask, containment } => {
-            v.extend([f64::from(*target), f64::from(*mask), f64::from(*containment)]);
+        OpIn::Bisector {
+            target,
+            mask,
+            containment,
+        } => {
+            v.extend([
+                f64::from(*target),
+                f64::from(*mask),
+                f64::from(*containment),
+            ]);
         }
         OpIn::Sector {
             loop_sel,
@@ -194,8 +204,13 @@ fn input_of(i: &Inputs) -> Result<Vec<f64>, HarnessError> {
 }
 
 fn run_ffi(i: &Inputs, export_only: bool) -> Result<Vec<f64>, HarnessError> {
-    ffi::eval(kind_of(&i.op), export_only, &brep_path(&i.brep)?, &input_of(i)?)
-        .map_err(|e| harness(format!("c++: {e}")))
+    ffi::eval(
+        kind_of(&i.op),
+        export_only,
+        &brep_path(&i.brep)?,
+        &input_of(i)?,
+    )
+    .map_err(|e| harness(format!("c++: {e}")))
 }
 
 /// Sequential reader of shim output.
@@ -287,8 +302,12 @@ fn face_or_edges_inexact(b: &Brep, exact: &Exact, f: FaceId) -> bool {
     };
     lus.into_iter().any(|lu| {
         eu1::loopuse_edgeuses(b, lu).is_ok_and(|eus| {
-            eus.into_iter()
-                .any(|eu| eu1::edge(b, eu).ok().flatten().is_some_and(|e| edge_inexact(exact, e)))
+            eus.into_iter().any(|eu| {
+                eu1::edge(b, eu)
+                    .ok()
+                    .flatten()
+                    .is_some_and(|e| edge_inexact(exact, e))
+            })
         })
     })
 }
@@ -407,7 +426,10 @@ fn export(i: &Inputs) -> Result<Result<(Brep, Resolved), Output>, HarnessError> 
             if face_or_edges_inexact(&b, &exact, face)
                 || edge_of(eu1).is_some_and(|e| edge_inexact(&exact, e))
                 || edge_of(eu2).is_some_and(|e| edge_inexact(&exact, e))
-                || eu1::face(&b, eu2).ok().flatten().is_some_and(|f| face_or_edges_inexact(&b, &exact, f))
+                || eu1::face(&b, eu2)
+                    .ok()
+                    .flatten()
+                    .is_some_and(|f| face_or_edges_inexact(&b, &exact, f))
             {
                 return Ok(Err(Output::err("inexact_geometry")));
             }
@@ -628,7 +650,9 @@ impl LoopObject for H {
 fn point_class_pair(pc: &PointClassification<H>) -> [i64; 2] {
     let class = i64::from(pc.point_class().code());
     let vertex = match pc.vertex_object() {
-        Some(H::Topo(EntityRef::Vertex(v))) if pc.point_class() == solidcore::intersect::point_class::PointClassType::Vertex => {
+        Some(H::Topo(EntityRef::Vertex(v)))
+            if pc.point_class() == solidcore::intersect::point_class::PointClassType::Vertex =>
+        {
             i64::from(v.index())
         }
         _ => -1,
@@ -713,7 +737,7 @@ fn rust_bisector(k: &Kernel, b: &Brep, c: &BisectorCase) -> Result<Output, Harne
         }
     }
     let mut objects: qf3::LoopObjectCurves<H> =
-        qf3::LoopObjectCurves::new(b, c.face).map_err(|e| harness(e.to_string()))?;
+        qf3::LoopObjectCurves::new(k, b, c.face).map_err(|e| harness(e.to_string()))?;
     let mut cc: CurveClassification<H> = CurveClassification::new(k);
     let r = qf3::find_and_classify_loop_bisector(
         k,
@@ -727,6 +751,14 @@ fn rust_bisector(k: &Kernel, b: &Brep, c: &BisectorCase) -> Result<Output, Harne
         &mut objects,
         &mut cc,
     );
+    // a failed vertex/face gap lookup surfaces as part 5's unresolved-gap error, which the
+    // bisector ignores as a status: report the lookup's own error
+    if let Some(g) = objects.take_gap_error() {
+        if let Some(d) = Output::unported(&g) {
+            return Ok(d);
+        }
+        return Ok(rust_err(&g));
+    }
     let r = match r {
         Ok(r) => r,
         Err(e) => {
@@ -750,8 +782,12 @@ fn rust_bisector(k: &Kernel, b: &Brep, c: &BisectorCase) -> Result<Output, Harne
     let line = match objects.classify_uv_curve() {
         Some(l) if r.has_curve => {
             let ivl: Extent1d = l.natural_interval();
-            let a = l.evaluate_point(ivl.min()).map_err(|e| harness(e.to_string()))?;
-            let z = l.evaluate_point(ivl.max()).map_err(|e| harness(e.to_string()))?;
+            let a = l
+                .evaluate_point(ivl.min())
+                .map_err(|e| harness(e.to_string()))?;
+            let z = l
+                .evaluate_point(ivl.max())
+                .map_err(|e| harness(e.to_string()))?;
             vec![a.x, a.y, z.x, z.y]
         }
         _ => Vec::new(),
@@ -779,7 +815,11 @@ fn rust_bisector(k: &Kernel, b: &Brep, c: &BisectorCase) -> Result<Output, Harne
 
 /// A flat or curved B-spline surface over `[0, 1]^2` of degree 1..3 (JSON, as unit
 /// `topology.edgeuse_p1`'s `SrfIn`): `bulge` 0 makes it planar.
-fn bspline(rng: &mut Rng, scale: f64, bulge: f64) -> Result<super::topology_edgeuse_p1::SrfIn, HarnessError> {
+fn bspline(
+    rng: &mut Rng,
+    scale: f64,
+    bulge: f64,
+) -> Result<super::topology_edgeuse_p1::SrfIn, HarnessError> {
     let p = 1 + rng.below(3) as usize;
     let q = 1 + rng.below(3) as usize;
     let n = p + rng.below(2) as usize;
@@ -797,7 +837,11 @@ fn bspline(rng: &mut Rng, scale: f64, bulge: f64) -> Result<super::topology_edge
         .map(|i| {
             (0..=m)
                 .map(|j| {
-                    let z = if bulge == 0.0 { 0.0 } else { rng.uniform(-bulge, bulge) };
+                    let z = if bulge == 0.0 {
+                        0.0
+                    } else {
+                        rng.uniform(-bulge, bulge)
+                    };
                     [i as f64 * scale, j as f64 * scale, z * scale, now]
                 })
                 .collect()
@@ -825,8 +869,14 @@ fn gen_face(rng: &mut Rng, tight: bool) -> Result<BrepIn, HarnessError> {
         if n.iter().all(|c| c.abs() < 0.1) {
             n = [0.0, 0.0, 1.0];
         }
-        let lo = [rng.uniform(-1.0, 0.5) * scale, rng.uniform(-1.0, 0.5) * scale];
-        let hi = [lo[0] + rng.uniform(0.01, 1.0) * scale, lo[1] + rng.uniform(0.01, 1.0) * scale];
+        let lo = [
+            rng.uniform(-1.0, 0.5) * scale,
+            rng.uniform(-1.0, 0.5) * scale,
+        ];
+        let hi = [
+            lo[0] + rng.uniform(0.01, 1.0) * scale,
+            lo[1] + rng.uniform(0.01, 1.0) * scale,
+        ];
         let surface: super::topology_edgeuse_p1::SrfIn =
             serde_json::from_value(serde_json::json!({"plane": {"o": o, "n": n}}))
                 .map_err(|e| harness(e.to_string()))?;
@@ -843,10 +893,34 @@ fn gen_face(rng: &mut Rng, tight: bool) -> Result<BrepIn, HarnessError> {
             surface: bspline(rng, scale, bulge)?,
         };
         let mut loops = vec![vec![
-            CurveIn::Line { a: 0.05, b: 0.05, c: 0.95, d: 0.05, rev: false },
-            CurveIn::Line { a: 0.95, b: 0.05, c: 0.95, d: 0.95, rev: false },
-            CurveIn::Line { a: 0.95, b: 0.95, c: 0.05, d: 0.95, rev: false },
-            CurveIn::Line { a: 0.05, b: 0.95, c: 0.05, d: 0.05, rev: false },
+            CurveIn::Line {
+                a: 0.05,
+                b: 0.05,
+                c: 0.95,
+                d: 0.05,
+                rev: false,
+            },
+            CurveIn::Line {
+                a: 0.95,
+                b: 0.05,
+                c: 0.95,
+                d: 0.95,
+                rev: false,
+            },
+            CurveIn::Line {
+                a: 0.95,
+                b: 0.95,
+                c: 0.05,
+                d: 0.95,
+                rev: false,
+            },
+            CurveIn::Line {
+                a: 0.05,
+                b: 0.95,
+                c: 0.05,
+                d: 0.05,
+                rev: false,
+            },
         ]];
         if rng.chance(0.4) {
             loops = vec![vec![CurveIn::Circle {
@@ -908,7 +982,11 @@ fn gen_case(rng: &mut Rng) -> Result<Inputs, HarnessError> {
     } else if roll < 75 {
         OpIn::Bisector {
             target: rng.below(4) as u32,
-            mask: if rng.chance(0.3) { rng.below(16) as u8 } else { 0 },
+            mask: if rng.chance(0.3) {
+                rng.below(16) as u8
+            } else {
+                0
+            },
             containment: *rng.choose(&[0u8, 1, 2, 5, 6]).unwrap_or(&1),
         }
     } else {
@@ -916,7 +994,11 @@ fn gen_case(rng: &mut Rng) -> Result<Inputs, HarnessError> {
             loop_sel: rng.below(3) as u32,
             eu: rng.below(8) as u32,
             // (the radial mode with a singularity returns before the binormals)
-            mode: if rng.chance(0.3) { 2 } else { rng.below(3) as u8 },
+            mode: if rng.chance(0.3) {
+                2
+            } else {
+                rng.below(3) as u8
+            },
             frac: *rng.choose(&[0.5, 0.25, 0.0, 1.0, 1e-6]).unwrap_or(&0.5),
             curve: rng.below(3) as u8,
             ta: rng.uniform(0.0, 1.0),
@@ -960,7 +1042,9 @@ impl UnitDiff for Runner {
     }
 
     fn generate(&self, rng: &mut Rng) -> Option<Value> {
-        gen_case(rng).ok().and_then(|c| serde_json::to_value(c).ok())
+        gen_case(rng)
+            .ok()
+            .and_then(|c| serde_json::to_value(c).ok())
     }
 }
 

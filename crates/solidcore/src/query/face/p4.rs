@@ -55,7 +55,9 @@
 //!   geometry of its handles. Its status is not checked upstream: a failure leaves an
 //!   empty done touch list here; [`SolidError::Unported`] and [`SolidError::InvalidInput`]
 //!   (a null dereference upstream, or a handle the bisector curves cannot resolve)
-//!   propagate.
+//!   propagate, as does the error of a vertex/face gap lookup of the bisector or of
+//!   `GetLoopCrossings` ([`qf3::LoopObjectCurves::take_gap_error`]), which part 5 can
+//!   only report as an unresolved gap that the bisector ignores as a status.
 //! - **Undefined behaviour upstream** is [`SolidError::InvalidInput`]: an index read
 //!   outside `rClassifyLoopIOs`, the face props' loop props or a touch list (odd length),
 //!   an empty seam classification read at its first or last interval, a loop without
@@ -446,7 +448,7 @@ pub fn classify_loops<O: LoopObject>(
             // loop does not cross an existing seam ClassifyCrv (the status is not
             // checked upstream; a handle type that cannot name the bisector's curves is
             // an error of the caller, not a status)
-            let mut bisector_curves = qf3::LoopObjectCurves::new(b, face)?;
+            let mut bisector_curves = qf3::LoopObjectCurves::new(k, b, face)?;
             ignored(find_and_classify_loop_bisector(
                 k,
                 b,
@@ -461,6 +463,12 @@ pub fn classify_loops<O: LoopObject>(
                 &mut start_on_seam,
                 &mut stop_on_seam,
             ))?;
+            // a failed vertex/face gap lookup (`GetVertexFaceGap`) reaches the bisector
+            // as part 5's unresolved-gap error, which it ignores as a status: the
+            // lookup's own error propagates (Unported, or a null dereference upstream)
+            if let Some(e) = bisector_curves.take_gap_error() {
+                return Err(e);
+            }
             if scratch.size() == 0 {
                 continue;
             }
@@ -469,7 +477,12 @@ pub fn classify_loops<O: LoopObject>(
             crv = ClassifyCrv::Bisector;
             // (an `InvalidInput` is a null dereference upstream, or a handle the bisector
             // curves cannot resolve: it propagates instead of being ignored as a status)
-            bisector_done = match get_loop_crossings(k, &bisector_curves, scratch, loops, props) {
+            // (and a failed gap lookup, as above)
+            let r = get_loop_crossings(k, &bisector_curves, scratch, loops, props);
+            if let Some(e) = bisector_curves.take_gap_error() {
+                return Err(e);
+            }
+            bisector_done = match r {
                 Err(e @ SolidError::InvalidInput { .. }) => return Err(e),
                 r => ignored(r)?.unwrap_or_default(),
             };

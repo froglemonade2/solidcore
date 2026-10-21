@@ -11438,3 +11438,49 @@ mechanical:
   `allow_removal_of_ends = false` or the runner's record after the squeeze op.
 
 `SmCurveInterval::GetMinUV` / `GetMaxUV` are wired (no case reaches them yet).
+
+**Resolved in PR #137 (2026-10-21).** Both are wired in `intersect::curve_class::p4`
+(`reset`, and `squeeze_out_smallest_interval` calling `CurveClassification::connect_intervals`):
+
+- `merge_plane10_line`: the brep_p2 runner's `MergeObjects` adapter now resolves the
+  classification's topology handles (`topology_entity` / `topology_handle`), edge and trim
+  curves, the face surface, vertex points and tolerances (commit `2fa9f019`). The case no
+  longer fails; it is deferred at `intersect::curve_class::p5::insert_solutions`, whose
+  edge-target branch (`sm_InsertSolutions` on an edge: `SmEdge::GetCurve`, vertex snapping,
+  `InsertAt`, `sm_RefineCCIToSurfaces`) is not ported yet (`p5.rs:748`, tagged
+  `UNPORTED(topology.edge)`). The C++ goes on to `MergeIntervals`.
+- The four squeeze cases (gen0164, gen1926, gen2544, gen2695) pass on #137's runner and shim,
+  which differ from main's copy (main carries #137's runner as merged at `41911e78`; the
+  follow-up commits since changed the runner's records and the shim's UB-216 refusal).
+  `--unit intersect.curve_class_p4`: 0 failed.
+
+## query.face_p4 — `GetLoopCrossings` wiring and the `heal.heal_data_p1` regression (2026-10-21, PR #137)
+
+`SmFace::ClassifyLoops`' bisector path (`query/face/p4.rs`, `get_loop_crossings`) calls
+`CurveClassification::get_loop_crossings` with the bisector's `query::face::p3::LoopObjectCurves`
+as the geometry. A first wiring (`b4a4764b`, reverted in `8f726b1f`) made 13
+`heal.heal_data_p1` cases fail (`values.out.len` C++ 3102 / Rust 3100, e.g.
+`file_surf_extrude_op21`): C++ keeps the face in the target list after `Cache_FaceProps_Stage3`,
+Rust moved it to the not-yet list.
+
+- **Cause** (owner: `query.face_p3`, the `LoopObjectCurves` adapter). `LoopObjectCurves`
+  answered `None` to `ClassGeometry::vertex_face_gap`. With big gaps, `sm_InsertSolutions`
+  (`intersect.curve_class_p5`) then returns `InvalidInput` ("unresolved classification
+  vertex/face gap") inside the bisector's `CurveOnClassify`, whose status
+  `sms_FindAndClassifyLoopBisector` ignores. The classification stays one unclassified interval,
+  `GetLoopCrossings` finds no touches, and `ClassifyLoops` reports
+  `NoClassifyZeroCrosscnt`, which stage 3 turns into `SM_ERR_NOTYET_HEAL_FACE`. The stub hid this
+  because the cases deferred at `GetLoopCrossings`.
+- **Fix.** `LoopObjectCurves` takes the `Kernel` (`new(k, b, f)`) and implements
+  `vertex_face_gap` as upstream: `GetVertexuseOfFace(face)->GetVertexFaceGap()`, its length,
+  `0.0` without a gap, computed on a copy of the B-rep when not cached. It also implements
+  `topology_entity` / `topology_handle` (face, loops, B-rep topology). The lookup's own error
+  (`Unported`, or `InvalidInput` for a vertex without a use on the face, a null dereference
+  upstream) is kept (`take_gap_error`), and `ClassifyLoops` and the `query.face_p3` runner
+  propagate it in place of part 5's unresolved-gap error. An `InvalidInput` from
+  `GetLoopCrossings` also propagates instead of being ignored as a status.
+- **Result.** `heal.heal_data_p1` 493 cases, 280 passed, 0 failed, 213 deferred, as with the stub.
+  The 13 cases now defer later, at the justified `UNPORTED(intersect.curve_class_p2):
+  SmCurveClassification::ReSet` of `curve::crv_on_surf` (no `Kernel` under `Curve::knots`, see
+  the `intersect.curve_class_p4` section). `query.face_p3` and `query.face_p4` counts are
+  unchanged.
