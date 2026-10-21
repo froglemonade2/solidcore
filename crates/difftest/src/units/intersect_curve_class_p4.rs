@@ -2842,9 +2842,16 @@ mod tests {
                 // (the loop crossings) records SM_ERR_NULL_POINTER (InvalidInput, 1007) right
                 // after the record of the ops before it
                 let mut before = s.clone();
-                assert!(matches!(before.ops.pop(), Some(OpIn::LoopCrossings { .. })), "{name}");
-                let Ok(prefix) = rust_run(&before) else { panic!("{name}: setup failed") };
-                let Ok(full) = rust_run(&s) else { panic!("{name}: no record") };
+                assert!(
+                    matches!(before.ops.pop(), Some(OpIn::LoopCrossings { .. })),
+                    "{name}"
+                );
+                let Ok(prefix) = rust_run(&before) else {
+                    panic!("{name}: setup failed")
+                };
+                let Ok(full) = rust_run(&s) else {
+                    panic!("{name}: no record")
+                };
                 assert_eq!(full.get(..prefix.len()), Some(prefix.as_slice()), "{name}");
                 assert_eq!(
                     full.get(prefix.len()..prefix.len() + 2),

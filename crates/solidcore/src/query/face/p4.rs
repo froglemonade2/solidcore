@@ -49,10 +49,13 @@
 //!   [`LoopObject::from_classify_curve`]; `EntityRef` cannot name curves) cannot run
 //!   the bisector: `ClassifyLoops` then returns [`SolidError::InvalidInput`]
 //!   ([`qf3::NO_CURVE_HANDLES`]) instead of ignoring it as a status.
-//! - **Unported callees** (`UNPORTED` stubs): `SmCurveClassification::GetLoopCrossings`
-//!   (`intersect.curve_class_p4`), reached only for a target loop that crosses no seam
-//!   the face props already classified. Faces whose loops all cross a periodic seam
-//!   (no-area loops of a missing seam) are classified entirely by the port.
+//! - **`GetLoopCrossings`** (`intersect.curve_class_p4`) runs on the bisector's
+//!   classification for a target loop that crosses no seam the face props already
+//!   classified, with the [`qf3::LoopObjectCurves`] the bisector's curves live in as the
+//!   geometry of its handles. Its status is not checked upstream: a failure leaves an
+//!   empty done touch list here; [`SolidError::Unported`] and [`SolidError::InvalidInput`]
+//!   (a null dereference upstream, or a handle the bisector curves cannot resolve)
+//!   propagate.
 //! - **Undefined behaviour upstream** is [`SolidError::InvalidInput`]: an index read
 //!   outside `rClassifyLoopIOs`, the face props' loop props or a touch list (odd length),
 //!   an empty seam classification read at its first or last interval, a loop without
@@ -263,19 +266,19 @@ fn find_and_classify_loop_bisector<O: LoopObject>(
 }
 
 /// `rCrvClassification.GetLoopCrossings(rLoops, &rFaceProps, &sCrossingCounts,
-/// &sRawTouchDirList, &sDoneTouchDirList)`: the done touch list.
+/// &sRawTouchDirList, &sDoneTouchDirList)`: the done touch list. `geometry` resolves the
+/// handles of the classification, which `FindAndClassifyLoopBisector` made against it.
 fn get_loop_crossings<O: LoopObject>(
-    _k: &Kernel,
-    _b: &Brep,
-    _classification: &CurveClassification<O>,
-    _loops: &[LoopId],
-    _props: &FaceProps<O>,
+    k: &Kernel,
+    geometry: &qf3::LoopObjectCurves<'_, O>,
+    classification: &CurveClassification<O>,
+    loops: &[LoopId],
+    props: &mut FaceProps<O>,
 ) -> Result<Vec<TouchData<O>>> {
-    // UNPORTED(intersect.curve_class_p4): SmCurveClassification::GetLoopCrossings
-    Err(SolidError::unported(
-        "SmCurveClassification::GetLoopCrossings",
-        "intersect.curve_class_p4",
-    ))
+    let targets: Vec<O> = loops.iter().map(|&l| O::from_loop(l)).collect();
+    Ok(classification
+        .get_loop_crossings(k, geometry, &targets, Some(props))?
+        .done_touches)
 }
 
 /// The orientation of an entering or pairing touch: `SM_OT_SAME` for an arrive-out /
@@ -311,8 +314,9 @@ fn touch_orient<O: Copy>(done: &[TouchData<O>], j1: usize) -> Result<OrientType>
 /// without touches to walk; [`SolidError::InvalidInput`] ([`NOT_THIS_FACE`],
 /// [`NO_SURFACE`]) when the first loop is not on `face` or the face has no surface, and
 /// where upstream's behaviour is undefined (module docs); [`SolidError::Unported`] for a
-/// target loop that crosses no seam (the bisector's callees, `intersect.curve_class_p4`);
-/// [`SolidError::InvalidInput`] ([`qf3::NO_CURVE_HANDLES`]) when such a loop meets a
+/// target loop that crosses no seam when a callee of the bisector or of
+/// `GetLoopCrossings` is unported; [`SolidError::InvalidInput`] from `GetLoopCrossings`
+/// (module docs) and ([`qf3::NO_CURVE_HANDLES`]) when such a loop meets a
 /// handle type that cannot name the bisector's curves; the
 /// errors of the topology queries and of [`FaceProps::set_props_stage2`]'s
 /// [`SolidError::Unported`].
@@ -463,8 +467,12 @@ pub fn classify_loops<O: LoopObject>(
 
             // UVTrimLine Vertex and Edge TgtLoop_Crossings (the status is not checked)
             crv = ClassifyCrv::Bisector;
-            bisector_done =
-                ignored(get_loop_crossings(k, b, scratch, loops, props))?.unwrap_or_default();
+            // (an `InvalidInput` is a null dereference upstream, or a handle the bisector
+            // curves cannot resolve: it propagates instead of being ignored as a status)
+            bisector_done = match get_loop_crossings(k, &bisector_curves, scratch, loops, props) {
+                Err(e @ SolidError::InvalidInput { .. }) => return Err(e),
+                r => ignored(r)?.unwrap_or_default(),
+            };
         }
         let done: &[TouchData<O>] = match crv {
             ClassifyCrv::SeamU => &props.done_touch_list_u,
