@@ -126,7 +126,7 @@ use crate::surface::cone::Cone;
 use crate::surface::offset_surface::SS_UNKNOWN;
 use crate::surface::sphere::Sphere;
 use crate::surface::surface::p1::evaluate_1st_derivatives;
-use crate::surface::surface::p2::{drop_vectors, SurfaceKind};
+use crate::surface::surface::p2::drop_vectors;
 use crate::surface::surface::Surface;
 use crate::surface::torus::Torus;
 use crate::topology::edgeuse::p1 as eu;
