@@ -104,6 +104,16 @@ impl ExecutiveAccess<Handle> for Access {
     ) -> SolidResult<StitchAttempt> {
         missing()
     }
+    fn stitch_faces(
+        &mut self,
+        _: &mut Kernel,
+        _: Handle,
+        _: f64,
+        _: Option<&[Handle]>,
+        _: bool,
+    ) -> SolidResult<StitchAttempt> {
+        missing()
+    }
     fn make_face_brep(
         &mut self,
         _: &mut Kernel,
