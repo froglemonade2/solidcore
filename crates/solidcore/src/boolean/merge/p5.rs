@@ -26,7 +26,7 @@
 //! Missing/dangling mates are rejected only when added to the keep list:
 //! typed ids cannot represent the null pointer upstream can append there.
 
-use crate::boolean::merge::p1::{self, VertexCopy};
+use crate::boolean::merge::p1;
 use crate::boolean::merge::p2::{self, MergeContext, TopologyCopy};
 use crate::boolean::topology_intersector::p1::Relations;
 use crate::error::{Result, SolidError};
@@ -537,7 +537,7 @@ mod tests {
         attributes: &'a mut AttributeStore,
     ) -> TopologyCopy<'a> {
         TopologyCopy {
-            vertices: VertexCopy {
+            vertices: p1::VertexCopy {
                 records,
                 attributes,
                 source_key: &|v| ObjectRef {
