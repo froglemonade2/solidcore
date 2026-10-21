@@ -723,6 +723,19 @@ fn own_surfaces(b: &mut Brep) -> Result<(), HarnessError> {
             }
         }
     }
+    // the edge curves' owners (`SmCurve::GetOwner`/`GetEdge`, set by the B-rep build
+    // upstream): the edge's arena identity, which `SmBrep::GetCurves`
+    // (`topology::brep::p1::curves`) tests the owner against; `ShrinkGeometry` trims the
+    // curves that name an edge
+    let edges: Vec<EdgeId> = b.edges().ids().collect();
+    for e in edges {
+        if let Some(c) = b.edge_mut(e).map_err(|e| err(&e))?.curve.as_mut() {
+            let _ = c.set_owner(
+                Some(arena_identity(CacheObject::Edge(e))),
+                Some(arena_identity(CacheObject::Brep)),
+            );
+        }
+    }
     Ok(())
 }
 
