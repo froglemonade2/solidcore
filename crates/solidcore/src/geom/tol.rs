@@ -116,8 +116,8 @@ use crate::topology::{Brep, EdgeId, FaceId, VertexId};
 // `Brep::this_model_size_estimate`, `Brep::set_this_model_size_estimate`, unit
 // topology.brep_p1); SmTol::GetScaledZero(const SmBrep&) needs SmBrep::CalculateBoundingBox
 // (query.brep).
-// UNPORTED(topology.vertex), UNPORTED(topology.edge), UNPORTED(topology.face_p2),
-// UNPORTED(topology.edgeuse_p1): SmTol::GetZoneTol3d(const
+// UNPORTED(geom.tol) (the owner in harness/callgraph/units.json; every call site of
+// these overloads carries this tag): SmTol::GetZoneTol3d(const
 // SmObject*), SmTol::GetZoneTol3d(const SmBrepData*), SmTol::GetApproxTol3d(const
 // SmObject*), SmTol::GetXSectTol3d(const SmObject*, const SmObject*, ..),
 // SmTol::GetZoneTol3d_ForXSectResult(const SmObject*, const SmObject*),
@@ -162,10 +162,10 @@ use crate::topology::{Brep, EdgeId, FaceId, VertexId};
 // UNPORTED(topology.vertex): SmTol::GetScaledZero(const SmVertex&) (SmVertex::GetPoint).
 // UNPORTED(topology.edge): SmTol::GetScaledZero(const SmEdge&) (SmEdge::GetCurve).
 // UNPORTED(topology.face_p2): SmTol::GetScaledZero(const SmFace&) (SmFace::GetSurface).
-// UNPORTED(query.face_p1): SmTol::GetScaledZero(const SmRegion&) and (const SmShell&) are
-// each one call to SmRegion::CalculateBoundingBox / SmShell::CalculateBoundingBox, which
-// harness/callgraph/units.json assigns to query.face_p1 (the blocking callee is in that
-// unit, not in geom.tol).
+// SmTol::GetScaledZero(const SmRegion&) and (const SmShell&) (SmTol.cpp:1394-1395) are not
+// ported: nothing calls them yet. Each is the scaled zero of one box, now
+// query::face::p1::calculate_region_bounding_box / calculate_shell_bounding_box (query.face_p1);
+// geom cannot call query, so port them beside those when a caller needs them.
 // SmTol::UpdateObjectTolerance(SmTopology*, double, double, SmBoolean) is
 // update_object_tolerance below (CO-PORTED in boolean.topology_intersector_p1).
 

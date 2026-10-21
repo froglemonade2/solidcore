@@ -58,11 +58,12 @@
 //! - `SmBrep::GlueVertices`, `RemoveFaces` (with the B-rep's own editing flag) and
 //!   `StitchAndOrient` call `topology.brep_p5`, which defers at its own barriers.
 //! - The calls into `GlueEdgesGeneral` (`topology.brep_p7`), `SqueezeEdge`
-//!   (`topology.brep_p3`), `Notify`
-//!   (`topology.brep_p2`), `CalculateBoundingBox` (`query.brep`), `SmFace::GetBrep`,
+//!   (`topology.brep_p3`), `CalculateBoundingBox` (`query.brep`), `SmFace::GetBrep`,
 //!   `GetVertices`, `GetEdges` (`topology.face_p4`) and `SmMerge::MergeAddedFace`
 //!   (`boolean.merge_p2`) return [`SolidError::Unported`]. The API entry points call
 //!   `DoStitching`, `StitchIntoSolid` and `StitchIntoShell` in [`super::p2`].
+//!   `SmBrep::Notify(SM_NO_PRE_EDIT)` is `topology::brep::p2::notify` on an empty notify
+//!   state (no B-rep cache, no attribute state on the heal path).
 
 use std::collections::BTreeMap;
 
@@ -383,11 +384,13 @@ pub fn select_topology_to_keep<C: StitchCallback + ?Sized>(
 
             // Find the distance from pEdge1->Curve to each face in sEFaces2.
             for &face2 in &faces2 {
-                let surface2 =
-                    fp2::surface(b, face2)?.ok_or_else(|| deref("face without surface"))?;
+                // (upstream reads the surface pointer first but dereferences it only in the
+                // distance call, after breaking on a null curve)
                 let Some(curve1) = edge::curve(b, edge1)? else {
                     break;
                 };
+                let surface2 =
+                    fp2::surface(b, face2)?.ok_or_else(|| deref("face without surface"))?;
                 // 0 samples: do a precise measurement; no max distance (status ignored)
                 if let Some(g) = ignored(curve1.surface_max_distance_between(
                     k,
@@ -409,11 +412,13 @@ pub fn select_topology_to_keep<C: StitchCallback + ?Sized>(
 
             // Find the distance from pEdge2->Curve to each face in sEFaces1.
             for &face1 in &faces1 {
-                let surface1 =
-                    fp2::surface(b, face1)?.ok_or_else(|| deref("face without surface"))?;
+                // (upstream reads the surface pointer first but dereferences it only in the
+                // distance call, after breaking on a null curve)
                 let Some(curve2) = edge::curve(b, edge2)? else {
                     break;
                 };
+                let surface1 =
+                    fp2::surface(b, face1)?.ok_or_else(|| deref("face without surface"))?;
                 if let Some(g) = ignored(curve2.surface_max_distance_between(
                     k,
                     &edge::interval(b, edge2)?,
@@ -2075,11 +2080,22 @@ fn local_identity(type_code: i64, index: u32) -> ObjectRef {
     }
 }
 
-/// `SmBrep::Notify(SM_NO_PRE_EDIT, this, NULL, NULL)` (unit `topology.brep_p2`).
+/// `SmBrep::Notify(SM_NO_PRE_EDIT, this, NULL, NULL)` ([`crate::topology::brep::p2::notify`]).
+/// No Rust caller holds the B-rep's `SM_OC_BREP` cache, and the stitcher, like the rest
+/// of the heal path, carries no attribute state (`plan/findings.md`, "heal: no attribute
+/// state on the heal path"), so the notification runs on an empty state; `PRE_EDIT` reads
+/// no topology record.
 pub(crate) fn brep_notify_pre_edit(b: &mut Brep) -> Result<()> {
-    let _ = b;
-    // UNPORTED(topology.brep_p2): SmBrep::Notify
-    Err(SolidError::unported("SmBrep::Notify", "topology.brep_p2"))
+    use crate::topology::brep::p2;
+    let mut state = p2::RegionNotifyState::new(b);
+    let this = Some(p2::NotifyArg::Object(p2::brep_ref(b)));
+    p2::notify(
+        b,
+        &mut state.env(),
+        None,
+        crate::geom::object::NotifyOperation::PreEdit,
+        [this, None, None],
+    )
 }
 
 /// `SmBrep::CalculateBoundingBox(rBox, bApprox, bTight, bExpandByZoneTol3d)` (unit

@@ -7,6 +7,7 @@
 
 pub mod fillet_corner;
 pub mod fillet_custom_solver;
+pub mod fillet_executive;
 pub mod fillet_geom;
 pub mod fillet_intersector;
 pub mod fillet_solver;

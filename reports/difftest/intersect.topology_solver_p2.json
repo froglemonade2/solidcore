@@ -2432,7 +2432,7 @@
     {
       "deferred": {
         "symbol": "SmTol::GetZoneTol3d(const SmObject*)",
-        "unit": "intersect.topology_solver_p1"
+        "unit": "geom.tol"
       },
       "max_rel_err": 0.0,
       "name": "face_included_without_shape_limit_5_3_0",
@@ -2444,7 +2444,7 @@
     {
       "deferred": {
         "symbol": "SmTol::GetZoneTol3d(const SmObject*)",
-        "unit": "intersect.topology_solver_p1"
+        "unit": "geom.tol"
       },
       "max_rel_err": 0.0,
       "name": "face_included_without_shape_limit_5_3_1",
@@ -2456,7 +2456,7 @@
     {
       "deferred": {
         "symbol": "SmTol::GetZoneTol3d(const SmObject*)",
-        "unit": "intersect.topology_solver_p1"
+        "unit": "geom.tol"
       },
       "max_rel_err": 0.0,
       "name": "face_included_without_shape_limit_5_4_0",
@@ -2468,7 +2468,7 @@
     {
       "deferred": {
         "symbol": "SmTol::GetZoneTol3d(const SmObject*)",
-        "unit": "intersect.topology_solver_p1"
+        "unit": "geom.tol"
       },
       "max_rel_err": 0.0,
       "name": "face_included_without_shape_limit_5_4_1",
@@ -2543,8 +2543,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::GetNaturalUVDomain",
-        "unit": "surface.surface_p2"
+        "symbol": "SmIsoCurve::SmIsoCurve (non-B-spline surface)",
+        "unit": "curve.iso_curve"
       },
       "max_rel_err": 0.0,
       "name": "face_included_without_shape_limit_6_3_0",
@@ -2555,8 +2555,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::GetNaturalUVDomain",
-        "unit": "surface.surface_p2"
+        "symbol": "SmIsoCurve::SmIsoCurve (non-B-spline surface)",
+        "unit": "curve.iso_curve"
       },
       "max_rel_err": 0.0,
       "name": "face_included_without_shape_limit_6_3_1",
@@ -2567,8 +2567,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::GetNaturalUVDomain",
-        "unit": "surface.surface_p2"
+        "symbol": "SmIsoCurve::SmIsoCurve (non-B-spline surface)",
+        "unit": "curve.iso_curve"
       },
       "max_rel_err": 0.0,
       "name": "face_included_without_shape_limit_6_4_0",
@@ -2579,8 +2579,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::GetNaturalUVDomain",
-        "unit": "surface.surface_p2"
+        "symbol": "SmIsoCurve::SmIsoCurve (non-B-spline surface)",
+        "unit": "curve.iso_curve"
       },
       "max_rel_err": 0.0,
       "name": "face_included_without_shape_limit_6_4_1",
@@ -2655,8 +2655,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::GetNaturalUVDomain",
-        "unit": "surface.surface_p2"
+        "symbol": "SmIsoCurve::SmIsoCurve (non-B-spline surface)",
+        "unit": "curve.iso_curve"
       },
       "max_rel_err": 0.0,
       "name": "face_included_without_shape_limit_7_3_0",
@@ -2667,8 +2667,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::GetNaturalUVDomain",
-        "unit": "surface.surface_p2"
+        "symbol": "SmIsoCurve::SmIsoCurve (non-B-spline surface)",
+        "unit": "curve.iso_curve"
       },
       "max_rel_err": 0.0,
       "name": "face_included_without_shape_limit_7_3_1",
@@ -2679,8 +2679,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::GetNaturalUVDomain",
-        "unit": "surface.surface_p2"
+        "symbol": "SmIsoCurve::SmIsoCurve (non-B-spline surface)",
+        "unit": "curve.iso_curve"
       },
       "max_rel_err": 0.0,
       "name": "face_included_without_shape_limit_7_4_0",
@@ -2691,8 +2691,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::GetNaturalUVDomain",
-        "unit": "surface.surface_p2"
+        "symbol": "SmIsoCurve::SmIsoCurve (non-B-spline surface)",
+        "unit": "curve.iso_curve"
       },
       "max_rel_err": 0.0,
       "name": "face_included_without_shape_limit_7_4_1",
@@ -2759,8 +2759,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::GetNaturalUVDomain",
-        "unit": "surface.surface_p2"
+        "symbol": "SmIsoCurve::SmIsoCurve (non-B-spline surface)",
+        "unit": "curve.iso_curve"
       },
       "max_rel_err": 0.0,
       "name": "face_included_without_shape_limit_8_3_0",
@@ -2771,8 +2771,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::GetNaturalUVDomain",
-        "unit": "surface.surface_p2"
+        "symbol": "SmIsoCurve::SmIsoCurve (non-B-spline surface)",
+        "unit": "curve.iso_curve"
       },
       "max_rel_err": 0.0,
       "name": "face_included_without_shape_limit_8_3_1",
@@ -2783,8 +2783,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::GetNaturalUVDomain",
-        "unit": "surface.surface_p2"
+        "symbol": "SmIsoCurve::SmIsoCurve (non-B-spline surface)",
+        "unit": "curve.iso_curve"
       },
       "max_rel_err": 0.0,
       "name": "face_included_without_shape_limit_8_4_0",
@@ -2795,8 +2795,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::GetNaturalUVDomain",
-        "unit": "surface.surface_p2"
+        "symbol": "SmIsoCurve::SmIsoCurve (non-B-spline surface)",
+        "unit": "curve.iso_curve"
       },
       "max_rel_err": 0.0,
       "name": "face_included_without_shape_limit_8_4_1",
@@ -2976,7 +2976,7 @@
     {
       "deferred": {
         "symbol": "SmTol::GetZoneTol3d(const SmObject*)",
-        "unit": "geom.solution_array"
+        "unit": "geom.tol"
       },
       "max_rel_err": 0.0,
       "name": "static_operation_matrix_0_8_0_0",
@@ -2996,7 +2996,7 @@
     {
       "deferred": {
         "symbol": "SmTol::GetZoneTol3d(const SmObject*)",
-        "unit": "geom.solution_array"
+        "unit": "geom.tol"
       },
       "max_rel_err": 0.0,
       "name": "static_operation_matrix_0_8_1_0",
@@ -19572,11 +19572,10 @@
   "cases_passed": 2396,
   "cases_total": 2429,
   "deferred_by_unit": {
-    "geom.solution_array": 2,
+    "curve.iso_curve": 12,
+    "geom.tol": 6,
     "intersect.curve_class_p2": 4,
     "intersect.surface_tracer": 8,
-    "intersect.topology_solver_p1": 4,
-    "surface.surface_p2": 12,
     "topology.edge": 3
   },
   "max_rel_err": 0.0,

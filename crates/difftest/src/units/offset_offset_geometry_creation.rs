@@ -33,21 +33,35 @@
 //! **Guards.** The shim refuses (`-2`) what upstream dereferences without checking;
 //! the topology-walking functions need every edge use of both B-reps to be a loop edge
 //! use with edge, curve, vertex, mate, neighbours and a face with surface (so wire,
-//! single-face and network B-reps only exercise the refusal). `ReplaceEdgeCurves` with
+//! single-face and network B-reps only exercise the refusal), except `VertexOffset`,
+//! which walks no loops and keeps only its per-edge checks (a curve on each edge; for a
+//! single edge, a face with surface and a B-spline curve). `ReplaceEdgeCurves` with
 //! a 3D curve and no UV curve is refused only when the curves run opposite (the shape
-//! test is replicated). The runner mirrors every guard on the imported B-reps.
+//! test is replicated). The runner mirrors every guard on the imported B-reps. The run
+//! header takes any finite offset distance (zero included) and any finite tolerance that
+//! is not negative: upstream neither crashes nor hangs at zero (every generated script
+//! ran at each zero; the `*_zero_distance` and `*_zero_approx` cases keep the bases whose
+//! compared output changes at zero), so only a negative tolerance is refused, and the
+//! runner mirrors that refusal (`approx_negative`) as it does the B-rep guards.
 //!
 //! **Hang guards (`-6`, the script stops; the case defers).** The shim does not run two
 //! ops the Rust side defers at anyway, as they can take minutes or not return (the
-//! fuzz allows 20 s a side): a non-local `FaceuseOffset` of a face imported as its
-//! B-spline part (deferred under `harness:analytic-geometry-export`; HANG-26, the offset
-//! self-intersection of an `SmSurfOfRevolution`), and an `EdgeuseOffset` with
+//! fuzz allows 20 s a side): a non-local `FaceuseOffset` of a face whose surface is an
+//! `SmBSplineSurface` subclass other than `SmPlane` (deferred under
+//! `harness:analytic-geometry-export`; HANG-26, the offset self-intersection of an
+//! `SmSurfOfRevolution`), and an `EdgeuseOffset` with
 //! `|offset distance| > 1e6` (deferred under `upstream:HANG-27`, the rail's
 //! `SmCrvOnSurf::ApproximateCurve`). The generator's distances (0.001 to 100) never
 //! reach the second bound; the first stops no compared case (the Rust defers there).
 //!
-//! **Deferred.** The offset surface of a non-plane analytic face (imported as its
-//! B-spline part, `harness:analytic-geometry-export`), `UpdateFaceSurfaceDomain`
+//! **Analytic faces.** The shared importer brings an `SmBSplineSurface` subclass in as its
+//! B-spline part; an exactly-`SmSurfOfRevolution` face surface is then replaced by the real
+//! surface, read back from the shim's binary `WriteToDB` record (`read_revolutions`).
+//! Extrusion, cone, sphere and torus faces stay inexact: ops that dispatch on their kind
+//! defer under `harness:analytic-geometry-export`.
+//!
+//! **Deferred.** The offset surface of a non-plane analytic face
+//! (`harness:analytic-geometry-export`), `UpdateFaceSurfaceDomain`
 //! (`SmFace::CreateUVTrimCurves` inside `CalculateUVDomainFromUVTrimCurves`,
 //! `topology.face_p3`), the trimmed surface cache of a face's own surface that the
 //! seeded `GetCreateExtendedSurface` hands to the surface intersections of `MateEdges`
@@ -63,7 +77,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use solidcore::curve::curve::p2::{CurveKind, BSPLINE_CURVE_TYPE, LINE_TYPE};
+use solidcore::curve::curve::p2::{CurveKind, BSPLINE_CURVE_TYPE};
 use solidcore::curve::curve::Curve as SmCurve;
 use solidcore::geom::attribute::{AttributeStore, ObjectKey};
 use solidcore::geom::context::MarkType;
@@ -89,9 +103,13 @@ use solidcore::offset::offset_geometry_creation::{
 };
 use solidcore::query::edge::ClosestPoint;
 use solidcore::surface::plane::Plane;
-use solidcore::surface::surface::p2::{DropCurveFail, SurfaceKind, TsectCurveType, SPHERE_TYPE};
+use solidcore::surface::surf_of_revolution::SurfOfRevolution;
+use solidcore::surface::surface::p2::{
+    DropCurveFail, SurfaceKind, TsectCurveType, B_SPLINE_SURFACE_TYPE, SPHERE_TYPE,
+};
 use solidcore::surface::surface::Surface;
 use solidcore::surface::volume::Volume;
+use solidcore::topology::database_io::{DatabaseReader, FileType, InputStream};
 use solidcore::topology::edge as ed;
 use solidcore::topology::edgeuse::p1 as eu1;
 use solidcore::topology::edgeuse::p2 as eu2;
@@ -125,13 +143,17 @@ fn harness(msg: impl Into<String>) -> HarnessError {
 const NULL_DEREF: f64 = -2.0;
 /// The deferral label of an op whose upstream path dispatches a virtual surface method
 /// on a face surface the importer could only bring in as its B-spline part (an
-/// `SmBSplineSurface` subclass other than `SmPlane`): no plan unit's port would
-/// unblock it, an exact import would.
+/// `SmBSplineSurface` subclass other than `SmPlane` and `SmSurfOfRevolution`, which
+/// `read_revolutions` imports exactly): no plan unit's port would unblock it, an
+/// exact import would.
 const ANALYTIC_EXPORT: &str = "harness:analytic-geometry-export";
 /// The deferral label of an `EdgeuseOffset` whose offset distance is beyond the
 /// shim's HANG-27 bound (`plan/upstream-issues.md`): upstream's rail approximation does
 /// not return in time there, so neither side runs the op.
 const HANG_27: &str = "upstream:HANG-27";
+/// The shim's `REVOLUTION_DB_VERSION`: the database version of the exported
+/// `SmSurfOfRevolution` records.
+const REVOLUTION_DB_VERSION: u64 = 33;
 /// The shim's `MAX_EDGEUSE_OFFSET_DISTANCE` (HANG-27): a bound chosen for the fuzz
 /// time budget (20 s a side; 10 s measured at 1e6), not the termination boundary
 /// (~1e250).
@@ -647,8 +669,9 @@ fn key_of(e: EntityRef) -> ObjectRef {
 struct Two {
     breps: [Option<Brep>; 2],
     /// Per B-rep, per face (traversal order): whether the face's surface was imported
-    /// exactly. An `SmBSplineSurface` subclass other than `SmPlane` (surface of
-    /// revolution or extrusion, cone, sphere, torus) arrives as its B-spline part.
+    /// exactly. An `SmBSplineSurface` subclass other than `SmPlane` and
+    /// `SmSurfOfRevolution` (surface of extrusion, cone, sphere, torus) arrives as its
+    /// B-spline part.
     exact: [Vec<bool>; 2],
     /// Per B-rep, per face: the exported surface subclass type code (`None` for a plane
     /// or no surface).
@@ -712,6 +735,45 @@ impl Two {
             .copied()
     }
 
+    /// Whether `ExtendTrimEdges` of `eu` onto `off` lifts through `sm_ExtractIsoCurve` on a
+    /// face imported as its B-spline part: the lift's UV curve (the edge use's or its
+    /// radial's UV trim curve) is an iso line and `off`'s face is not exact. The C++ iso
+    /// curve then keeps the subclass's kind (an `SmCircle` on a sphere, an `SmLine` on a
+    /// surface of extrusion), which becomes the offset edge's curve, while the Rust
+    /// lifts a B-spline.
+    fn lifts_iso_on_inexact_face(&self, eu: H, off: H) -> solidcore::Result<bool> {
+        match self.edgeuse_face(off)? {
+            Some(face) if self.face_exact(face) != Some(true) => {}
+            _ => return Ok(false),
+        }
+        let mut uses = vec![eu];
+        if let Some(rad) = self.edgeuse_radial(eu)? {
+            uses.push(rad);
+        }
+        for u in uses {
+            let curve = self.edgeuse_uv_trim_curve(u)?;
+            if curve
+                .and_then(|h| ClassGeometry::curve(self, h))
+                .is_some_and(is_uv_iso_segment)
+            {
+                return Ok(true);
+            }
+        }
+        Ok(false)
+    }
+
+    /// Whether `face`'s surface is an `SmBSplineSurface` subclass other than `SmPlane`
+    /// (see `types`), whether or not it was imported exactly.
+    fn face_is_subclass(&self, face: H) -> bool {
+        usize::try_from(face.b)
+            .ok()
+            .and_then(|b| self.types.get(b))
+            .and_then(|v| v.get(usize::try_from(face.i).ok()?))
+            .copied()
+            .flatten()
+            .is_some_and(|t| t != B_SPLINE_SURFACE_TYPE)
+    }
+
     /// Whether `face`'s surface is an `SmSphere` (see `types`).
     fn face_is_sphere(&self, face: H) -> bool {
         usize::try_from(face.b)
@@ -721,6 +783,24 @@ impl Two {
             .copied()
             .flatten()
             == Some(SPHERE_TYPE)
+    }
+
+    /// Refuses (as [`ANALYTIC_EXPORT`]) an edit of a B-rep with a face whose surface was
+    /// imported as its B-spline part: `MateLaminaEdgeToSurface` and `ReplaceSurface`
+    /// branch on the surface kinds, which the Rust side would not see.
+    fn require_exact_faces(&self, h: H) -> solidcore::Result<()> {
+        let all = usize::try_from(h.b)
+            .ok()
+            .and_then(|b| self.exact.get(b))
+            .ok_or_else(|| invalid("handle names an absent B-rep"))?;
+        if all.iter().all(|&e| e) {
+            Ok(())
+        } else {
+            Err(SolidError::Unported {
+                upstream: "SmBrep::MateLaminaEdgeToSurface / ReplaceSurface (face surface imported as its B-spline part)",
+                unit: ANALYTIC_EXPORT,
+            })
+        }
     }
 
     fn brep_mut(&mut self, h: H) -> Option<&mut Brep> {
@@ -1008,6 +1088,71 @@ impl OffsetBrep<H> for Two {
             .ok_or_else(|| invalid("curve handle cannot be resolved"))?
             .clone();
         self.set_edge_curve_from(edge, c)
+    }
+    fn brep_mate_lamina_edge_to_surface(
+        &mut self,
+        k: &Kernel,
+        edge: H,
+        surface: H,
+        surface_extension_factor: f64,
+        uv_curve_extension_factor: f64,
+    ) -> solidcore::Result<()> {
+        if edge.kind != K_EDGE {
+            return Err(invalid("mate of a non-edge handle"));
+        }
+        self.require_exact_faces(edge)?;
+        // a const reference upstream: the mating surface is only read
+        let mating = ClassGeometry::surface(self, surface)
+            .ok_or_else(|| invalid("surface handle cannot be resolved"))?
+            .clone();
+        let b = self.brep_m(edge)?;
+        let mut state = solidcore::topology::brep::p2::ArenaNotifyState::new(b);
+        solidcore::topology::brep::p2::mate_lamina_edge_to_surface(
+            k,
+            b,
+            &mut state.env(None),
+            eid(edge),
+            &mating,
+            surface_extension_factor,
+            uv_curve_extension_factor,
+        )
+    }
+    fn brep_replace_surface(
+        &mut self,
+        k: &Kernel,
+        face: H,
+        surface: H,
+        add_to_deleted_list: bool,
+        create_uv_trim_curves: bool,
+    ) -> solidcore::Result<()> {
+        if face.kind != K_FACE {
+            return Err(invalid("surface replacement of a non-face handle"));
+        }
+        self.require_exact_faces(face)?;
+        // the face takes the surface; its store entry is left unreferenced
+        let new_surface = ClassGeometry::surface(self, surface)
+            .ok_or_else(|| invalid("surface handle cannot be resolved"))?
+            .clone();
+        let b = self.brep_m(face)?;
+        let mut state = solidcore::topology::brep::p2::ArenaNotifyState::new(b);
+        let old = if add_to_deleted_list {
+            solidcore::topology::brep::p2::OldSurface::AddToDeletedList
+        } else {
+            solidcore::topology::brep::p2::OldSurface::Delete
+        };
+        let mut env = state.env(None);
+        let face_ref = (env.key_of)(EntityRef::Face(fid(face)));
+        solidcore::topology::brep::p2::replace_surface(
+            k,
+            b,
+            &mut env,
+            fid(face),
+            new_surface,
+            face_ref,
+            old,
+            create_uv_trim_curves,
+        )
+        .map(|_| ())
     }
     fn edge_faces(&self, edge: H) -> solidcore::Result<Vec<H>> {
         let b = self.brep_r(edge)?;
@@ -1364,9 +1509,14 @@ fn put_curve(out: &mut Vec<f64>, c: Option<&SmCurve>) -> Result<(), HarnessError
         out.push(-1.0);
         return Ok(());
     };
-    let (ty, base) = match c.kind() {
-        CurveKind::BSpline(b) => (BSPLINE_CURVE_TYPE, b),
-        CurveKind::Line(l) => (LINE_TYPE, l.base()),
+    // every SmBSplineCurve kind: its type and NURB (an SmLine adds its line state); an
+    // iso curve on an exactly imported SmSurfOfRevolution is an SmCircle / SmEllipse
+    let base = match c.kind() {
+        CurveKind::BSpline(b) => b,
+        CurveKind::Line(l) => l.base(),
+        CurveKind::Ellipse(e) => e.base(),
+        CurveKind::Hyperbola(h) => h.base(),
+        CurveKind::Parabola(p) => p.base(),
         _ => {
             if c.is_kind_of(BSPLINE_CURVE_TYPE) {
                 return Err(harness(
@@ -1377,7 +1527,7 @@ fn put_curve(out: &mut Vec<f64>, c: Option<&SmCurve>) -> Result<(), HarnessError
             return Ok(());
         }
     };
-    out.push(ty as f64);
+    out.push(c.type_code() as f64);
     out.push(base.dim() as f64);
     match base.gw_nurb() {
         Some(n) => {
@@ -1621,8 +1771,14 @@ fn resolve(i: &Inputs, c: &mut Counts, two: &Two) -> Result<(RHeader, Vec<ROp>),
             Some(_) => Err(format!("unresolvable_{what}_kind")),
         }
     };
-    // header (the local pairs come last: their store surfaces are named against the
-    // store the ops fill, and resolved again at each local op)
+    // header: the FFI refuses a negative tolerance (no upstream caller passes one); the
+    // refusal is mirrored here, as the B-rep guards are, so that neither side runs the
+    // script
+    if i.approx < 0.0 {
+        return Err("approx_negative".into());
+    }
+    // (the local pairs come last: their store surfaces are named against the store the
+    // ops fill, and resolved again at each local op)
     let mut shell = Vec::new();
     for (j, f) in i.shell.iter().enumerate() {
         shell.push(hk(c, *f, &[K_FACE], true, 3, &format!("shell{j}"))?);
@@ -1772,7 +1928,7 @@ fn resolve(i: &Inputs, c: &mut Counts, two: &Two) -> Result<(RHeader, Vec<ROp>),
                 other_off: eu(c, *other_off, true)?,
             },
             OpIn::HaveTangentGaps { n, off, other_off } => OpIn::HaveTangentGaps {
-                n: (*n).clamp(1, ffi::MAX_SAMPLES as u64),
+                n: (*n).min(ffi::MAX_SAMPLES as u64),
                 off: eu(c, *off, true)?,
                 other_off: eu(c, *other_off, true)?,
             },
@@ -1964,6 +2120,35 @@ fn encode(i: &Inputs, hdr: &RHeader, ops: &[ROp]) -> Result<Vec<f64>, HarnessErr
 
 // ---- running ----------------------------------------------------------------------------------
 
+/// Replaces each face surface that is exactly an `SmSurfOfRevolution` (which the export
+/// reduces to its B-spline part) by the real surface, read back from the C++ binary
+/// `WriteToDB` record ([`ffi::split_revolutions`]) with the face as owner, and marks the
+/// face exact: its virtual overrides (`CreateIsoParametricCurve` in `LiftCurve`'s
+/// `sm_ExtractIsoCurve`, ...) are then the upstream ones.
+fn read_revolutions(
+    b: &mut Brep,
+    exact: &mut [bool],
+    records: &[Option<Vec<u8>>],
+) -> Result<(), HarnessError> {
+    let k = Kernel::default();
+    for (i, rec) in records.iter().enumerate() {
+        let Some(bytes) = rec else { continue };
+        let f = FaceId::from_index(u32::try_from(i).map_err(|_| harness("face index"))?);
+        let mut db = DatabaseReader::with_stream(FileType::Binary, InputStream::new(bytes.clone()));
+        let rev = SurfOfRevolution::read_from_db(&k, &mut db, REVOLUTION_DB_VERSION)
+            .map_err(|e| harness(format!("revolution record of face {i}: {e}")))?;
+        let face = b.face_mut(f).map_err(|e| harness(e.to_string()))?;
+        let owner = face.surface.as_ref().and_then(Surface::owner);
+        let mut surface = Surface::from(rev);
+        surface.set_owner(owner);
+        face.surface = Some(surface);
+        *exact
+            .get_mut(i)
+            .ok_or_else(|| harness("revolution record past the faces"))? = true;
+    }
+    Ok(())
+}
+
 struct Prepared {
     two: Two,
     hdr: RHeader,
@@ -1978,10 +2163,15 @@ fn prepare(i: &Inputs) -> Result<Prepared, Box<Result<Output, HarnessError>>> {
     let Some((a, b)) = ffi::split_exports(&ex) else {
         return Err(Box::new(Ok(build_failure(&ex))));
     };
-    let (brep_a, exact_a, types_a) = import_with_types(&a).map_err(|e| Box::new(Err(e)))?;
+    let [rev_a, rev_b] =
+        ffi::split_revolutions(&ex).ok_or_else(|| Box::new(Err(harness("revolution records"))))?;
+    let (mut brep_a, mut exact_a, types_a) = import_with_types(&a).map_err(|e| Box::new(Err(e)))?;
+    read_revolutions(&mut brep_a, &mut exact_a, &rev_a).map_err(|e| Box::new(Err(e)))?;
     let (brep_b, exact_b, types_b) = match &b {
         Some(b) => {
-            let (brep, exact, types) = import_with_types(b).map_err(|e| Box::new(Err(e)))?;
+            let (mut brep, mut exact, types) =
+                import_with_types(b).map_err(|e| Box::new(Err(e)))?;
+            read_revolutions(&mut brep, &mut exact, &rev_b).map_err(|e| Box::new(Err(e)))?;
             (Some(brep), exact, types)
         }
         None => (None, Vec::new(), Vec::new()),
@@ -2158,6 +2348,51 @@ fn would_reverse(two: &Two, eu: H, c3: H, orig: Option<H>) -> Result<bool, Fail>
     Ok(t1.dot(t2) < 0.0)
 }
 
+/// Whether a UV curve is a degree-1 B-spline (or line) along a constant `u` or `v`: the
+/// UV curves `sm_ExtractIsoCurve` lifts to the surface's iso curve (their extensions in
+/// `ExtendTrimEdges` stay such lines). The bound is generous, so a borderline curve
+/// is counted as iso.
+fn is_uv_iso_segment(c: &SmCurve) -> bool {
+    let nurb = match c.kind() {
+        CurveKind::BSpline(b) => b.gw_nurb().cloned(),
+        CurveKind::Line(l) => {
+            let mut l = l.clone();
+            if l.base().gw_nurb().is_none() && l.make_nurb().is_err() {
+                return false;
+            }
+            l.base().gw_nurb().cloned()
+        }
+        _ => return false,
+    };
+    let Some(n) = nurb else {
+        return false;
+    };
+    if n.degree() > 1 {
+        return false;
+    }
+    let pts: Vec<(f64, f64)> = n
+        .cpts()
+        .iter()
+        .map(|p| {
+            if p.w == NOW {
+                (p.x, p.y)
+            } else {
+                (p.x / p.w, p.y / p.w)
+            }
+        })
+        .collect();
+    let flat = |f: fn(&(f64, f64)) -> f64| {
+        let (lo, hi) = pts
+            .iter()
+            .map(f)
+            .fold((f64::INFINITY, f64::NEG_INFINITY), |(l, h), x| {
+                (l.min(x), h.max(x))
+            });
+        hi - lo <= 1e-9 * (1.0 + lo.abs().max(hi.abs()))
+    };
+    flat(|p| p.0) || flat(|p| p.1)
+}
+
 /// Whether the curve is of a B-spline kind (`IsKindOf(SmBSplineCurve_TYPE)`).
 fn is_bspline_kind(c: &SmCurve) -> bool {
     c.is_kind_of(BSPLINE_CURVE_TYPE)
@@ -2326,15 +2561,13 @@ fn run_rust_script(i: &Inputs, p: Prepared) -> Result<Vec<f64>, Fail> {
                         }
                     }
                 }
-                if !is_local
-                    && !two
-                        .face_exact(face)
-                        .ok_or_else(|| Fail::Harness(harness("face outside the import table")))?
-                {
+                if !is_local && two.face_is_subclass(face) {
                     // CreateOffsetSurface is virtual and every SmBSplineSurface subclass
                     // the importer reduces to its B-spline part overrides it: the Rust
                     // would dispatch the B-spline override instead (the shim stops the
-                    // script here, as nothing after it is compared; HANG-26)
+                    // script here for every subclass face, as nothing after it is
+                    // compared; an SmSurfOfRevolution's offset self-intersection takes
+                    // 20 s to minutes, HANG-26)
                     return Err(Fail::Solid(SolidError::Unported {
                         upstream: "SmSurface subclass::CreateOffsetSurface (face surface imported as its B-spline part)",
                         unit: ANALYTIC_EXPORT,
@@ -2378,7 +2611,8 @@ fn run_rust_script(i: &Inputs, p: Prepared) -> Result<Vec<f64>, Fail> {
                         _ => bad = true,
                     }
                 }
-                if bad || !all_ok {
+                // (no `all_ok`: VertexOffset walks no loops, as the shim)
+                if bad {
                     o.push(NULL_DEREF);
                     continue;
                 }
@@ -2563,6 +2797,13 @@ fn run_rust_script(i: &Inputs, p: Prepared) -> Result<Vec<f64>, Fail> {
                     o.push(NULL_DEREF);
                     continue;
                 }
+                // LiftCurve's iso curve keeps the subclass's kind (lifts_iso_on_inexact_face)
+                if two.lifts_iso_on_inexact_face(eu, off)? {
+                    return Err(Fail::Solid(SolidError::Unported {
+                        upstream: "SmSurface::LiftCurve iso curve of a subclass (face surface imported as its B-spline part)",
+                        unit: ANALYTIC_EXPORT,
+                    }));
+                }
                 let r = geom.extend_trim_edges(
                     &k,
                     &mut two,
@@ -2674,6 +2915,15 @@ fn run_rust_script(i: &Inputs, p: Prepared) -> Result<Vec<f64>, Fail> {
                         if bad {
                             o.push(NULL_DEREF);
                             continue;
+                        }
+                        // ExtendTrimEdges' LiftCurve (lifts_iso_on_inexact_face)
+                        if let Some(off) = off {
+                            if two.lifts_iso_on_inexact_face(orig, off)? {
+                                return Err(Fail::Solid(SolidError::Unported {
+                                    upstream: "SmSurface::LiftCurve iso curve of a subclass (face surface imported as its B-spline part)",
+                                    unit: ANALYTIC_EXPORT,
+                                }));
+                            }
                         }
                     }
                 }
@@ -3137,6 +3387,8 @@ impl UnitDiff for Runner {
                 inputs,
             });
         }
+        let zero = zero_header_cases(self.id(), &cases)?;
+        cases.extend(zero);
         Ok(cases)
     }
 
@@ -3169,7 +3421,8 @@ const fn h(b: i64, kind: u8, i: i64) -> Hin {
 const NULL_H: Hin = [-1, K_NULL, -1];
 
 /// Cases built in code: each op on real solid B-reps with explicit geometry, at unit,
-/// tiny and huge scale, plus the guard refusals on the wire network.
+/// tiny and huge scale, plus the guard refusals on the wire network (the run header at
+/// zero is [`zero_header_cases`]).
 #[allow(clippy::too_many_lines)]
 fn edge_cases() -> Vec<(String, Value)> {
     let mut out = Vec::new();
@@ -3860,5 +4113,115 @@ fn edge_cases() -> Vec<(String, Value)> {
         add(&format!("vase_{name}_scale"), i);
     }
 
+    // VertexOffset on topology without loops (it walks none, so the shim no longer
+    // refuses it there): the wire network's vertices with two and three of their edges,
+    // and with no edges; a single wire's end vertex with its own edge (refused: the
+    // one-edge branch needs a face)
+    for (name, v, edges) in [
+        ("network_vertex_two_edges", 0, vec![0, 1]),
+        ("network_vertex_three_edges", 1, vec![1, 2, 3]),
+        ("network_vertex_no_edges", 2, Vec::new()),
+    ] {
+        let mut i = base("cone.smb", None, 0.5);
+        i.brep_a = BrepIn::Network;
+        i.ops = vec![OpIn::VertexOffset {
+            v: h(0, K_VERTEX, v),
+            edges: edges.into_iter().map(|e| h(0, K_EDGE, e)).collect(),
+        }];
+        add(name, i);
+    }
+    {
+        let mut i = base("cone.smb", None, 0.5);
+        i.brep_a = BrepIn::Wire {
+            curve: CrvIn {
+                dim: 3,
+                cpts: vec![
+                    [0.0, 0.0, 0.0, 1.0],
+                    [1.0, 2.0, 0.0, 1.0],
+                    [3.0, 1.0, 1.0, 1.0],
+                ],
+                p: 2,
+                u: vec![0.0, 0.0, 0.0, 1.0, 1.0, 1.0],
+            },
+            t0: 0.0,
+            t1: 1.0,
+        };
+        i.ops = vec![
+            OpIn::VertexOffset {
+                v: h(0, K_VERTEX, 0),
+                edges: vec![h(0, K_EDGE, 0)],
+            },
+            OpIn::VertexOffset {
+                v: h(0, K_VERTEX, 1),
+                edges: Vec::new(),
+            },
+        ];
+        add("wire_vertex_offset", i);
+    }
+
+    // HaveTangentGaps with no samples: upstream evaluates once at 0 / 0
+    let mut i = base("cone.smb", Some("cone.smb"), 0.5);
+    i.pairs = pairs(4, 1);
+    i.ops = vec![OpIn::HaveTangentGaps {
+        n: 0,
+        off: h(1, K_EDGEUSE, 0),
+        other_off: h(1, K_EDGEUSE, 1),
+    }];
+    add("cone_have_tangent_gaps_no_samples", i);
+
     out
+}
+
+/// Bases of the `*_zero_distance` cases: their compared output changes at `dist = 0`.
+///
+/// A sweep of the 800 generated scripts at `dist = 0` (the `Getters` echo of the header
+/// left out) changes 67 compared results, every one a script with a `FaceuseOffset` (the
+/// offset surface at distance 0) or a `VertexOffset` (the radius-0 arc, status 1007);
+/// `EdgeuseOffset` reads the distance on its rail path only, which defers. The built-in
+/// `cone_vertex_offset` is the only built-in whose compared output changes. `gen0638`
+/// offsets a B-spline face (`ellips_ts2.smb`); `gen0700` and `gen0012` offset planes.
+const ZERO_DISTANCE_BASES: &[&str] = &[
+    "cone_vertex_offset",
+    "gen0700",
+    "gen0107",
+    "gen0012",
+    "gen0638",
+];
+
+/// Bases of the `*_zero_approx` cases: their compared output changes at `approx = 0`.
+///
+/// The same sweep at `approx = 0` changes 2 compared results, both through
+/// `VertexOffset`; the built-in `cone_trim_extended_edge` is the only built-in whose
+/// compared output changes (`TrimExtendedEdge`'s `d3DTol`, ten times the tolerance).
+const ZERO_APPROX_BASES: &[&str] = &["cone_trim_extended_edge", "gen0775", "gen0651"];
+
+/// The run header at zero (maintainer review of #156, second round): the bases above with
+/// `dist = 0` or `approx = 0`, named by exact case name (a generated base is taken from
+/// the case list, so `MIN_GENERATED` keeps it present); a base that is missing is an error.
+fn zero_header_cases(unit: &str, cases: &[Case]) -> Result<Vec<Case>, HarnessError> {
+    let mut out = Vec::new();
+    for (suffix, bases, zero_dist) in [
+        ("zero_distance", ZERO_DISTANCE_BASES, true),
+        ("zero_approx", ZERO_APPROX_BASES, false),
+    ] {
+        for base in bases {
+            let Some(c) = cases.iter().find(|c| c.name == *base) else {
+                return Err(harness(format!("zero-header base {base} is not a case")));
+            };
+            let mut i: Inputs = c.parse()?;
+            if zero_dist {
+                i.dist = 0.0;
+            } else {
+                i.approx = 0.0;
+            }
+            let inputs = serde_json::to_value(i).map_err(|e| harness(e.to_string()))?;
+            out.push(Case {
+                unit: unit.to_string(),
+                name: format!("{base}_{suffix}"),
+                source: CaseSource::Inline,
+                inputs,
+            });
+        }
+    }
+    Ok(out)
 }

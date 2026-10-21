@@ -33,6 +33,7 @@
 //! | [`TopologyIntersector::relate`]                        | `Relate`                                             |
 //! | [`TopologyIntersector::fixup_end_point_class_mates`]   | `FixupEndPointClassMates`                            |
 //! | [`TopologyIntersector::fixup_mid_point_class_mates`]   | `FixupMidPointClassMates`                            |
+//! | [`TopologyIntersector::clear_relationships`] | mate maps `RemoveAll` (inline call sites) |
 //! | [`TopologyIntersector::set_subset`]                    | `SetSubset`                                          |
 //! | [`check_interior_edge`]                                | `sm_CheckInteriorEdge`                               |
 //! | [`test_and_split_two_edges`]                           | `sm_TestAndSplitTwoEdges`                            |
@@ -50,7 +51,7 @@
 //! | [`TopologyIntersector::subset`]                        | `GetSubset`                                          |
 //! | [`TopologyIntersector::this_ang_tol_rad`], [`TopologyIntersector::set_this_ang_tol_rad`] | `GetThisAngTolRad`, `SetThisAngTolRad` |
 //! | [`IntersectorBrep`]                                    | what the intersector reads from and writes to its two `SmBrep`s |
-//! | [`MateMap`], [`Relations`]                             | `m_pBToO`, `m_pOToB` (edge/vertex subset over [`Brep`] ids; CO-PORTED by `boolean.merge_p1`) |
+//! | [`MateMap`], [`Relations`]                             | `m_pBToO`, `m_pOToB` (face/edge/vertex subset over [`Brep`] ids; shared by `boolean.merge_p1/p4/p5`) |
 //! | [`MateMap::other`], [`MateMap::primary`]               | `GetOtherMate`, `GetBrepMate` over [`Brep`] ids       |
 //! | [`Relations::relate_vertices`]                         | `Relate` of two vertices over [`Brep`] ids            |
 //!
@@ -86,14 +87,20 @@
 //!   [`IntersectorBrep::brep_glue_edges_general`], which the B-rep owner implements with
 //!   `topology::brep::p7::glue_edges_general` (so `face_face_intersect` takes the
 //!   kernel mutably).
+//! - **`SmBrep::GlueVertices`** (`topology.brep_p5`) goes through
+//!   its supertrait `BrepGlue` (`topology::proto_topology::p3`), which the B-rep owner
+//!   implements with `topology::brep::p5` (so `vertex_face_intersect` and the
+//!   interval-end imprint take the kernel mutably).
 //! - **Callees not ported yet** are private stubs returning [`SolidError::Unported`],
 //!   each tagged `UNPORTED(<unit>)`: `SmBrep::MakeVertexLoop` / `MakeVertexSplitEdge`
-//!   (`topology.brep_p9`), `GlueVertices` / `MakeEdgeInFace` (`topology.brep_p5`),
+//!   (`topology.brep_p9`), `MakeEdgeInFace` (`topology.brep_p5`),
 //!   `DeleteFace` (`topology.brep_p3`),
 //!   `SmFace::GetVertices` / `GetEdges` / `GetBrep` (`topology.face_p4`),
 //!   `SmFace::FaceIntersect` with UV curve and point outputs (`topology.face_p3`; part
 //!   2's `face_face_intersect_curves`, which [`IntersectorBrep`] does not cover),
-//!   `SmFace::CalculateBoundingBox` / `Point3DClassify` (`query.face_p1`). The
+//!   `SmFace::Point3DClassify` (`query.face_p1`; `SmFace::CalculateBoundingBox` goes
+//!   through [`IntersectorBrep::face_calculate_bounding_box`] since the `query.face_p1`
+//!   port). The
 //!   code after a stub is ported in full. `SmSurface::GlobalCurveIntersect` /
 //!   `CoincidenceCheck` (`surface.surface_p8`), `SmCurveClassification::Homogenize`
 //!   (`intersect.curve_class_p6`), `InsertTopologyIntersections`
@@ -160,7 +167,7 @@ use crate::nurbs::b_spline_surface_n_lib::p2::OrientType;
 use crate::surface::surface::p2::TsectCurveType;
 use crate::surface::surface::p5::{DropPoint, DropPointOptions};
 use crate::topology::proto_topology::{ProtoBrep, ProtoTopologyManager};
-use crate::topology::{vertex, Brep, EdgeId, VertexId};
+use crate::topology::{vertex, Brep, EdgeId, FaceId, VertexId};
 
 const OP: &str = "boolean::topology_intersector::p1";
 const OP_CHECK_SSI: &str = "boolean::topology_intersector::p1::check_if_have_existing_ssi";
@@ -226,7 +233,9 @@ pub(super) fn find_common_elements<O: Copy + PartialEq>(this: &[O], other: &[O])
 /// upstream function and
 /// the ported function that implements it. A method returns `Ok(None)` /
 /// `Err(InvalidInput)` where upstream would dereference null.
-pub trait IntersectorBrep<O>: ProtoBrep<O> {
+pub trait IntersectorBrep<O>:
+    ProtoBrep<O> + crate::topology::proto_topology::p3::BrepGlue<O>
+{
     /// `SmBrep::MakeVertexLoop` with its default opposite orientation, using the
     /// caller's mutable arenas and notification state (`topology::brep::p9`).
     fn make_vertex_loop(&mut self, brep: O, face: O, point: Point3) -> Result<(O, O)>;
@@ -246,6 +255,13 @@ pub trait IntersectorBrep<O>: ProtoBrep<O> {
     ///
     /// Those of the topology walk.
     fn vertex_brep(&self, vertex: O) -> Result<Option<O>>;
+    /// The arena of the B-rep `brep` names (what a `SmBrep*` reaches: its tolerance
+    /// and edges, for `SmProtoTopologyManager`'s tolerance fallback).
+    ///
+    /// # Errors
+    ///
+    /// [`SolidError::InvalidInput`] for a handle that names no B-rep.
+    fn brep_arena(&self, brep: O) -> Result<&Brep>;
     /// `SmEdge::GetBrep` (`topology::edge::brep`): the B-rep handle of an edge
     /// ([`ProtoTopology::edge_brep`](crate::topology::proto_topology::ProtoTopology::edge_brep) gives its key; the intersector edits the B-rep
     /// through its handle).
@@ -417,21 +433,18 @@ pub trait IntersectorBrep<O>: ProtoBrep<O> {
     ///
     /// [`SolidError::InvalidInput`] for an unknown B-rep.
     fn brep_vertices(&self, brep: O) -> Result<Vec<O>>;
+    /// The bounding box of `face` (`SmFace::CalculateBoundingBox(rBox, bTight)`, unit
+    /// `query.face_p1`: `query::face::p1::calculate_bounding_box` on the B-rep behind the
+    /// handle). The intersector passes `tight = false`, upstream's default. (Named after
+    /// the upstream call in full: `face_bounding_box` is #229's `MergeBrep` method.)
+    ///
+    /// # Errors
+    ///
+    /// [`SolidError::InvalidInput`] for an unknown face, and those of the port.
+    fn face_calculate_bounding_box(&self, k: &Kernel, face: O, tight: bool) -> Result<Extent3d>;
 }
 
 // ---- unported callees -----------------------------------------------------------------------
-
-/// `SmBrep::GlueVertices(pV1, pV2, pOptWireEdgesInBrep)`; `opt_wire_edges_in_brep` is
-/// `pOptWireEdgesInBrep` (`NULL` by default: every shell edge is checked).
-fn brep_glue_vertices<O: Copy + PartialEq>(
-    _k: &Kernel,
-    _brep: O,
-    v1: O,
-    v2: O,
-    _opt_wire_edges_in_brep: Option<&[O]>,
-) -> Result<()> {
-    crate::topology::brep::p5::opaque_glue_preflight(v1 == v2)
-}
 
 /// `SmBrep::MakeEdgeInFace(pFace, pV1, pV2, pCurve, pOptUVCurve, ivl, eOrient, tol,
 /// rpNewEdge, rpNewLoop, rpNewFace)`: the new edge, loop and (when the face was
@@ -600,15 +613,6 @@ fn face_uv_domain_from_uv_trim_curves<O>(
     }
 }
 
-/// `SmFace::CalculateBoundingBox(rBox, bTight)` (`bTight` is `FALSE` by default).
-fn face_bounding_box<O>(_k: &Kernel, _face: O, _tight: bool) -> Result<Extent3d> {
-    // UNPORTED(query.face_p1): SmFace::CalculateBoundingBox
-    Err(SolidError::unported(
-        "SmFace::CalculateBoundingBox",
-        "query.face_p1",
-    ))
-}
-
 /// `SmFace::Point3DClassify(pt, tol, bDoBoundaryIntersections, pc, pOptGuessUV,
 /// bTgtLoopsOnly, pOptTgtLoops, bUVSpaceOkay)` (`NULL`, `FALSE`, `NULL`, `TRUE` by
 /// default); `opt_guess_uv` is the value `pOptGuessUV` points to (an input only).
@@ -624,7 +628,9 @@ fn face_point_3d_classify<O>(
     _opt_tgt_loops: Option<&[O]>,
     _uv_space_okay: bool,
 ) -> Result<()> {
-    // UNPORTED(query.face_p1): SmFace::Point3DClassify
+    // DISPATCH GAP: SmFace::Point3DClassify is ported (`query::face::p1::point_3d_classify`,
+    // query.face_p1 partial; no UNPORTED marker), but it takes the face's `Brep` and
+    // `FaceId`, which this caller's opaque face handle does not carry.
     Err(SolidError::unported(
         "SmFace::Point3DClassify",
         "query.face_p1",
@@ -1116,6 +1122,19 @@ impl<O: ClassObject + SolutionObject + Ord> TopologyIntersector<O> {
         }
     }
 
+    /// Populate valid paired mate-map fixtures without exposing maps in production.
+    #[cfg(test)]
+    pub(crate) fn seed_mates_for_test(&mut self, pairs: &[(O, O)]) {
+        for &(primary, other) in pairs {
+            self.b_to_o
+                .get_or_insert_with(BTreeMap::new)
+                .insert(primary, Some(other));
+            self.o_to_b
+                .get_or_insert_with(BTreeMap::new)
+                .insert(Some(other), primary);
+        }
+    }
+
     /// `~SmTopologyIntersector`: deletes the intersection table (and its curves), the
     /// mate maps and the subset. Returns the curve handles deleted. The proto topology
     /// manager is not deleted by upstream's destructor (it is owned by
@@ -1345,14 +1364,7 @@ impl<O: ClassObject + SolutionObject + Ord> TopologyIntersector<O> {
     pub fn common_edges(&self, geometry: &impl IntersectorBrep<O>) -> Result<(Vec<O>, Vec<O>)> {
         let brep = self.brep.ok_or(dangling("no B-rep"))?;
         let edges = geometry.brep_edges(brep)?;
-        let mut out = (Vec::new(), Vec::new());
-        for edge in edges {
-            if let Some(o_edge) = self.other_mate(Some(edge)) {
-                out.0.push(edge);
-                out.1.push(o_edge);
-            }
-        }
-        Ok(out)
+        Ok(common_mates(edges, |edge| self.other_mate(Some(edge))))
     }
 
     /// `GetCommonVertices(rVertices, rOtherVertices)`: every B-rep vertex with an other
@@ -1365,14 +1377,9 @@ impl<O: ClassObject + SolutionObject + Ord> TopologyIntersector<O> {
     pub fn common_vertices(&self, geometry: &impl IntersectorBrep<O>) -> Result<(Vec<O>, Vec<O>)> {
         let brep = self.brep.ok_or(dangling("no B-rep"))?;
         let vertices = geometry.brep_vertices(brep)?;
-        let mut out = (Vec::new(), Vec::new());
-        for vertex in vertices {
-            if let Some(o_vertex) = self.other_mate(Some(vertex)) {
-                out.0.push(vertex);
-                out.1.push(o_vertex);
-            }
-        }
-        Ok(out)
+        Ok(common_mates(vertices, |vertex| {
+            self.other_mate(Some(vertex))
+        }))
     }
 
     /// `Relate(pBrepTopo, pOtherTopo)`: mates the two objects. Vertices and edges
@@ -1539,20 +1546,22 @@ impl<O: ClassObject + SolutionObject + Ord> TopologyIntersector<O> {
     /// to intersect (a surface per face, a curve per edge, a vertex per vertex),
     /// replacing any previous subset; an empty list clears it. Always `SM_SUCCESS`.
     pub fn set_subset(&mut self, subset_geometry: &[O]) {
-        // clear out any old Subset SmMapPtrToPtr object
-        self.subset = None;
+        set_subset_objects(&mut self.subset, subset_geometry);
+    }
 
-        // size the new array
-        if !subset_geometry.is_empty() {
-            self.subset = Some(BTreeSet::new());
-        }
-
-        // for every Object in the subset make a subset entry
-        if let Some(set) = &mut self.subset {
-            for &obj in subset_geometry {
-                set.insert(obj);
-            }
-        }
+    /// Clears both canonical mate maps (`m_pBToO->RemoveAll`,
+    /// `m_pOToB->RemoveAll`) without replacing the intersector or its controls.
+    /// The operand constructor must have created both maps first.
+    pub fn clear_relationships(&mut self) -> Result<()> {
+        self.b_to_o
+            .as_mut()
+            .ok_or(dangling("no mate maps"))?
+            .clear();
+        self.o_to_b
+            .as_mut()
+            .ok_or(dangling("no mate maps"))?
+            .clear();
+        Ok(())
     }
 
     /// `GetSubset`: the subset, if one was set.
@@ -1719,7 +1728,7 @@ impl<O: ClassObject + SolutionObject + Ord> TopologyIntersector<O> {
     /// changes.
     fn imprint_body(
         &mut self,
-        k: &Kernel,
+        k: &mut Kernel,
         brep: &mut impl IntersectorBrep<O>,
         ret: &mut Result<()>,
         deleted: &mut Vec<O>,
@@ -1819,7 +1828,7 @@ impl<O: ClassObject + SolutionObject + Ord> TopologyIntersector<O> {
     /// dereferences.
     pub fn vertex_face_intersect(
         &mut self,
-        k: &Kernel,
+        k: &mut Kernel,
         brep: &mut impl IntersectorBrep<O>,
         verts: &mut [Option<O>],
         faces: &[Option<O>],
@@ -1906,7 +1915,7 @@ impl<O: ClassObject + SolutionObject + Ord> TopologyIntersector<O> {
                     let mid = 0.5 * (v_point + new_point);
                     brep.set_vertex_point(k, v, mid)?;
 
-                    ignore_soft(brep_glue_vertices(k, v_brep, v, new_vertex, None))?;
+                    ignore_soft(brep.glue_vertices(k, v_brep, v, new_vertex, None))?;
                     add_unique(&mut out.processed_verts, v);
                     if let Some(slot) = verts.get_mut(ii) {
                         *slot = None;
@@ -1943,8 +1952,10 @@ impl<O: ClassObject + SolutionObject + Ord> TopologyIntersector<O> {
     /// # Errors
     ///
     /// Unless `ignore_problems`, a failing vertex loop or edge split (`SER`); those of
-    /// the geometry queries; [`SolidError::Unported`] for the face bounding box
-    /// (`query.face_p1`), `SmFace::CalculateUVDomainFromUVTrimCurves`'s
+    /// the geometry queries; [`SolidError::Unported`] from the adapter's face bounding box
+    /// and the stubs after it (`gen0011` defers at `SmBrep::CalculateBoundingBox`,
+    /// `query.brep`; six cases at `SmFace::GetUpwardLoopuses`, `topology.face_p4`),
+    /// `SmFace::CalculateUVDomainFromUVTrimCurves`'s
     /// `CreateUVTrimCurves`, `SmSurface::GlobalCurveIntersect` and the B-rep edits;
     /// [`SolidError::InvalidInput`] for null handles upstream dereferences.
     #[allow(clippy::too_many_lines)]
@@ -2029,7 +2040,7 @@ impl<O: ClassObject + SolutionObject + Ord> TopologyIntersector<O> {
                 }
 
                 // BBox check.
-                if let Some(b) = ignore_soft(face_bounding_box(k, face, false))? {
+                if let Some(b) = ignore_soft(brep.face_calculate_bounding_box(k, face, false))? {
                     f_bbox = b;
                 }
                 if e_bbox.are_disjoint(&f_bbox, face_zone_tol_3d) {
@@ -2368,7 +2379,7 @@ impl<O: ClassObject + SolutionObject + Ord> TopologyIntersector<O> {
                 let mid = 0.5 * (ev_pt + fv_pt);
                 brep.set_vertex_point(k, ev, mid)?;
 
-                ignore_soft(brep_glue_vertices(k, f_brep, ev, fv, None))?;
+                ignore_soft(brep.glue_vertices(k, f_brep, ev, fv, None))?;
 
                 // Set max distance.
                 out.max_vertex_gap = max2(out.max_vertex_gap, this_deviation);
@@ -2742,7 +2753,7 @@ impl<O: ClassObject + SolutionObject + Ord> TopologyIntersector<O> {
     #[allow(clippy::too_many_arguments)]
     fn imprint_interval_end(
         &self,
-        k: &Kernel,
+        k: &mut Kernel,
         brep: &mut impl IntersectorBrep<O>,
         this_brep: O,
         pc1: &mut PointClassification<O>,
@@ -2838,7 +2849,7 @@ impl<O: ClassObject + SolutionObject + Ord> TopologyIntersector<O> {
             // null vertex is dereferenced by GlueVertices)
             match (v1, v2) {
                 (Some(v1), Some(v2)) => {
-                    ignore_soft(brep_glue_vertices(k, this_brep, v1, v2, None))?;
+                    ignore_soft(brep.glue_vertices(k, this_brep, v1, v2, None))?;
                 }
                 (None, None) => {}
                 _ => return Err(dangling("GlueVertices of one null vertex")),
@@ -3883,7 +3894,7 @@ pub fn test_and_split_two_edges<O: ClassObject + SolutionObject + Ord>(
         let mid = 0.5 * (p1 + p2);
         geometry.set_vertex_point(k, new_v1, mid)?;
 
-        ignore_soft(brep_glue_vertices(k, brep, new_v1, new_v2, None))?;
+        ignore_soft(geometry.glue_vertices(k, brep, new_v1, new_v2, None))?;
 
         out.new_verts.push(new_v1); // This one will survive.
     }
@@ -3986,6 +3997,41 @@ pub fn test_and_imprint_face<O: ClassObject + SolutionObject + Ord>(
 
 // ---- mate storage of the merge stages (co-ported by boolean.merge_p1, PR #163) -----------
 
+// The same SetSubset operation for generic handles and the concrete merge adapter.
+pub(crate) fn set_subset_objects<O: Copy + Ord>(
+    subset: &mut Option<BTreeSet<O>>,
+    subset_geometry: &[O],
+) {
+    // clear out any old Subset SmMapPtrToPtr object
+    *subset = None;
+
+    // size the new array
+    if !subset_geometry.is_empty() {
+        *subset = Some(BTreeSet::new());
+    }
+
+    // for every Object in the subset make a subset entry
+    if let Some(set) = subset {
+        for &obj in subset_geometry {
+            set.insert(obj);
+        }
+    }
+}
+
+fn common_mates<I: Copy>(
+    order: impl IntoIterator<Item = I>,
+    mate: impl Fn(I) -> Option<I>,
+) -> (Vec<I>, Vec<I>) {
+    let mut out = (Vec::new(), Vec::new());
+    for id in order {
+        if let Some(other) = mate(id) {
+            out.0.push(id);
+            out.1.push(other);
+        }
+    }
+    out
+}
+
 /// The same mate relationship viewed in both operand directions: the `m_pBToO` /
 /// `m_pOToB` pair over one kind of operand-local [`Brep`] arena id, as the merge
 /// stages hold it.
@@ -4015,6 +4061,30 @@ impl<I: Ord + Copy> MateMap<I> {
         self.to_primary.get(&other).copied()
     }
 
+    /// Primary-to-other projection, borrowed by the shared merge helpers.
+    #[must_use]
+    pub fn primary_to_other(&self) -> &BTreeMap<I, I> {
+        &self.to_other
+    }
+
+    /// Other-to-primary projection, borrowed by the shared merge helpers.
+    #[must_use]
+    pub fn other_to_primary(&self) -> &BTreeMap<I, I> {
+        &self.to_primary
+    }
+
+    /// `GetMappedBrepObjects` for this typed class, in other-handle order.
+    #[must_use]
+    pub fn mapped_primary(&self) -> Vec<I> {
+        self.to_primary.values().copied().collect()
+    }
+
+    /// `GetCommonEdges` / `GetCommonVertices`, preserving the supplied B-rep list order.
+    #[must_use]
+    pub fn common(&self, order: impl IntoIterator<Item = I>) -> (Vec<I>, Vec<I>) {
+        common_mates(order, |id| self.other(id))
+    }
+
     /// Record an established pair. Conflicting pairs fail before either map changes.
     /// New geometry is related with [`Relations::relate_vertices`] (`Relate`, with its
     /// tolerance updates) instead.
@@ -4036,9 +4106,11 @@ impl<I: Ord + Copy> MateMap<I> {
     }
 }
 
-/// Edge and vertex mates shared by the merge stages; every id is operand-local.
+/// Face, edge and vertex mates shared by the merge stages; every id is operand-local.
 #[derive(Debug, Default, Clone)]
 pub struct Relations {
+    /// Face mates in both directions; face Relate has no tolerance update.
+    pub faces: MateMap<FaceId>,
     /// Edge mates in both directions.
     pub edges: MateMap<EdgeId>,
     /// Vertex mates in both directions.
@@ -4046,6 +4118,93 @@ pub struct Relations {
 }
 
 impl Relations {
+    /// Move the typed mate store through a generic intersector operation, then
+    /// restore it even when that operation fails. Geometry and proto state stay
+    /// in the same intersector; no second live relationship store is retained.
+    pub(crate) fn with_intersector<O, T>(
+        &mut self,
+        intersector: &mut TopologyIntersector<O>,
+        encode: impl Fn(crate::EntityRef, bool) -> O,
+        decode: impl Fn(O) -> crate::EntityRef,
+        action: impl FnOnce(&mut TopologyIntersector<O>) -> Result<T>,
+    ) -> Result<T>
+    where
+        O: ClassObject + SolutionObject + Ord,
+    {
+        let mut forward = BTreeMap::new();
+        let mut reverse = BTreeMap::new();
+        macro_rules! transfer {
+            ($field:ident, $variant:ident) => {
+                for (b, o) in std::mem::take(&mut self.$field.to_other) {
+                    let b = encode(crate::EntityRef::$variant(b), false);
+                    let o = encode(crate::EntityRef::$variant(o), true);
+                    forward.insert(b, Some(o));
+                }
+                for (o, b) in std::mem::take(&mut self.$field.to_primary) {
+                    let b = encode(crate::EntityRef::$variant(b), false);
+                    let o = encode(crate::EntityRef::$variant(o), true);
+                    reverse.insert(Some(o), b);
+                }
+            };
+        }
+        transfer!(faces, Face);
+        transfer!(edges, Edge);
+        transfer!(vertices, Vertex);
+        intersector.b_to_o = Some(forward);
+        intersector.o_to_b = Some(reverse);
+        let result = action(intersector);
+        // Preserve both actual projections, including changes made before an
+        // error. All handles admitted here represent the same typed entities.
+        let mut restore_error = None;
+        if let Some(forward) = intersector.b_to_o.take() {
+            for (b, o) in forward {
+                if let Some(o) = o {
+                    match (decode(b), decode(o)) {
+                        (crate::EntityRef::Face(b), crate::EntityRef::Face(o)) => {
+                            self.faces.to_other.insert(b, o);
+                        }
+                        (crate::EntityRef::Edge(b), crate::EntityRef::Edge(o)) => {
+                            self.edges.to_other.insert(b, o);
+                        }
+                        (crate::EntityRef::Vertex(b), crate::EntityRef::Vertex(o)) => {
+                            self.vertices.to_other.insert(b, o);
+                        }
+                        _ => {
+                            restore_error = Some(SolidError::invalid_input(
+                                OP_RELATE,
+                                "mixed typed mate handles",
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+        if let Some(reverse) = intersector.o_to_b.take() {
+            for (o, b) in reverse {
+                if let Some(o) = o {
+                    match (decode(o), decode(b)) {
+                        (crate::EntityRef::Face(o), crate::EntityRef::Face(b)) => {
+                            self.faces.to_primary.insert(o, b);
+                        }
+                        (crate::EntityRef::Edge(o), crate::EntityRef::Edge(b)) => {
+                            self.edges.to_primary.insert(o, b);
+                        }
+                        (crate::EntityRef::Vertex(o), crate::EntityRef::Vertex(b)) => {
+                            self.vertices.to_primary.insert(o, b);
+                        }
+                        _ => {
+                            restore_error = Some(SolidError::invalid_input(
+                                OP_RELATE,
+                                "mixed typed mate handles",
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+        restore_error.map_or(result, Err)
+    }
+
     /// `Relate(pBrepTopo, pOtherTopo)` for two vertices of the concrete [`Brep`]
     /// operands of the merge stages: [`TopologyIntersector::relate`]'s vertex branch
     /// on arena ids. The conflict checks come first; then (`SM_USE_OLDTOL`) each vertex
@@ -4152,6 +4311,12 @@ mod tests {
             .mapped_brep_objects(ClassObjectKind::Edge)
             .unwrap()
             .is_empty());
+        ti.set_subset(&[F0]);
+        ti.clear_relationships().unwrap();
+        assert_eq!(ti.other_mate(Some(F0)), None);
+        assert_eq!(ti.this_mate(Some(F1)), None);
+        assert_eq!(ti.primary_brep(), Some(H(9, 0)));
+        assert!(ti.subset().unwrap().contains(&F0));
     }
 
     #[test]

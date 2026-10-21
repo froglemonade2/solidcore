@@ -1864,13 +1864,13 @@ fn curve_global_curve_solve<O: SolutionObject>(
 
 /// `SmTol::GetZoneTol3d(m_pPointVertex)`.
 pub(super) fn object_zone_tol_3d<O>(_vertex: Option<O>) -> Result<f64> {
-    // UNPORTED(intersect.topology_solver_p1): SmTol::GetZoneTol3d(const SmObject*) on an opaque handle. Every
+    // UNPORTED(geom.tol): SmTol::GetZoneTol3d(const SmObject*) on an opaque handle. Every
     // arm it dispatches to is ported (topology::{vertex, edge, face::p2, edgeuse::p1}::tolerance,
     // Brep::tolerance) but each takes `&Brep` and none is in scope here; wire once this code
     // receives the owning B-rep
     Err(SolidError::unported(
         "SmTol::GetZoneTol3d(const SmObject*)",
-        "intersect.topology_solver_p1",
+        "geom.tol",
     ))
 }
 
@@ -1905,7 +1905,9 @@ pub(super) fn face_point_classify<O>(
 /// against the face within `tol`, retrying within `100 * tol` when that fails;
 /// `false` when both fail or the class is not `SM_PC_FACE`.
 fn face_classifies_on_face<O>(_face: O, _point: Point3, _tol: f64) -> Result<bool> {
-    // UNPORTED(query.face_p1): SmFace::Point3DClassify
+    // DISPATCH GAP: SmFace::Point3DClassify is ported (`query::face::p1::point_3d_classify`,
+    // query.face_p1 partial; no UNPORTED marker), but it takes the face's `Brep` and
+    // `FaceId`, which this caller's opaque face handle does not carry.
     Err(SolidError::unported(
         "SmFace::Point3DClassify",
         "query.face_p1",

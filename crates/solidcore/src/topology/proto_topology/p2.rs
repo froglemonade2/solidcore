@@ -374,17 +374,24 @@ fn classify_param_on_faces<O: Copy>(
     ))
 }
 
-/// `SmSurface::DropPoint` (normalising) over the surface's natural domain: the drop
-/// point when it succeeded.
-fn surface_drop_point<O: Copy>(surface: Option<O>, point: Point3) -> Result<Option<Point2>> {
-    let _ = (surface, point);
-    // UNPORTED(surface.surface_p5): SmSurface::DropPoint
-    // (justified: findings.md "stubs naming green units": the surface is an opaque handle of
-    // the proto topology, as for edgeuse_evaluate_binormal below)
-    Err(SolidError::unported(
-        "SmSurface::DropPoint",
-        "surface.surface_p5",
-    ))
+/// `SmSurface::DropPoint(pt, GetNaturalUVDomain(), NULL, .., SM_SO_NORMALIZE)`: the
+/// drop point when it succeeded.
+fn surface_drop_point<O: Copy>(
+    k: &Kernel,
+    brep: &impl ProtoBrep<O>,
+    surface: Option<O>,
+    point: Point3,
+) -> Result<Option<Point2>> {
+    let srf = surface
+        .and_then(|o| brep.surface(o))
+        .ok_or(dangling("surface handle is null or unknown"))?;
+    let domain = srf.natural_uv_domain();
+    let opts = crate::surface::surface::p5::DropPointOptions {
+        operation: SolverOperation::Normalize, // Don't want off-boundary drops.
+        ..crate::surface::surface::p5::DropPointOptions::default()
+    };
+    let r = srf.drop_point::<crate::surface::surface::p4::NoObject>(k, point, &domain, &opts)?;
+    Ok(r.success.then_some(r.result_uv))
 }
 
 /// `SmEdgeuse::EvaluateBinormal(dParam, FALSE, rPt, rBinormal)`: the binormal.
@@ -1783,7 +1790,7 @@ impl<O: ClassObject> ProtoTopologyManager<O> {
                     Err(e) if e.is_unported() => return Err(e),
                     _ => Vec3::UNDEF,
                 };
-                face_uv = ignore_soft(surface_drop_point(surface, mid_pt))?.flatten();
+                face_uv = ignore_soft(surface_drop_point(k, brep, surface, mid_pt))?.flatten();
             }
             let Some(face_uv) = face_uv else { continue };
 
@@ -1882,7 +1889,8 @@ impl<O: ClassObject> ProtoTopologyManager<O> {
                         _ => Vec3::UNDEF,
                     };
                     let surface = brep.face_surface(old_face).ok_or_else(unknown)?;
-                    let Some(face_uv) = ignore_soft(surface_drop_point(surface, mid_pt))?.flatten()
+                    let Some(face_uv) =
+                        ignore_soft(surface_drop_point(k, brep, surface, mid_pt))?.flatten()
                     else {
                         continue;
                     };
@@ -2058,6 +2066,7 @@ mod tests {
     use crate::intersect::point_class::{ClassGeometry, ClassObjectKind};
     use crate::surface::surface::Surface;
     use crate::surface::volume::Volume;
+    use crate::topology::Brep;
 
     /// Pool handles: an index and a kind.
     #[derive(Debug, Clone, Copy, PartialEq)]
@@ -2189,7 +2198,9 @@ mod tests {
 
     fn manager() -> ProtoTopologyManager<H> {
         let b = H(100, ClassObjectKind::Other);
-        ProtoTopologyManager::new(b, b, b, 1e-5, 1e-3, -1.0).unwrap()
+        let e = Brep::new();
+        ProtoTopologyManager::new(&Kernel::default(), (b, &e), (b, &e), b, 1e-5, 1e-3, -1.0)
+            .unwrap()
     }
 
     fn region_pc(o: H) -> PointClassification<H> {

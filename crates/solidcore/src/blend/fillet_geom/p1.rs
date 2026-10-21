@@ -91,10 +91,10 @@
 //!   `SmBrep()`, which creates that region; the constructor is `topology.brep_p3`'s and
 //!   not ported, so [`FilletBrep::new`] has none and the edge use constructor stops
 //!   there with `UNPORTED(topology.brep_p3)` (a missing region is that gap, never
-//!   upstream's NULL). `MakeShellVertexTopology` (`topology.brep_p2`) is a stub carrying
-//!   upstream's arguments; the rest of the constructor (the shell-owned edge use with no
-//!   fillet geometry) is ported behind them, so [`FilletBrep::new_fillet_edgeuse`]
-//!   returns [`SolidError::Unported`] today and completes once they are wired. `SmFilletGeom(pFilletSolver, eType)` copies the
+//!   upstream's NULL). `MakeShellVertexTopology` is `topology.brep_p2`'s; the rest of the
+//!   constructor (the shell-owned edge use with no fillet geometry) is ported behind
+//!   them, so [`FilletBrep::new_fillet_edgeuse`] returns [`SolidError::Unported`] today
+//!   and completes once the `SmBrep` constructor is wired. `SmFilletGeom(pFilletSolver, eType)` copies the
 //!   solver's offset surfaces with `SmOffsetSurface::Copy` (the kernel stands for the
 //!   solver's creation context; its status is ignored upstream, so a failed copy leaves
 //!   `NULL`, and only [`SolidError::Unported`] propagates). That constructor leaves `m_dOrientations` and `m_bCapped`
@@ -172,9 +172,9 @@
 //!   `SmSurfaceDropCurve::DoTrace` call of `intersect.surface_drop_lib_p1` (its stub
 //!   carries the label `intersect.surface_drop_curve`);
 //!   `SmFace::CreateUVTrimCurves` (`topology.face_p3`, reached through the wired
-//!   `SmFace::CalculateUVDomainFromUVTrimCurves` of `topology.face_p1`) and
-//!   `SmFace::Point3DClassify` (`query.face_p1`) in `sm_ClassifyFacePoint`;
-//!   `SmFilletSolver::FindIndexOfRailOnFace` (`blend.fillet_solver_p1`) and
+//!   `SmFace::CalculateUVDomainFromUVTrimCurves` of `topology.face_p1`) and the
+//!   unported callees of `SmFace::Point3DClassify` (wired to `query::face::p1`) in
+//!   `sm_ClassifyFacePoint`;
 //!   `SmFilletSolver::RailRailIntersect` (`blend.fillet_solver_p2`) in
 //!   `sm_CreateCubicRailRailInterpolant` (the cubic built from their result is ported
 //!   behind them); `SmSurface::DropCurve` (`intersect.surface_drop_lib_p3`) in the
@@ -1382,8 +1382,8 @@ impl FilletBrep {
     /// # Errors
     ///
     /// [`SolidError::Unported`]: `SmBrep::SmBrep` (`topology.brep_p3`) while the pseudo
-    /// B-rep has no infinite region (see below); then `SmBrep::MakeShellVertexTopology`
-    /// of `topology.brep_p2` when the region has no shell; [`SolidError::Upstream`]
+    /// B-rep has no infinite region (see below); the errors of
+    /// `SmBrep::MakeShellVertexTopology` when the region has no shell; [`SolidError::Upstream`]
     /// (`SM_ERR_NULL_POINTER`) when the region still has no shell (upstream reads
     /// `sShells[0]` of an empty array).
     pub fn new_fillet_edgeuse(&mut self) -> Result<EdgeuseId> {
@@ -1700,7 +1700,8 @@ impl FilletBrep {
     ///
     /// # Errors
     ///
-    /// Those of [`classify_face_point`] (deferred: `topology.face_p3`, `query.face_p1`);
+    /// Those of [`classify_face_point`] (deferred: `topology.face_p3` and the unported
+    /// callees of `SmFace::Point3DClassify`);
     /// [`SolidError::NotFound`] for dangling ids.
     pub fn update_split_face(
         &mut self,
@@ -2553,27 +2554,47 @@ fn uv_domain_from_uv_trim_curves(
     }
 }
 
-/// `SmFace::Point3DClassify` (unit `query.face_p1`): the classification's point class
-/// and the call's status. `zone_tol_3d` is `SmTol::GetZoneTol3d(pOrigFace)` for both
-/// faces; the flags are upstream's `TRUE` (check boundaries first), `FALSE` (target
-/// loops only), `NULL` (target loops) and `TRUE` (okay to work in UV space).
+/// `SmFace::Point3DClassify` ([`crate::query::face::p1::point_3d_classify`]): the
+/// classification's point class and whether the call returned `SM_SUCCESS` (upstream
+/// compares the status and does not propagate it). `zone_tol_3d` is
+/// `SmTol::GetZoneTol3d(pOrigFace)` for both faces; the flags are upstream's `TRUE`
+/// (check boundaries first), `FALSE` (target loops only), `NULL` (target loops) and
+/// `TRUE` (okay to work in UV space). A failed call keeps the class written before the
+/// failure; an unported callee propagates.
+#[allow(clippy::too_many_arguments)]
 fn point_3d_classify(
-    _k: &Kernel,
-    _brep: &Brep,
-    _face: FaceId,
-    _pos: Point3,
-    _zone_tol_3d: f64,
-    _check_boundaries_first: bool,
-    _guess_uv: Option<Point2>,
-    _target_loops_only: bool,
-    _target_loops: Option<&[crate::topology::LoopId]>,
-    _ok_in_uv_space: bool,
+    k: &Kernel,
+    brep: &mut Brep,
+    face: FaceId,
+    pos: Point3,
+    zone_tol_3d: f64,
+    check_boundaries_first: bool,
+    guess_uv: Option<Point2>,
+    target_loops_only: bool,
+    target_loops: Option<&[crate::topology::LoopId]>,
+    ok_in_uv_space: bool,
 ) -> Result<(PointClassType, bool)> {
-    // UNPORTED(query.face_p1): SmFace::Point3DClassify
-    Err(SolidError::unported(
-        "SmFace::Point3DClassify",
-        "query.face_p1",
-    ))
+    let mut pc = PointClassification::<EntityRef>::new(zone_tol_3d);
+    let r = crate::query::face::p1::point_3d_classify(
+        k,
+        brep,
+        face,
+        pos,
+        zone_tol_3d,
+        check_boundaries_first,
+        &mut pc,
+        crate::query::face::p1::Point3dClassifyOptions {
+            guess_uv,
+            tgt_loops_only: target_loops_only,
+            tgt_loops: target_loops,
+            uv_space_okay: ok_in_uv_space,
+        },
+    );
+    match r {
+        Ok(()) => Ok((pc.point_class(), true)),
+        Err(e) if e.is_unported() => Err(e),
+        Err(_) => Ok((pc.point_class(), false)),
+    }
 }
 
 /// `sm_ClassifyFacePoint`: which of two faces that were one face before a split
@@ -2585,8 +2606,8 @@ fn point_3d_classify(
 /// # Errors
 ///
 /// [`SolidError::Unported`]: `SmFace::CreateUVTrimCurves` (`topology.face_p3`, through
-/// `SmFace::CalculateUVDomainFromUVTrimCurves`), `SmFace::Point3DClassify`
-/// (`query.face_p1`);
+/// `SmFace::CalculateUVDomainFromUVTrimCurves`), the unported callees of
+/// `SmFace::Point3DClassify` ([`crate::query::face::p1::point_3d_classify`]);
 /// [`SolidError::Upstream`] (`SM_ERR_NULL_POINTER`) for a face without a surface.
 pub fn classify_face_point(
     k: &Kernel,
@@ -2873,9 +2894,8 @@ pub fn adjust_uv_on_seam(surf: &Surface, ref_direction: Vec3, uv: &mut Point2) -
 ///
 /// # Errors
 ///
-/// [`SolidError::Unported`]: `SmFilletSolver::FindIndexOfRailOnFace`
-/// (`blend.fillet_solver_p1`) and `SmFilletSolver::RailRailIntersect`
-/// (`blend.fillet_solver_p2`); [`SolidError::Upstream`] (`SM_ERR_NULL_POINTER`) for a
+/// [`SolidError::Unported`]: `SmFilletSolver::RailRailIntersect`
+/// (`blend.fillet_solver_p2`); those of `SmFilletSolver::FindIndexOfRailOnFace`; [`SolidError::Upstream`] (`SM_ERR_NULL_POINTER`) for a
 /// rail index past the solver's two edge uses, a missing edge use or vertex use (all
 /// dereferenced unchecked upstream); `SM_ERR` when the rails do not intersect; those of
 /// the angle computations and [`BSplineCurve::create_canonical`].
@@ -2902,8 +2922,12 @@ pub fn create_cubic_rail_rail_interpolant(
             .ok_or_else(|| SolidError::null_pointer(OP))
     };
     // First, calculate the intersection of two rails
-    let rail_index = find_index_of_rail_on_face(fil_solver1, face)?;
-    let other_rail_index = find_index_of_rail_on_face(fil_solver2, face)?;
+    let rail_index = fil_solver1
+        .solver
+        .find_index_of_rail_on_face(brep, Some(face))?;
+    let other_rail_index = fil_solver2
+        .solver
+        .find_index_of_rail_on_face(brep, Some(face))?;
     // Derive guess uv point here
     let mut eu = solver_edgeuse(fil_solver1, rail_index)?;
     let eu_vertex = |brep: &Brep, eu: EdgeuseId| -> Result<(VertexuseId, Option<VertexId>)> {
@@ -2966,18 +2990,6 @@ pub fn create_cubic_rail_rail_interpolant(
         weights: None,
         trim: None,
     })
-}
-
-/// `SmFilletSolver::FindIndexOfRailOnFace(pOrigFace)` (unit `blend.fillet_solver_p1`).
-fn find_index_of_rail_on_face(
-    _solver: &ConstantRadiusAssistedFs,
-    _orig_face: FaceId,
-) -> Result<usize> {
-    // UNPORTED(blend.fillet_solver_p1): SmFilletSolver::FindIndexOfRailOnFace
-    Err(SolidError::unported(
-        "SmFilletSolver::FindIndexOfRailOnFace",
-        "blend.fillet_solver_p1",
-    ))
 }
 
 /// `SmFilletSolver::RailRailIntersect(crUVGuess, lRailIndex, pOtherFillet,
@@ -3378,14 +3390,11 @@ fn region_shells(brep: &Brep, region: RegionId) -> Result<Vec<ShellId>> {
     brep.region(region)?.get_shells(None, |_, _| Ok(false))
 }
 
-/// `SmBrep::MakeShellVertexTopology(pRegion, rpShell, rpVertex)` (unit
-/// `topology.brep_p2`): the new shell and vertex.
-fn make_shell_vertex_topology(_brep: &mut Brep, _region: RegionId) -> Result<(ShellId, VertexId)> {
-    // UNPORTED(topology.brep_p2): SmBrep::MakeShellVertexTopology
-    Err(SolidError::unported(
-        "SmBrep::MakeShellVertexTopology",
-        "topology.brep_p2",
-    ))
+/// `SmBrep::MakeShellVertexTopology(pRegion, rpShell, rpVertex)`
+/// ([`topology::brep::p2::make_shell_vertex_topology`](crate::topology::brep::p2::make_shell_vertex_topology)):
+/// the new shell and vertex.
+fn make_shell_vertex_topology(brep: &mut Brep, region: RegionId) -> Result<(ShellId, VertexId)> {
+    crate::topology::brep::p2::make_shell_vertex_topology(brep, Some(region))
 }
 
 /// `SmOffsetSurface::Copy(crContext, rpNewSurf)` ([`OffsetSurface::copy`](crate::surface::offset_surface::OffsetSurface::copy);
@@ -3504,7 +3513,7 @@ pub fn join_verts_by_capping(
 
             // add the curves to the output arrays
             uv_curves.push(uv_curve);
-            curves_3d.push(Curve::from(lifted.curve));
+            curves_3d.push(lifted.curve);
             orients.push(OrientType::Same);
         }
     }

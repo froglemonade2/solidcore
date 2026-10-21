@@ -17,7 +17,7 @@
 // input. The B-rep construction, traversal and export are those of sc_topology_fixture.h
 // (two B-rep blocks; `path` holds the two file paths separated by a newline). The private
 // m_pProtoTopoMgr of the intersector is reached through a pointer-to-member (the manager is
-// made by IntersectInsertRelate, unit boolean.topology_intersector_p2, not ported yet).
+// made by IntersectInsertRelate, unit boolean.topology_intersector_p2).
 //
 // harness/cpp/shim/boolean_topology_intersector_p2.cpp includes this file with
 // SC_TI_EXTRA_OPS defined: unknown script ops then go to its run_extra_op, and the entry
@@ -1673,6 +1673,7 @@ void run_script(Rd& rd, Two& t, std::vector<double>& o)
             mgr = new (t.brep[0]) SmProtoTopologyManager(t.brep[0], t.brep[1], ti, capture, override_tol);
             ti->*ti_get(TiMgr()) = mgr;
             o.push_back(0.0);
+            o.push_back((double)mgr->GetTolerance());
             break;
         }
         case S_RESOLVE:

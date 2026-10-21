@@ -50,11 +50,11 @@
 //!   reports the `rbDelete*` flags).
 //! - **Callees not ported yet** are private stubs returning [`SolidError::Unported`],
 //!   each tagged `UNPORTED(<unit>)`:
-//!   `SmBrep::MateLaminaEdgeToSurface` / `ReplaceSurface` (`topology.brep_p2`) and
 //!   `SmCircularCrossSectionFSG` (`blend.fillet_solver_p1`,
 //!   `blend.fillet_standard_solver_p1`). The code after a stub is ported in full;
 //!   `SmEdgeuse::NormalizedEvaluate` / `CreateUVTrimCurve` (`topology.edgeuse_p3`,
-//!   through [`OffsetBrep`]), `SmSurface::GlobalCurveIntersect` (`surface.surface_p8`) and
+//!   through [`OffsetBrep`]), `SmBrep::MateLaminaEdgeToSurface` / `ReplaceSurface`
+//!   (`topology.brep_p2`, through [`OffsetBrep`]), `SmSurface::GlobalCurveIntersect` (`surface.surface_p8`) and
 //!   `SmSurface::CreateOffsetSurface` / the `SmOffsetSurface` constructor
 //!   (`surface.offset_surface`) are real calls. The offset-surface rail of
 //!   `EdgeuseOffset` defers at `SmCrvOnSurf` over that offset surface
@@ -63,12 +63,16 @@
 //! - `SM_CAST_PTR(SmOffsetSurface, ..)` on an analytic copy: an offset surface gets
 //!   `SetAllowExtension(FALSE)`, as upstream.
 //! - **Undefined behaviour upstream** (null objects dereferenced, a curve that is
-//!   not an `SmBSplineCurve` cast as one and used, a null curve extension used, the
-//!   stale `sSolutions2[0]` of `TrimExtendedEdge` read when the second drop finds
-//!   nothing) is [`SolidError::InvalidInput`] with [`UNDEFINED_UPSTREAM`] as
-//!   operation, which tells it apart from a callee's real `SM_ERR_INVALID_INPUT`; the
-//!   statuses upstream ignores are ignored whatever they are, except these and
-//!   [`SolidError::Unported`].
+//!   not an `SmBSplineCurve` cast as one and used, a null curve extension used) is
+//!   [`SolidError::InvalidInput`] with [`UNDEFINED_UPSTREAM`] as operation, which tells
+//!   it apart from a callee's real `SM_ERR_INVALID_INPUT`; the statuses upstream
+//!   ignores are ignored whatever they are, except these and [`SolidError::Unported`].
+//! - **`ExtendTrimEdges`' empty seam drop.** When a candidate's `GlobalPointSolve`
+//!   (`SM_SR_SINGLE`, minimize) finds no solution, upstream reads `sSolutions2[0]`
+//!   anyway (cpp:1610): defined behaviour, the array's backing `sData2[0]` (a default
+//!   `SmSolution`, value `0.0`, or an earlier candidate's result). A single minimizing
+//!   solve always has a solution, so this is unreachable; the port refuses it with the
+//!   same [`UNDEFINED_UPSTREAM`] error instead of reproducing the stale value.
 //! - **Virtual calls.** `pSur->CreateOffsetSurface` dispatches on the surface kind
 //!   (the plane, surface-of-revolution and B-spline overrides, else the base); the
 //!   curves cast `SM_CAST_PTR(SmBSplineCurve, ..)` keep their kind (a line or a circle
@@ -267,6 +271,17 @@ pub struct ReplaceEdgeCurves {
 /// implements it on top of the ported struct, mapping handles to its typed ids. The
 /// tangency tolerance is not here: upstream's executive calls back into the geometry
 /// creation (`m_rGeometryCreation.GetTangencyTolDegrees()`), so this module reads its own.
+///
+/// # Implementing this trait
+///
+/// As for [`OffsetBrep`], the only implementation today is the difftest runner's (`Exec`,
+/// wrapping the ported struct). An adapter keeps upstream's identities: the extension
+/// cache is keyed by the base surface's identity (upstream's pointer; one key per
+/// surface object, never per copy), a lookup that hits returns the cached surface's
+/// handle (the runner seeds the cache with each surface mapped to itself, as the C++
+/// shim seeds `m_vSurfExtSurf`, so a hit returns the base handle), and an extension made
+/// on a miss is stored once and its handle returned again on later hits.
+/// [`OffsetExecutive::offset_edgeuse`] follows `GetOffsetEdgeuse`'s exactly-one rule.
 pub trait OffsetExecutive<O> {
     /// `GetInset`.
     fn inset(&self) -> bool;
@@ -301,6 +316,31 @@ pub trait OffsetExecutive<O> {
 /// implemented by their owner on top of [`ClassGeometry`] / [`ProtoGeometry`] with
 /// the ported topology functions each method names. A method returns `Ok(None)` or
 /// [`SolidError::InvalidInput`] where upstream would dereference null.
+///
+/// # Implementing this trait
+///
+/// The only implementation today is the `offset.offset_geometry_creation` difftest
+/// runner's (`Two` in `crates/difftest/src/units/offset_offset_geometry_creation.rs`),
+/// which is compared against upstream; a library-side adapter (for
+/// [`crate::offset::offset_executive::p1::OffsetExecutive`]'s `EdgeuseOffset` /
+/// `VertexOffset` calls) must make the same choices where a method's upstream call has
+/// side effects:
+/// - For [`OffsetBrep::edge_set_curve`], a copy of the curve through
+///   `topology::edge::set_curve` with `SetCurveOptions { delete_old_curve: true,
+///   dbg_warn_leaks: true, call_notify: true }` and the B-rep's notification environment
+///   (`topology::edge::NotifyEnv`: its topology records, attribute store and object
+///   keys), then `Curve::set_owner` on the edge's new curve with the edge's key.
+/// - For [`OffsetBrep::set_edge_tolerance`], `topology::edge::set_tolerance(.., true, true)`
+///   (`bUpdateOnlyIfLarger`, `bCascadeToBndries`: upstream's defaults).
+/// - For [`OffsetBrep::edgeuse_set_uv_trim_curve`], `topology::edgeuse::p1::set_uv_trim_curve`
+///   with a new curve (or null), the given distance and `true` (delete the existing UV
+///   trim curve), no drop-curve record.
+/// - For [`OffsetBrep::set_vertex_point`], `topology::vertex::set_point` with the same
+///   notification environment (vertex uses keyed as the B-rep's topology records).
+/// - For [`OffsetBrep::insert_curve`] / [`OffsetBrep::insert_surface`], new objects get
+///   handles of their own; they are never attached to topology by the store.
+/// - The surfaces of faces keep their face as owner (`Surface::set_owner`), so that a
+///   trimmed surface cache built on them reaches the face as upstream's does.
 #[allow(clippy::too_many_arguments)]
 pub trait OffsetBrep<O>: ProtoGeometry<O> {
     /// Stores a new curve and returns its handle; `None` when the store is full.
@@ -340,6 +380,28 @@ pub trait OffsetBrep<O>: ProtoGeometry<O> {
     /// `Curve::set_owner`): the edge takes the curve (its old curve and the edge
     /// uses' UV trim curves are dropped).
     fn edge_set_curve(&mut self, k: &Kernel, edge: O, curve: O) -> Result<()>;
+    /// `SmBrep::MateLaminaEdgeToSurface(pEdge, crSurface, dSurfaceExtensionFactor,
+    /// dUVCurveExtensionFactor)` of the edge's B-rep (`topology::brep::p2`, with the
+    /// owner's arenas and notification state).
+    fn brep_mate_lamina_edge_to_surface(
+        &mut self,
+        k: &Kernel,
+        edge: O,
+        surface: O,
+        surface_extension_factor: f64,
+        uv_curve_extension_factor: f64,
+    ) -> Result<()>;
+    /// `SmBrep::ReplaceSurface(pFace, pNewSurface, bAddToDeletedList, NULL,
+    /// bCreateUVTrimCurves)` of the face's B-rep (`topology::brep::p2`): the face takes
+    /// the surface behind `surface`.
+    fn brep_replace_surface(
+        &mut self,
+        k: &Kernel,
+        face: O,
+        surface: O,
+        add_to_deleted_list: bool,
+        create_uv_trim_curves: bool,
+    ) -> Result<()>;
     /// `SmEdge::GetFaces` (`topology::edge::faces`).
     fn edge_faces(&self, edge: O) -> Result<Vec<O>>;
     /// `SmEdge::GetEdgeuses` (`topology::edge::edgeuses`).
@@ -484,36 +546,36 @@ fn edgeuse_create_uv_trim_curve<O: ClassObject>(
 /// `pEdge->GetBrep()->MateLaminaEdgeToSurface(pEdge, crSurface, dTolMult = 1.5,
 /// dMaxTolMult = 10.0)` (both values passed explicitly upstream).
 fn brep_mate_lamina_edge_to_surface<O>(
-    _k: &Kernel,
-    _brep: &mut impl OffsetBrep<O>,
-    _edge: O,
-    _surface: O,
-    _tol_mult: f64,
-    _max_tol_mult: f64,
+    k: &Kernel,
+    brep: &mut impl OffsetBrep<O>,
+    edge: O,
+    surface: O,
+    tol_mult: f64,
+    max_tol_mult: f64,
 ) -> Result<()> {
-    // UNPORTED(topology.brep_p2): SmBrep::MateLaminaEdgeToSurface
-    Err(SolidError::unported(
-        "SmBrep::MateLaminaEdgeToSurface",
-        "topology.brep_p2",
-    ))
+    brep.brep_mate_lamina_edge_to_surface(k, edge, surface, tol_mult, max_tol_mult)
 }
 
 /// `pFace->GetBrep()->ReplaceSurface(pFace, pNewSurface, bAddToDeleteSurfaceList = FALSE,
 /// rOptModifiedFaces = NULL, bOptCreateUVTrimCurves = TRUE)`.
 fn brep_replace_surface<O>(
-    _k: &Kernel,
-    _brep: &mut impl OffsetBrep<O>,
-    _face: O,
-    _surface: O,
-    _add_to_delete_surface_list: bool,
-    _want_modified_faces: bool,
-    _create_uv_trim_curves: bool,
+    k: &Kernel,
+    brep: &mut impl OffsetBrep<O>,
+    face: O,
+    surface: O,
+    add_to_delete_surface_list: bool,
+    want_modified_faces: bool,
+    create_uv_trim_curves: bool,
 ) -> Result<()> {
-    // UNPORTED(topology.brep_p2): SmBrep::ReplaceSurface
-    Err(SolidError::unported(
-        "SmBrep::ReplaceSurface",
-        "topology.brep_p2",
-    ))
+    // rOptModifiedFaces = NULL: the modified faces are not wanted
+    let _ = want_modified_faces;
+    brep.brep_replace_surface(
+        k,
+        face,
+        surface,
+        add_to_delete_surface_list,
+        create_uv_trim_curves,
+    )
 }
 
 /// `SmSurface::GlobalCurveIntersect(domain, curve, interval, tol, solutions)` of the
@@ -1330,8 +1392,8 @@ impl OffsetGeometryCreation {
     ///
     /// `SM_ERR` when the trim curve domain cannot be computed;
     /// [`SolidError::Unported`] from `SmFace::CalculateUVDomainFromUVTrimCurves`' callees
-    /// (`CreateUVTrimCurves`, `topology.face_p3`) and for `SmBrep::ReplaceSurface`
-    /// (`topology.brep_p2`).
+    /// (`CreateUVTrimCurves`, `topology.face_p3`); those of `SmBrep::ReplaceSurface`
+    /// ([`OffsetBrep::brep_replace_surface`]).
     pub fn update_face_surface_domain<O: ClassObject + SolutionObject>(
         &self,
         k: &Kernel,
@@ -2263,7 +2325,7 @@ impl OffsetGeometryCreation {
             let dropped = surface_of(brep, other_ext_h)?.drop_and_trim_curve::<O>(
                 k,
                 &other_ext_domain,
-                &Curve::from(lifted_curve.clone()),
+                &lifted_curve,
                 &lifted_curve.natural_interval(),
                 off_tol / 3.0,
                 true,
@@ -2336,7 +2398,7 @@ impl OffsetGeometryCreation {
 
         // Now that we have created one or two UV curves and a 3D curve find trimming
         // interval and if we find a good one replace the geometry.
-        let lifted_h = store_curve(brep, Curve::from(lifted_curve.clone()))?;
+        let lifted_h = store_curve(brep, lifted_curve.clone())?;
         let trim_ivl = self.trim_extended_edge(
             k,
             brep,

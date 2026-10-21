@@ -75,9 +75,12 @@ export CARGO_BUILD_JOBS=2 RUSTC_WRAPPER=sccache      # sccache is installed in ~
 nice -n 10 cargo test -p solidcore                     # every cargo/C++ command under nice
 ```
 
-- C++ builds: `nice -n 10 harness/cpp/build.sh --jobs 6`. Only rebuild if `bin/cpp/lib`
-  is missing or the harness changed; one shared build serves all worktrees (below).
-- Run `build.sh` from the main tree; worktrees reuse that build by exporting
+- C++ reference: `scripts/fetch-cpp.sh` downloads the prebuilt libraries for the current
+  harness key (no compiling); it falls back to `nice -n 10 harness/cpp/build.sh --jobs 6`
+  when no prebuilt matches. Only refetch/rebuild if `bin/cpp/lib` is missing or the
+  harness changed; one shared `bin/cpp` serves all worktrees (below). With
+  `RUSTC_WRAPPER=sccache` the shims solidcore-ffi compiles are cached by sccache too.
+- Run it from the main tree; worktrees reuse that build by exporting
   `SOLIDCORE_CPP_DIR=$HOME/github/solidcore/bin/cpp` (the CMake build dir is keyed by
   source tree, so a worktree run gets its own build dir but installs to the same `lib/`).
 - Before claiming a unit, check load: `cut -d' ' -f1 /proc/loadavg`. If > 24, do not
@@ -150,8 +153,8 @@ the easiest, lowest `layer` first. Claiming a unit that is not ready is fine:
   that PR's branch (merge it into yours) or agree on the split in that PR's comments.
 
 **One-time setup** (per machine): clone this repo, clone upstream at the pinned commit
-into `upstream/` (see README), build the C++ reference with
-`nice -n 10 harness/cpp/build.sh --jobs 6`.
+into `upstream/` (see README), then run `scripts/fetch-cpp.sh`, or
+`nice -n 10 harness/cpp/build.sh --jobs 6` to build from source.
 
 1. **Claim = a draft PR.** Check nobody has it:
    `gh pr list --state open --search "<unit id> in:title"`. If none, branch from the
@@ -177,8 +180,11 @@ into `upstream/` (see README), build the C++ reference with
    cargo test -p solidcore
    cargo check -p solidcore --target wasm32-unknown-unknown
    cargo run --profile difftest -p difftest --features cpp -- --unit <unit id>   # and every unit you touched
-   cargo run --profile difftest -p difftest --features cpp -- --green            # what CI runs (~2 min)
+   cargo run --profile difftest -p difftest --features cpp -- --green --jobs 4   # what CI runs (with --jobs 0)
    ```
+   `--jobs N` runs N units at a time, each in its own process (`0` = every core; the
+   output and reports are the same as a serial run). On a shared machine stay within the
+   section 2 budget: `--jobs 4` at most, fewer when the load is high.
 5. **Before you mark a PR ready**, check each item. Earlier PRs passed CI yet still
    disagreed with the C++ because of these:
    1. **Default arguments** match upstream (e.g. `IsDegenerate()` defaults to

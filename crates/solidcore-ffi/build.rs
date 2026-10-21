@@ -13,7 +13,14 @@
 //!    runtime. Static libs are linked `-bundle` (not copied into the rlib; they
 //!    are huge) so the final link of `difftest` pulls them from `bin/cpp/lib`.
 //!
-//! `SOLIDCORE_CPP_DIR` overrides the `bin/cpp` location.
+//! `SOLIDCORE_CPP_DIR` overrides the `bin/cpp` location. `scripts/fetch-cpp.sh`
+//! downloads a prebuilt `bin/cpp` (or builds it with `harness/cpp/build.sh`).
+//!
+//! Shim compile caching: the `cc` crate (1.8) runs the C++ compiler through
+//! `RUSTC_WRAPPER` when that is `sccache` (or cachepot/buildcache/kache), so
+//! `RUSTC_WRAPPER=sccache` caches the shim objects as well as the Rust crates. To
+//! cache only the C++, set `CXX="sccache c++"` instead; `cc` recognises the wrapper.
+//! Nothing here needs to change for either.
 //!
 //! `ffi.env` format (one `KEY=VALUE` per line, `#` comments, values are
 //! whitespace separated lists; relative paths are relative to the repo root):
@@ -176,7 +183,15 @@ fn main() {
     for l in cfg.syslibs.as_deref().unwrap_or(&[]) {
         println!("cargo:rustc-link-lib=dylib={l}");
     }
-    println!("cargo:rustc-link-lib=dylib=stdc++");
+    // Apple, FreeBSD and OpenBSD (clang platforms) ship libc++, not libstdc++. NetBSD
+    // still defaults to GCC and libstdc++.
+    let os = env::var("CARGO_CFG_TARGET_OS").unwrap_or_default();
+    let cxx = if matches!(os.as_str(), "macos" | "ios" | "freebsd" | "openbsd") {
+        "c++"
+    } else {
+        "stdc++"
+    };
+    println!("cargo:rustc-link-lib=dylib={cxx}");
     println!("cargo:rustc-link-lib=dylib=m");
 }
 

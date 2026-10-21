@@ -34,12 +34,14 @@
 //! - `DoStitching` collects the modified faces (`sModifiedFaces`) as upstream, though
 //!   only commented-out code reads them; its `dMinEdgeLength` is dropped for the same
 //!   reason (the lengths are still computed).
-//! - The calls into `SmBrep::Notify` (`topology.brep_p2`), `CalculateBoundingBox`
-//!   (`query.brep`), `DeleteFace`, `SqueezeEdge` (`topology.brep_p3`), `GlueVertices`,
-//!   `FindAndSetInfiniteRegion` (`topology.brep_p5`), `GlueEdgesGeneral`
-//!   (`topology.brep_p7`), `MakeVertexSplitEdge` (`topology.brep_p9`, through
-//!   [`test_and_split_edge`]) and `SmFace::IsLamina`, `IsDegenerate`, `Notify`
-//!   (`topology.face_p3`) return [`SolidError::Unported`].
+//! - `SmBrep::Notify(SM_NO_PRE_EDIT)` is `super::p1::brep_notify_pre_edit`
+//!   (`topology::brep::p2::notify`), which still defers inside `topology.brep_p2`.
+//!   This file's own stubs return [`SolidError::Unported`]: `CalculateBoundingBox`
+//!   (`query.brep`), `DeleteFace` (`topology.brep_p3`) and `FindAndSetInfiniteRegion`
+//!   (`topology.brep_p5`, ported there but not wired here yet: it needs the `Kernel`
+//!   and a typed void-type argument). `SqueezeEdge`, `GlueVertices`, `GlueEdgesGeneral`
+//!   and `MakeVertexSplitEdge` (through [`test_and_split_edge`]) defer only where their
+//!   own units still do.
 
 use super::p1::{
     brep_notify_pre_edit, glue_edges_general, glue_vertices, set_point, sort_by_param,
@@ -620,7 +622,6 @@ impl Stitch<'_> {
                     f,
                     NotifyOperation::PreEdit,
                     Some(EntityRef::Face(f)),
-                    false, // SM_NO_GET_BREP(pF)
                     None,
                 ))?;
             }
@@ -1480,8 +1481,8 @@ fn delete_face(
 }
 
 /// `SmBrep::FindAndSetInfiniteRegion(pOptShellToTest, eVoidSettingFlag, pOptBrepBBox)`
-/// (unit `topology.brep_p5`; upstream defaults `NULL`, `SM_VS_INFINITEREGION_SWAP`,
-/// `NULL`).
+/// (upstream defaults `NULL`, `SM_VS_INFINITEREGION_SWAP`, `NULL`); the box is passed
+/// as a copy.
 pub(crate) fn find_and_set_infinite_region(
     k: &mut Kernel,
     b: &mut Brep,
@@ -1489,12 +1490,14 @@ pub(crate) fn find_and_set_infinite_region(
     void_setting: SetRegionVoidType,
     brep_bbox: Option<&Extent3d>,
 ) -> Result<()> {
-    let _ = (k, b, shell_to_test, void_setting, brep_bbox);
-    // UNPORTED(topology.brep_p5): SmBrep::FindAndSetInfiniteRegion
-    Err(SolidError::unported(
-        "SmBrep::FindAndSetInfiniteRegion",
-        "topology.brep_p5",
-    ))
+    let _ = k;
+    let code = match void_setting {
+        SetRegionVoidType::NestedSolid => 0,
+        SetRegionVoidType::InfiniteRegionOnly => 1,
+        SetRegionVoidType::InfiniteRegionSwap => 2,
+    };
+    let mut bbox = brep_bbox.copied();
+    crate::topology::brep::p5::find_and_set_infinite_region(b, shell_to_test, code, bbox.as_mut())
 }
 
 /// `SmFace::IsLamina` (unit `topology.face_p3`).
@@ -1515,19 +1518,16 @@ fn face_is_degenerate(
 }
 
 /// `SmFace::Notify(eNotifyOperation, pData1, pData2, pData3)` (unit
-/// `topology.face_p3`); `data2_is_brep` stands for `pData2` being the face's B-rep,
-/// else null (`SM_NO_GET_BREP(pF)` is null).
+/// `topology.face_p3`) with `pData2 = SM_NO_GET_BREP(pF)` (null), the only form used
+/// here.
 fn face_notify(
     b: &mut Brep,
     f: FaceId,
     operation: NotifyOperation,
     data1: Option<EntityRef>,
-    data2_is_brep: bool,
     data3: Option<EntityRef>,
 ) -> Result<()> {
-    let _ = (b, f, operation, data1, data2_is_brep, data3);
-    // UNPORTED(topology.face_p3): SmFace::Notify
-    Err(SolidError::unported("SmFace::Notify", "topology.face_p3"))
+    crate::topology::loopuse::face_notify_data(b, f, operation, [data1, None, data3])
 }
 
 #[cfg(test)]
