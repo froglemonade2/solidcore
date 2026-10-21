@@ -64,8 +64,7 @@ use crate::blend::fillet_executive::p3::{
 };
 use crate::blend::fillet_solver::p1::FilletSurfaceGenerator;
 use crate::blend::fillet_standard_solver::p1::{
-    BlendCurveCrossSectionFsg, BoundaryTrimmingType, CircularCrossSectionFsg, FilletLaw,
-    FilletLawKind, FilletSolverType, FilletSurfaceGeneratorType,
+    BoundaryTrimmingType, FilletLaw, FilletLawKind, FilletSolverType, FilletSurfaceGeneratorType,
 };
 use crate::curve::curve::p8::CurveIntersectOptions;
 use crate::curve::curve::Curve;
@@ -547,19 +546,15 @@ impl<O: ClassObject + SolutionObject + Ord> FilletExecutive<O> {
 
         let generator_spec = |kind: FilletSurfaceGeneratorType, circular_tol: f64| match kind {
             FilletSurfaceGeneratorType::Linear => Some(FilletSurfaceGenerator::Linear),
-            FilletSurfaceGeneratorType::Circular => {
-                Some(FilletSurfaceGenerator::Circular(CircularCrossSectionFsg {
-                    approximate_arcs: true,
-                    tol_percent_radius: circular_tol,
-                    mirror: false,
-                    complement: false,
-                }))
-            }
-            FilletSurfaceGeneratorType::BlendCurve => Some(FilletSurfaceGenerator::BlendCurve(
-                BlendCurveCrossSectionFsg {
-                    continuity: params.continuity,
-                    blend_scale: params.thumbweight,
-                },
+            FilletSurfaceGeneratorType::Circular => Some(FilletSurfaceGenerator::circular(
+                true,
+                circular_tol,
+                false,
+                false,
+            )),
+            FilletSurfaceGeneratorType::BlendCurve => Some(FilletSurfaceGenerator::blend_curve(
+                params.thumbweight,
+                params.continuity,
             )),
             FilletSurfaceGeneratorType::Unknown => None,
         };
@@ -1272,12 +1267,12 @@ where
     } else {
         access.new_surface_generator(
             k,
-            FilletSurfaceGenerator::Circular(CircularCrossSectionFsg {
-                approximate_arcs: options.xsect_type == 1,
-                tol_percent_radius: options.xsect_accuracy,
-                mirror: options.mirror,
-                complement: options.complement,
-            }),
+            FilletSurfaceGenerator::circular(
+                options.xsect_type == 1,
+                options.xsect_accuracy,
+                options.mirror,
+                options.complement,
+            ),
         )?
     };
 
