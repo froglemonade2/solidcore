@@ -175,7 +175,6 @@
 //!   `SmFace::CalculateUVDomainFromUVTrimCurves` of `topology.face_p1`) and the
 //!   unported callees of `SmFace::Point3DClassify` (wired to `query::face::p1`) in
 //!   `sm_ClassifyFacePoint`;
-//!   `SmFilletSolver::FindIndexOfRailOnFace` (`blend.fillet_solver_p1`) and
 //!   `SmFilletSolver::RailRailIntersect` (`blend.fillet_solver_p2`) in
 //!   `sm_CreateCubicRailRailInterpolant` (the cubic built from their result is ported
 //!   behind them); `SmSurface::DropCurve` (`intersect.surface_drop_lib_p3`) in the
@@ -2895,9 +2894,8 @@ pub fn adjust_uv_on_seam(surf: &Surface, ref_direction: Vec3, uv: &mut Point2) -
 ///
 /// # Errors
 ///
-/// [`SolidError::Unported`]: `SmFilletSolver::FindIndexOfRailOnFace`
-/// (`blend.fillet_solver_p1`) and `SmFilletSolver::RailRailIntersect`
-/// (`blend.fillet_solver_p2`); [`SolidError::Upstream`] (`SM_ERR_NULL_POINTER`) for a
+/// [`SolidError::Unported`]: `SmFilletSolver::RailRailIntersect`
+/// (`blend.fillet_solver_p2`); those of `SmFilletSolver::FindIndexOfRailOnFace`; [`SolidError::Upstream`] (`SM_ERR_NULL_POINTER`) for a
 /// rail index past the solver's two edge uses, a missing edge use or vertex use (all
 /// dereferenced unchecked upstream); `SM_ERR` when the rails do not intersect; those of
 /// the angle computations and [`BSplineCurve::create_canonical`].

@@ -2551,11 +2551,12 @@ pub enum AnalyticTestSurface<'a> {
 /// # Errors
 ///
 /// Those of `IsPlanar` and of the cone test (`SmCone::IsNurbSurfaceCone`), except a
-/// failing iso curve status, which upstream returns as the `SmBoolean` and which
-/// reads as `true`; `InvalidInput` for a surface kind that is not an
-/// `SmBSplineSurface`.
+/// failing iso curve status, which upstream returns as the `SmBoolean` (`SER`) and
+/// which reads as `true`; [`SolidError::InvalidInput`] for a surface kind that is not an
+/// `SmBSplineSurface` (a plane is accepted by type before).
 pub fn test_analytic_surface(k: &Kernel, surface: AnalyticTestSurface<'_>) -> Result<bool> {
     use crate::surface::surface::p2::{CONE_TYPE, PLANE_TYPE};
+    use crate::surface::surface::SurfaceKind;
     let type_code = match surface {
         AnalyticTestSurface::Surface(s) => s.type_code(),
         AnalyticTestSurface::Cone(c) => c.type_code(),
@@ -2579,29 +2580,29 @@ pub fn test_analytic_surface(k: &Kernel, surface: AnalyticTestSurface<'_>) -> Re
     if planar.is_planar {
         return Ok(true);
     }
-    // test NurbSurface to see if its a canonical cone (the SmBSplineSurface part of the
-    // surface, default dToleranceScale = 1)
+    // test NurbSurface to see if its a canonical cone (the SmBSplineSurface data of the
+    // tested surface; pSurface is an SmBSplineSurface*, default dToleranceScale = 1).
+    // A plane never gets here: it is accepted by type above.
     let bss = match surface {
         AnalyticTestSurface::Surface(s) => match s.kind() {
             SurfaceKind::BSpline(b) => b,
-            SurfaceKind::Plane(p) => p.base(),
             SurfaceKind::SurfOfRevolution(r) => r.base(),
             // not an SmBSplineSurface: upstream's parameter type excludes these
             _ => {
-                return Err(SolidError::InvalidInput {
-                    operation: "blend::fillet_solver::test_analytic_surface",
-                    reason: "surface is not an SmBSplineSurface",
-                })
+                return Err(SolidError::invalid_input(
+                    "blend::fillet_solver::test_analytic_surface",
+                    "surface is not an SmBSplineSurface",
+                ))
             }
         },
         AnalyticTestSurface::Cone(c) => c.rev().base(),
         AnalyticTestSurface::Sphere(s) => s.base().base(),
-        AnalyticTestSurface::Torus(t) => t.base.base(),
+        AnalyticTestSurface::Torus(t) => t.base().base(),
     };
     match Cone::is_nurb_surface_cone(k, bss, 1.0) {
         Ok(None) => Ok(false),
-        // upstream returns the iso curve status as the SmBoolean: a failing (non-zero)
-        // status reads as TRUE
+        // upstream returns the iso curve status as the SmBoolean (`SER(...)` in
+        // `IsNurbSurfaceCone`): a failing (non-zero) status reads as TRUE
         Ok(Some(_)) | Err(SolidError::Upstream { .. }) => Ok(true),
         Err(e) => Err(e),
     }
