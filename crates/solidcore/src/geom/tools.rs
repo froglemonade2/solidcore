@@ -233,7 +233,7 @@ pub fn find_first_vertex_within_tol_to_pnt(
 /// `CurveMaxDistanceBetween` skips the edge unless it is
 /// [`SolidError::Unported`].
 pub fn find_coincident_edge(
-    kernel: &Kernel,
+    k: &Kernel,
     brep: &Brep,
     query: &CoincidentEdgeQuery<'_>,
     edges: &[EdgeId],
@@ -260,10 +260,10 @@ pub fn find_coincident_edge(
 
         let edge_ivl = edge_interval(brep, e)?;
         let edge_mid_param = edge_ivl.evaluate(0.5);
-        let mid_pt = edge_curve_point(brep, e, edge_mid_param)?;
+        let mid_pt = edge_curve_point(k, brep, e, edge_mid_param)?;
 
         let drop = query.curve.drop_point(
-            kernel,
+            k,
             &curve_ivl,
             mid_pt,
             None,
@@ -275,10 +275,10 @@ pub fn find_coincident_edge(
             continue;
         }
 
-        let edge_tangent = edge_curve_derivative(brep, e, edge_mid_param)?;
+        let edge_tangent = edge_curve_derivative(k, brep, e, edge_mid_param)?;
         let curve_tangent = query
             .curve
-            .evaluate(drop.parameter, 1, true, true)?
+            .evaluate(k, drop.parameter, 1, true, true)?
             .get(1)
             .copied()
             .ok_or(SolidError::null_pointer("geom::tools::curve_derivative"))?;
@@ -291,7 +291,7 @@ pub fn find_coincident_edge(
             (edge_ivl.max(), edge_ivl.min())
         };
         let dist = match query.curve.curve_max_distance_between(
-            kernel,
+            k,
             &curve_ivl,
             edge_curve(brep, e)?,
             other_range.0,
@@ -409,13 +409,13 @@ fn edge_curve(brep: &Brep, e: EdgeId) -> Result<&Curve> {
 }
 
 /// `pE->GetCurve()->EvaluatePoint(t)` (`NER` on a missing curve).
-fn edge_curve_point(brep: &Brep, e: EdgeId, t: f64) -> Result<Point3> {
-    edge_curve(brep, e)?.evaluate_point(t)
+fn edge_curve_point(k: &Kernel, brep: &Brep, e: EdgeId, t: f64) -> Result<Point3> {
+    edge_curve(brep, e)?.evaluate_point(k, t)
 }
 
 /// First derivative from `pE->GetCurve()->Evaluate(t, 1, TRUE, ...)`.
-fn edge_curve_derivative(brep: &Brep, e: EdgeId, t: f64) -> Result<Vec3> {
-    let pv = edge_curve(brep, e)?.evaluate(t, 1, true, true)?;
+fn edge_curve_derivative(k: &Kernel, brep: &Brep, e: EdgeId, t: f64) -> Result<Vec3> {
+    let pv = edge_curve(brep, e)?.evaluate(k, t, 1, true, true)?;
     pv.get(1).copied().ok_or(SolidError::null_pointer(
         "geom::tools::edge_curve_derivative",
     ))
@@ -530,7 +530,7 @@ mod tests {
 
     #[test]
     fn curve_paths() {
-        let k = Kernel::default();
+        let k = &Kernel::default();
         let keys = &crate::topology::brep_cache::arena_identity;
         let mut brep = Brep::new();
         let a = brep.add_vertex(p(0.0, 0.0, 0.0)).unwrap();
@@ -584,13 +584,13 @@ mod tests {
             tolerance: 1e-6,
         };
         // an edge without a curve (upstream dereferences null)
-        assert!(find_coincident_edge(&k, &brep, &q, &[e], 0, keys).is_err());
+        assert!(find_coincident_edge(k, &brep, &q, &[e], 0, keys).is_err());
         assert_eq!(
-            find_coincident_edge(&k, &brep, &q, &[e], 1, keys).unwrap(),
+            find_coincident_edge(k, &brep, &q, &[e], 1, keys).unwrap(),
             None
         );
         brep.edge_mut(e).unwrap().curve = Some(line());
-        let found = find_coincident_edge(&k, &brep, &q, &[e], 0, keys)
+        let found = find_coincident_edge(k, &brep, &q, &[e], 0, keys)
             .unwrap()
             .unwrap();
         assert_eq!((found.index, found.same_orientation), (0, true));
@@ -600,11 +600,11 @@ mod tests {
         owned.set_owner(Some(keys(CacheObject::Edge(e))), None);
         let q = CoincidentEdgeQuery { curve: &owned, ..q };
         assert_eq!(
-            find_coincident_edge(&k, &brep, &q, &[e], 0, keys).unwrap(),
+            find_coincident_edge(k, &brep, &q, &[e], 0, keys).unwrap(),
             None
         );
         // the nearest edge to a point and its parameter
-        let pick = find_edge(&k, &brep, p(0.25, 0.1, 0.0)).unwrap().unwrap();
+        let pick = find_edge(k, &brep, p(0.25, 0.1, 0.0)).unwrap().unwrap();
         assert_eq!(pick.index, 0);
         assert!((pick.parameter - 0.25).abs() < 1e-9);
         assert!(matches!(

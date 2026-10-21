@@ -167,7 +167,7 @@ fn index_i64(i: usize) -> Result<i64, HarnessError> {
     i64::try_from(i).map_err(|e| harness(&e))
 }
 
-fn rust(i: &Inputs) -> Result<Output, HarnessError> {
+fn rust(k: &solidcore::kernel::Kernel, i: &Inputs) -> Result<Output, HarnessError> {
     match i {
         Inputs::Point { pts, target, tol } => {
             let pts: Vec<Point3> = pts.iter().copied().map(p3).collect();
@@ -186,7 +186,9 @@ fn rust(i: &Inputs) -> Result<Output, HarnessError> {
                 .iter()
                 .map(|&[x, y, z, t]| {
                     let v = brep.add_vertex(p3([x, y, z]))?;
-                    brep.vertex_mut(v)?.tolerance = t;
+                    // the shim assigns the double to the `SmZoneTol3d` member
+                    // (`operator=(double)` takes `fabs` only)
+                    brep.vertex_mut(v)?.tolerance = solidcore::geom::tol::tol3d(t);
                     Ok(v)
                 })
                 .collect::<Result<_, SolidError>>()
@@ -208,7 +210,6 @@ fn rust(i: &Inputs) -> Result<Output, HarnessError> {
             // the shim's target: the curve of edge `edge` (a copy has no owner, the edge's
             // own curve is owned by the edge) over the edge interval, between its vertices
             // (swapped when asked), searched over every edge in `SmBrep::GetEdges` order
-            let kernel = solidcore::kernel::Kernel::default();
             let brep = file_brep(file)?;
             let edges: Vec<EdgeId> =
                 solidcore::topology::brep::p1::edges(&brep, None).map_err(|e| harness(&e))?;
@@ -226,7 +227,7 @@ fn rust(i: &Inputs) -> Result<Output, HarnessError> {
                 .ok_or_else(|| harness(&"edge without a curve"))?;
             let keys = &solidcore::topology::brep_cache::arena_identity;
             let curve = if *copy_curve {
-                let mut c = own.copy(&kernel).map_err(|e| harness(&e))?;
+                let mut c = own.copy(k).map_err(|e| harness(&e))?;
                 c.set_owner(None, None);
                 c
             } else {
@@ -253,7 +254,7 @@ fn rust(i: &Inputs) -> Result<Output, HarnessError> {
                 interval,
                 tolerance: *tol,
             };
-            match tools::find_coincident_edge(&kernel, &brep, &query, &edges, *start, keys) {
+            match tools::find_coincident_edge(k, &brep, &query, &edges, *start, keys) {
                 Ok(Some(m)) => Ok(coincident_out(
                     true,
                     m.same_orientation,
@@ -264,11 +265,7 @@ fn rust(i: &Inputs) -> Result<Output, HarnessError> {
                 Err(e) => Ok(rust_err(&e)),
             }
         }
-        Inputs::Edge { file, pnt } => match tools::find_edge(
-            &solidcore::kernel::Kernel::default(),
-            &file_brep(file)?,
-            p3(*pnt),
-        ) {
+        Inputs::Edge { file, pnt } => match tools::find_edge(k, &file_brep(file)?, p3(*pnt)) {
             Ok(Some(m)) => Ok(status_only(0)
                 .int("index", index_i64(m.index)?)
                 .scalar("param", m.parameter)),
@@ -276,7 +273,7 @@ fn rust(i: &Inputs) -> Result<Output, HarnessError> {
             Err(e) => Ok(rust_err(&e)),
         },
         Inputs::Face { file, pnt } => match tools::find_face(
-            &solidcore::kernel::Kernel::default(),
+            k,
             &file_brep(file)?,
             solidcore::topology::BrepId::from_index(0),
             p3(*pnt),
@@ -411,6 +408,7 @@ impl UnitDiff for Runner {
     }
 
     fn run_rust(&self, case: &Case) -> Result<Output, HarnessError> {
-        rust(&case.parse()?)
+        let k = &solidcore::Kernel::default();
+        rust(k, &case.parse()?)
     }
 }
