@@ -2,20 +2,28 @@
   "abs_floors": [],
   "cases": [
     {
+      "deferred": {
+        "symbol": "SmCircularCrossSectionFSG::CreateSurfaceFromCurves",
+        "unit": "blend.fillet_standard_solver_p1"
+      },
       "max_rel_err": 0.0,
       "name": "box_solid_offset_vertex_edge_caps",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/offset.offset_geometry_creation/upstream.json#0 (upstream tests/prog_test/src/smOffsetTest.cpp:my_test_offset (SmOffsetGeometryCreation(dOffsetRadius, dTolerance) over Solids/box.smb; VertexOffset / EdgeuseOffset through SmOffsetExecutive::DoSolidOffset))",
-      "values_compared": 1438
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmCircularCrossSectionFSG::CreateSurfaceFromCurves",
+        "unit": "blend.fillet_standard_solver_p1"
+      },
       "max_rel_err": 0.0,
       "name": "box_shell_inset_shell_face",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/offset.offset_geometry_creation/upstream.json#1 (upstream tests/prog_test/src/smOffsetTest.cpp:my_test_offset (lShellFace > 0: SetShellFaces + inset; EdgeuseOffset on an inset edge of a shell face))",
-      "values_compared": 642
+      "values_compared": 0
     },
     {
       "deferred": {
@@ -42,16 +50,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
-      },
       "max_rel_err": 0.0,
       "name": "box_local_operation_faceuse_offset",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/offset.offset_geometry_creation/upstream.json#4 (upstream tests/prog_test/src/smLocalOpTest.cpp:my_local_op (SmLocalOperationGeometryCreation(dist, tol, faces, surfaces); FaceuseOffset returns the listed surface))",
-      "values_compared": 0
+      "values_compared": 237
     },
     {
       "max_rel_err": 0.0,
@@ -502,16 +506,12 @@
       "values_compared": 16
     },
     {
-      "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
-      },
       "max_rel_err": 0.0,
       "name": "gen0047",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=9515163603058762803",
-      "values_compared": 0
+      "values_compared": 227
     },
     {
       "max_rel_err": 0.0,
@@ -847,8 +847,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "gen0084",
@@ -859,8 +859,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "UpdateFaceSurfaceDomain on a face surface imported as its B-spline part",
+        "unit": "harness:analytic-geometry-export"
       },
       "max_rel_err": 0.0,
       "name": "gen0085",
@@ -1006,16 +1006,12 @@
       "values_compared": 23
     },
     {
-      "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
-      },
       "max_rel_err": 0.0,
       "name": "gen0100",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=9515163603058762856",
-      "values_compared": 0
+      "values_compared": 228
     },
     {
       "deferred": {
@@ -1147,8 +1143,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "UpdateFaceSurfaceDomain on a face surface imported as its B-spline part",
+        "unit": "harness:analytic-geometry-export"
       },
       "max_rel_err": 0.0,
       "name": "gen0115",
@@ -1214,16 +1210,12 @@
       "values_compared": 142
     },
     {
-      "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
-      },
       "max_rel_err": 0.0,
       "name": "gen0122",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=9515163603058762878",
-      "values_compared": 0
+      "values_compared": 1019
     },
     {
       "deferred": {
@@ -1890,16 +1882,12 @@
       "values_compared": 87
     },
     {
-      "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
-      },
       "max_rel_err": 0.0,
       "name": "gen0194",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=9515163603058762950",
-      "values_compared": 0
+      "values_compared": 57
     },
     {
       "deferred": {
@@ -1935,8 +1923,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "UpdateFaceSurfaceDomain on a face surface imported as its B-spline part",
+        "unit": "harness:analytic-geometry-export"
       },
       "max_rel_err": 0.0,
       "name": "gen0198",
@@ -2330,16 +2318,12 @@
       "values_compared": 13
     },
     {
-      "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
-      },
       "max_rel_err": 0.0,
       "name": "gen0241",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=9515163603058762997",
-      "values_compared": 0
+      "values_compared": 418
     },
     {
       "max_rel_err": 0.0,
@@ -2435,8 +2419,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "gen0252",
@@ -2482,16 +2466,12 @@
       "values_compared": 605
     },
     {
-      "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
-      },
       "max_rel_err": 0.0,
       "name": "gen0257",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=9515163603058763013",
-      "values_compared": 0
+      "values_compared": 158
     },
     {
       "deferred": {
@@ -2686,16 +2666,12 @@
       "values_compared": 165
     },
     {
-      "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
-      },
       "max_rel_err": 0.0,
       "name": "gen0279",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=9515163603058763035",
-      "values_compared": 0
+      "values_compared": 55
     },
     {
       "max_rel_err": 0.0,
@@ -2774,16 +2750,12 @@
       "values_compared": 1308
     },
     {
-      "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
-      },
       "max_rel_err": 0.0,
       "name": "gen0289",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=9515163603058763045",
-      "values_compared": 0
+      "values_compared": 105
     },
     {
       "deferred": {
@@ -2862,16 +2834,12 @@
       "values_compared": 91
     },
     {
-      "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
-      },
       "max_rel_err": 0.0,
       "name": "gen0298",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=9515163603058763054",
-      "values_compared": 0
+      "values_compared": 146
     },
     {
       "max_rel_err": 0.0,
@@ -3203,8 +3171,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "UpdateFaceSurfaceDomain on a face surface imported as its B-spline part",
+        "unit": "harness:analytic-geometry-export"
       },
       "max_rel_err": 0.0,
       "name": "gen0335",
@@ -3259,8 +3227,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "SmCrvOnSurf::SmCrvOnSurf (non-B-spline surface)",
+        "unit": "curve.crv_on_surf"
       },
       "max_rel_err": 0.0,
       "name": "gen0341",
@@ -3627,8 +3595,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "UpdateFaceSurfaceDomain on a face surface imported as its B-spline part",
+        "unit": "harness:analytic-geometry-export"
       },
       "max_rel_err": 0.0,
       "name": "gen0380",
@@ -3851,8 +3819,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "UpdateFaceSurfaceDomain on a face surface imported as its B-spline part",
+        "unit": "harness:analytic-geometry-export"
       },
       "max_rel_err": 0.0,
       "name": "gen0403",
@@ -4098,16 +4066,12 @@
       "values_compared": 15
     },
     {
-      "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
-      },
       "max_rel_err": 0.0,
       "name": "gen0431",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=9515163603058763187",
-      "values_compared": 0
+      "values_compared": 88
     },
     {
       "max_rel_err": 0.0,
@@ -4127,8 +4091,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "SmSurfaceDropCurve::DoTrace",
+        "unit": "intersect.surface_drop_curve"
       },
       "max_rel_err": 0.0,
       "name": "gen0434",
@@ -4327,8 +4291,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "UpdateFaceSurfaceDomain on a face surface imported as its B-spline part",
+        "unit": "harness:analytic-geometry-export"
       },
       "max_rel_err": 0.0,
       "name": "gen0455",
@@ -4370,16 +4334,12 @@
       "values_compared": 115
     },
     {
-      "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
-      },
       "max_rel_err": 0.0,
       "name": "gen0459",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=9515163603058763215",
-      "values_compared": 0
+      "values_compared": 371
     },
     {
       "deferred": {
@@ -4431,8 +4391,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "UpdateFaceSurfaceDomain on a face surface imported as its B-spline part",
+        "unit": "harness:analytic-geometry-export"
       },
       "max_rel_err": 0.0,
       "name": "gen0465",
@@ -4659,8 +4619,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "UpdateFaceSurfaceDomain on a face surface imported as its B-spline part",
+        "unit": "harness:analytic-geometry-export"
       },
       "max_rel_err": 0.0,
       "name": "gen0490",
@@ -4831,8 +4791,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "UpdateFaceSurfaceDomain on a face surface imported as its B-spline part",
+        "unit": "harness:analytic-geometry-export"
       },
       "max_rel_err": 0.0,
       "name": "gen0508",
@@ -4922,16 +4882,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
-      },
       "max_rel_err": 0.0,
       "name": "gen0518",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=9515163603058763274",
-      "values_compared": 0
+      "values_compared": 225
     },
     {
       "max_rel_err": 0.0,
@@ -5059,8 +5015,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "UpdateFaceSurfaceDomain on a face surface imported as its B-spline part",
+        "unit": "harness:analytic-geometry-export"
       },
       "max_rel_err": 0.0,
       "name": "gen0533",
@@ -5119,8 +5075,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "gen0539",
@@ -5139,8 +5095,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "UpdateFaceSurfaceDomain on a face surface imported as its B-spline part",
+        "unit": "harness:analytic-geometry-export"
       },
       "max_rel_err": 0.0,
       "name": "gen0541",
@@ -5259,8 +5215,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "gen0554",
@@ -5378,16 +5334,12 @@
       "values_compared": 54
     },
     {
-      "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
-      },
       "max_rel_err": 0.0,
       "name": "gen0567",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=9515163603058763323",
-      "values_compared": 0
+      "values_compared": 320
     },
     {
       "max_rel_err": 0.0,
@@ -5558,16 +5510,12 @@
       "values_compared": 16
     },
     {
-      "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
-      },
       "max_rel_err": 0.0,
       "name": "gen0586",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=9515163603058763342",
-      "values_compared": 0
+      "values_compared": 275
     },
     {
       "max_rel_err": 0.0,
@@ -5578,16 +5526,12 @@
       "values_compared": 237
     },
     {
-      "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
-      },
       "max_rel_err": 0.0,
       "name": "gen0588",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=9515163603058763344",
-      "values_compared": 0
+      "values_compared": 243
     },
     {
       "max_rel_err": 0.0,
@@ -5762,16 +5706,12 @@
       "values_compared": 315
     },
     {
-      "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
-      },
       "max_rel_err": 0.0,
       "name": "gen0609",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=9515163603058763365",
-      "values_compared": 0
+      "values_compared": 825
     },
     {
       "deferred": {
@@ -5839,8 +5779,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "gen0617",
@@ -5851,8 +5791,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "SmSurface::DropCurve",
+        "unit": "intersect.surface_drop_lib_p3"
       },
       "max_rel_err": 0.0,
       "name": "gen0618",
@@ -5899,8 +5839,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "UpdateFaceSurfaceDomain on a face surface imported as its B-spline part",
+        "unit": "harness:analytic-geometry-export"
       },
       "max_rel_err": 0.0,
       "name": "gen0623",
@@ -6539,8 +6479,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "SmSurface subclass::CreateOffsetSurface (face surface imported as its B-spline part)",
+        "unit": "harness:analytic-geometry-export"
       },
       "max_rel_err": 0.0,
       "name": "gen0690",
@@ -6911,8 +6851,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "UpdateFaceSurfaceDomain on a face surface imported as its B-spline part",
+        "unit": "harness:analytic-geometry-export"
       },
       "max_rel_err": 0.0,
       "name": "gen0730",
@@ -6962,16 +6902,12 @@
       "values_compared": 89
     },
     {
-      "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
-      },
       "max_rel_err": 0.0,
       "name": "gen0735",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=9515163603058763491",
-      "values_compared": 0
+      "values_compared": 231
     },
     {
       "deferred": {
@@ -7175,8 +7111,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
+        "symbol": "SmSurface subclass::CreateOffsetSurface (face surface imported as its B-spline part)",
+        "unit": "harness:analytic-geometry-export"
       },
       "max_rel_err": 0.0,
       "name": "gen0756",
@@ -7494,16 +7430,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
-      },
       "max_rel_err": 0.0,
       "name": "gen0792",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=9515163603058763548",
-      "values_compared": 0
+      "values_compared": 435
     },
     {
       "max_rel_err": 0.0,
@@ -7530,24 +7462,24 @@
       "values_compared": 218
     },
     {
-      "deferred": {
-        "symbol": "SmFace::GetUpwardLoopuses",
-        "unit": "topology.face_p4"
-      },
       "max_rel_err": 0.0,
       "name": "gen0796",
-      "outcome": "deferred",
-      "pass": false,
-      "source": "generated:seed=9515163603058763552",
-      "values_compared": 0
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "gen0797",
       "outcome": "pass",
       "pass": true,
+      "source": "generated:seed=9515163603058763552",
+      "values_compared": 73
+    },
+    {
+      "deferred": {
+        "symbol": "SmCircularCrossSectionFSG::CreateSurfaceFromCurves",
+        "unit": "blend.fillet_standard_solver_p1"
+      },
+      "max_rel_err": 0.0,
+      "name": "gen0797",
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=9515163603058763553",
-      "values_compared": 245
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -7715,8 +7647,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmCrvOnSurf::SmCrvOnSurf (non-B-spline surface)",
-        "unit": "curve.crv_on_surf"
+        "symbol": "SmCircularCrossSectionFSG::CreateSurfaceFromCurves",
+        "unit": "blend.fillet_standard_solver_p1"
       },
       "max_rel_err": 0.0,
       "name": "box_edgeuse_offset_plain",
@@ -7894,12 +7826,16 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmCircularCrossSectionFSG::CreateSurfaceFromCurves",
+        "unit": "blend.fillet_standard_solver_p1"
+      },
       "max_rel_err": 0.0,
       "name": "box_with_large_fillet_edgeuse_offset_rails_torus",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "inline",
-      "values_compared": 578
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -7910,12 +7846,16 @@
       "values_compared": 374
     },
     {
+      "deferred": {
+        "symbol": "SmCircularCrossSectionFSG::CreateSurfaceFromCurves",
+        "unit": "blend.fillet_standard_solver_p1"
+      },
       "max_rel_err": 0.0,
       "name": "box_with_large_fillet_edgeuse_offset_rails_torus_self_intersecting",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "inline",
-      "values_compared": 578
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -7926,12 +7866,16 @@
       "values_compared": 374
     },
     {
+      "deferred": {
+        "symbol": "SmCircularCrossSectionFSG::CreateSurfaceFromCurves",
+        "unit": "blend.fillet_standard_solver_p1"
+      },
       "max_rel_err": 0.0,
       "name": "box_with_large_fillet_edgeuse_offset_rails_torus_vertical",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "inline",
-      "values_compared": 578
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -7942,12 +7886,16 @@
       "values_compared": 374
     },
     {
+      "deferred": {
+        "symbol": "SmCircularCrossSectionFSG::CreateSurfaceFromCurves",
+        "unit": "blend.fillet_standard_solver_p1"
+      },
       "max_rel_err": 0.0,
       "name": "box_with_large_fillet_edgeuse_offset_rails_cylinder",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "inline",
-      "values_compared": 498
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -7958,12 +7906,16 @@
       "values_compared": 262
     },
     {
+      "deferred": {
+        "symbol": "SmCircularCrossSectionFSG::CreateSurfaceFromCurves",
+        "unit": "blend.fillet_standard_solver_p1"
+      },
       "max_rel_err": 0.0,
       "name": "box_with_large_fillet_edgeuse_offset_rails_cone",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "inline",
-      "values_compared": 498
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -7974,12 +7926,16 @@
       "values_compared": 262
     },
     {
+      "deferred": {
+        "symbol": "SmCircularCrossSectionFSG::CreateSurfaceFromCurves",
+        "unit": "blend.fillet_standard_solver_p1"
+      },
       "max_rel_err": 0.0,
       "name": "box_with_large_fillet_edgeuse_offset_rails_close_rails",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "inline",
-      "values_compared": 498
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -7990,12 +7946,16 @@
       "values_compared": 262
     },
     {
+      "deferred": {
+        "symbol": "SmCircularCrossSectionFSG::CreateSurfaceFromCurves",
+        "unit": "blend.fillet_standard_solver_p1"
+      },
       "max_rel_err": 0.0,
       "name": "box_with_large_fillet_edgeuse_offset_rails_mismatched_intervals",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "inline",
-      "values_compared": 498
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -8191,19 +8151,19 @@
     }
   ],
   "cases_both_errored": 0,
-  "cases_deferred": 299,
+  "cases_deferred": 289,
   "cases_failed": 0,
-  "cases_passed": 575,
+  "cases_passed": 585,
   "cases_total": 874,
   "deferred_by_unit": {
+    "blend.fillet_standard_solver_p1": 11,
     "curve.crv_on_surf": 28,
     "geom.tol": 82,
-    "harness:analytic-geometry-export": 107,
-    "intersect.surface_drop_curve": 17,
-    "intersect.surface_drop_lib_p3": 7,
+    "harness:analytic-geometry-export": 123,
+    "intersect.surface_drop_curve": 18,
+    "intersect.surface_drop_lib_p3": 13,
     "surface.surface_p2": 1,
-    "topology.face_p2": 13,
-    "topology.face_p4": 44
+    "topology.face_p2": 13
   },
   "max_rel_err": 0.0,
   "pass": true,
