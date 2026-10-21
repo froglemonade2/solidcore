@@ -2290,7 +2290,7 @@ mod tests {
         assert_eq!((h2, hu2), (H::Curve(false), None));
         assert!(objects.classify_uv_curve().is_none());
         // a handle type that cannot name curves cannot make them
-        assert!(LoopObjectCurves::<EntityRef>::new(&b, f).is_err());
+        assert!(LoopObjectCurves::<EntityRef>::new(&k, &b, f).is_err());
     }
 
     #[test]
@@ -2364,7 +2364,8 @@ mod tests {
         use crate::topology::brep::p1::HealLoopHandle;
         let mut b = Brep::new();
         let f = square(&mut b, 0.0);
-        assert!(LoopObjectCurves::<HealLoopHandle>::new(&b, f).is_ok());
+        let k = Kernel::default();
+        assert!(LoopObjectCurves::<HealLoopHandle>::new(&k, &b, f).is_ok());
     }
 
     #[test]
