@@ -2354,9 +2354,16 @@ mod tests {
         let mut b = Brep::new();
         let v = b.add_vertex_record(Vertex::default()).unwrap();
         let mut edge = Some(EdgeId::from_index(3));
-        assert!(
-            combine_coincident_vertices(&mut Kernel::default(), &mut b, v, v, &mut edge).is_err()
-        );
+        // a vertex that is not in the B-rep: the lookup fails (DeleteVertex's own status
+        // is ignored upstream, so combining a vertex with itself no longer fails)
+        assert!(combine_coincident_vertices(
+            &mut Kernel::default(),
+            &mut b,
+            v,
+            VertexId::from_index(9),
+            &mut edge
+        )
+        .is_err());
         assert!(edge.is_none());
         let mut out = SqueezedFace {
             deleted_vertices: vec![v],

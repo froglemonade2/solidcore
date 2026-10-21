@@ -138,16 +138,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmBrep::DeleteEdge",
-        "unit": "topology.brep_p4"
-      },
       "max_rel_err": 0.0,
       "name": "gen0014",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "generated:seed=16427438353069631923",
-      "values_compared": 0
+      "values_compared": 17
     },
     {
       "max_rel_err": 0.0,
@@ -2847,9 +2843,9 @@
     }
   ],
   "cases_both_errored": 0,
-  "cases_deferred": 79,
+  "cases_deferred": 78,
   "cases_failed": 0,
-  "cases_passed": 237,
+  "cases_passed": 238,
   "cases_total": 316,
   "deferred_by_unit": {
     "cpp-guard:ub-165": 3,
@@ -2858,7 +2854,6 @@
     "query.brep": 2,
     "surface.surface_p2": 12,
     "topology.brep_p3": 36,
-    "topology.brep_p4": 1,
     "topology.brep_p9": 2,
     "topology.face_p2": 18,
     "topology.face_p3": 1

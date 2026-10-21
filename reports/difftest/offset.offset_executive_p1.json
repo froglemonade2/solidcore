@@ -4306,14 +4306,10 @@
       "values_compared": 24
     },
     {
-      "deferred": {
-        "symbol": "SmBrep::ShrinkGeometry",
-        "unit": "topology.brep_p4"
-      },
       "max_rel_err": 0.0,
       "name": "probe_replace_empty",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:fixtures/offset.offset_executive_p1/probe.json#0",
       "values_compared": 0
     },
@@ -9545,9 +9541,9 @@
     }
   ],
   "cases_both_errored": 0,
-  "cases_deferred": 317,
+  "cases_deferred": 316,
   "cases_failed": 0,
-  "cases_passed": 714,
+  "cases_passed": 715,
   "cases_rejected": 1,
   "cases_total": 1032,
   "deferred_by_unit": {
@@ -9555,8 +9551,7 @@
     "offset.offset_geometry_creation": 1,
     "query.brep": 1,
     "topology.brep_p1": 1,
-    "topology.brep_p3": 312,
-    "topology.brep_p4": 1
+    "topology.brep_p3": 312
   },
   "max_rel_err": 1.850371707708594e-16,
   "pass": true,
