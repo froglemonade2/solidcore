@@ -480,7 +480,7 @@ impl<'s> SurfaceTrace<'s> for SectionTracer<'s> {
 
     fn find_solutions_on_boundary_curve(
         &self,
-        _k: &Kernel,
+        k: &Kernel,
         boundary: &Curve,
         interval: &Extent1d,
         _side: usize,
@@ -491,7 +491,7 @@ impl<'s> SurfaceTrace<'s> for SectionTracer<'s> {
         let (mut t_prev, mut f_prev) = (0.0, 0.0);
         for i in 0..=N {
             let t = interval.evaluate(i as f64 / N as f64);
-            let p = boundary.evaluate_point(t)?;
+            let p = boundary.evaluate_point(k, t)?;
             let f = self.n.dot(p - self.p0);
             if i > 0 && ((f_prev <= 0.0 && f > 0.0) || (f_prev > 0.0 && f <= 0.0)) {
                 let tt = t_prev + (t - t_prev) * (f_prev / (f_prev - f));
