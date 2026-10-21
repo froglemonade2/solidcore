@@ -627,9 +627,10 @@ impl<O: LoopObject + PartialEq> ClassGeometry<O> for LoopObjectCurves<'_, O> {
     }
 
     fn vertex_face_gap(&self, vertex: O, surface: &Surface, face: Option<O>) -> Option<f64> {
-        let v = match (vertex.as_vertex(), vertex.as_topology()) {
-            (Some(v), _) | (None, Some(EntityRef::Vertex(v))) => v,
-            _ => return None,
+        let ((Some(v), _) | (None, Some(EntityRef::Vertex(v)))) =
+            (vertex.as_vertex(), vertex.as_topology())
+        else {
+            return None;
         };
         let f = match face {
             Some(o) if o == self.face => self.f,
