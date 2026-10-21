@@ -13,8 +13,8 @@
 //! upstream preserves its partial contents on failure. Classification (including
 //! face/edge-to-region resolution) waits for `query.brep`; graph deletion is
 //! `topology.brep_p4`'s `DeleteEdge` / `DeleteVertex`, notified through `copy`'s
-//! records, attributes and primary identities and the kernel's context (hence
-//! `&mut Kernel`). Edge copying is [`p2::merge_edge`] of each edge's
+//! records, attributes and primary identities and the primary kernel's context
+//! (hence `&mut Kernel`). Edge copying is [`p2::merge_edge`] of each edge's
 //! primary edge use; vertex copying delegates to [`p1::merge_vertex`]. B-rep
 //! caches are not attached to arena B-reps yet, so the optional cache resizing is
 //! absent. The deletion retry loop is iterative; wire collection uses the bounded
@@ -26,7 +26,7 @@
 //! Missing/dangling mates are rejected only when added to the keep list:
 //! typed ids cannot represent the null pointer upstream can append there.
 
-use crate::boolean::merge::p1;
+use crate::boolean::merge::p1::{self, VertexCopy};
 use crate::boolean::merge::p2::{self, MergeContext, TopologyCopy};
 use crate::boolean::topology_intersector::p1::Relations;
 use crate::error::{Result, SolidError};
@@ -99,13 +99,13 @@ fn delete_vertex(
     p4::delete_vertex(k, brep, &mut delete_env(copy), vertex)
 }
 
-fn midpoint(b: &Brep, id: EdgeId) -> Result<Point3> {
+fn midpoint(k: &Kernel, b: &Brep, id: EdgeId) -> Result<Point3> {
     let edge = b.edge(id)?;
     let curve = edge
         .curve
         .as_ref()
         .ok_or_else(|| SolidError::null_pointer(OP))?;
-    curve.evaluate_point(edge.interval.evaluate(0.5))
+    curve.evaluate_point(k, edge.interval.evaluate(0.5))
 }
 
 fn removes_primary(operation: BooleanOperation) -> bool {
@@ -248,9 +248,10 @@ pub fn process_wires_and_shell_vertices_with_kernels(
 trait StageKernels {
     fn primary(&self) -> &Kernel;
     fn other(&self) -> &Kernel;
-    /// `SmBrep::DeleteEdge(edge)`, notified with the primary kernel and `copy`.
+    /// `SmBrep::DeleteEdge(edge)` on the primary B-rep, notified through the
+    /// primary kernel's context and the copy's records, attributes and identities.
     fn delete_edge(&mut self, brep: &mut Brep, edge: EdgeId) -> Result<()>;
-    /// `SmBrep::DeleteVertex(vertex)`, notified with the primary kernel and `copy`.
+    /// `SmBrep::DeleteVertex(vertex)` on the primary B-rep (as `delete_edge`).
     fn delete_vertex(&mut self, brep: &mut Brep, vertex: VertexId) -> Result<()>;
     fn merge_edge(
         &mut self,
@@ -380,7 +381,7 @@ fn collect_wires_and_shell_vertices(
             let region = classify_region(
                 kernels.primary(),
                 other,
-                midpoint(brep, id)?,
+                midpoint(kernels.primary(), brep, id)?,
                 brep.edge(id)?.tolerance,
                 true,
                 true,
@@ -446,7 +447,7 @@ fn collect_wires_and_shell_vertices(
         let region = classify_region(
             kernels.primary(),
             brep,
-            midpoint(other, id)?,
+            midpoint(kernels.other(), other, id)?,
             other.edge(id)?.tolerance,
             true,
             false,
@@ -536,7 +537,7 @@ mod tests {
         attributes: &'a mut AttributeStore,
     ) -> TopologyCopy<'a> {
         TopologyCopy {
-            vertices: p1::VertexCopy {
+            vertices: VertexCopy {
                 records,
                 attributes,
                 source_key: &|v| ObjectRef {

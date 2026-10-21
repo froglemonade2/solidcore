@@ -519,8 +519,8 @@ pub fn create_wire_edge_from_curve(
     curve: Curve,
     interval: Extent1d,
 ) -> Result<EdgeId> {
-    let start = curve.evaluate_point(interval.min())?;
-    let end = curve.evaluate_point(interval.max())?;
+    let start = curve.evaluate_point(k, interval.min())?;
+    let end = curve.evaluate_point(k, interval.max())?;
     let region = b
         .infinite_region()
         .ok_or_else(|| SolidError::null_pointer(OP))?;
@@ -589,10 +589,10 @@ pub fn delete_topological_vertex_with_notifications(
         edge
     } else {
         let length1 = edge_curve(b, *first)?
-            .approximate_length(&b.edge(*first)?.interval, 5, false)?
+            .approximate_length(k, &b.edge(*first)?.interval, 5, false)?
             .0;
         let length2 = edge_curve(b, *last)?
-            .approximate_length(&b.edge(*last)?.interval, 5, false)?
+            .approximate_length(k, &b.edge(*last)?.interval, 5, false)?
             .0;
         if length2 < length1 {
             *last
@@ -674,7 +674,7 @@ pub fn delete_topological_vertex_with_notifications(
                             // Native ignores EvaluatePoint's status. Its defined
                             // SM_UNDEF_DOUBLE sentinel remains explicit when an ordinary evaluation fails.
                             let evaluated =
-                                crate::error::ignored(survive_curve.evaluate_point(far))?
+                                crate::error::ignored(survive_curve.evaluate_point(k, far))?
                                     .unwrap_or(Vec3::UNDEF);
                             if evaluated.closer_than(max_gap, point) {
                                 same_geometry = true;
@@ -803,6 +803,7 @@ fn join_copied_curves(
             owner,
         ),
         _ => bspline_curve_base_mut(survivor)?.join_with(
+            k,
             survivor_end,
             bspline_curve_base_mut(deleted)?,
             deleted_end,
@@ -2258,6 +2259,12 @@ fn transformed_surface_base(
             }
             Some(revolution.base().clone())
         }
+        SurfaceKind::Cone(cone) => {
+            if cone.rev().base().gw_nurb().is_none() {
+                crate::error::ignore_status(cone.make_nurb(k))?;
+            }
+            Some(cone.rev().base().clone())
+        }
         SurfaceKind::CurveBounded(_)
         | SurfaceKind::Step(_)
         | SurfaceKind::OffsetSurface(_)
@@ -2354,16 +2361,12 @@ mod tests {
         let mut b = Brep::new();
         let v = b.add_vertex_record(Vertex::default()).unwrap();
         let mut edge = Some(EdgeId::from_index(3));
-        // a vertex that is not in the B-rep: the lookup fails (DeleteVertex's own status
-        // is ignored upstream, so combining a vertex with itself no longer fails)
-        assert!(combine_coincident_vertices(
-            &mut Kernel::default(),
-            &mut b,
-            v,
-            VertexId::from_index(9),
-            &mut edge
-        )
-        .is_err());
+        // With `SmBrep::DeleteVertex` (topology.brep_p4) and `Notify` ported, the
+        // isolated-vertex branch completes (upstream ignores both statuses); the
+        // deleted-edge output is still reset first.
+        assert!(
+            combine_coincident_vertices(&mut Kernel::default(), &mut b, v, v, &mut edge).is_ok()
+        );
         assert!(edge.is_none());
         let mut out = SqueezedFace {
             deleted_vertices: vec![v],

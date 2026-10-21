@@ -10,12 +10,16 @@
       "values_compared": 14
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "isolated_op1_editing_True",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p5/branches.json#1 (upstream source/SMLib/src/SmBrep.cpp)",
-      "values_compared": 8
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -66,12 +70,16 @@
       "values_compared": 13
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "isolated_op5_editing_True",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p5/branches.json#7 (upstream source/SMLib/src/SmBrep.cpp)",
-      "values_compared": 7
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -226,12 +234,16 @@
       "values_compared": 13
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "manifold_kind0_mode2",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p5/branches.json#25 (upstream source/SMLib/src/SmBrep.cpp)",
-      "values_compared": 1
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -350,12 +362,16 @@
       "values_compared": 52
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "manifold_kind1_mode2",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p5/branches.json#39 (upstream source/SMLib/src/SmBrep.cpp)",
-      "values_compared": 1
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -2138,12 +2154,16 @@
       "values_compared": 14
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "combine_alias_isolated_00_True_0",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p5/review_aliases.json#41 (upstream source/SMLib/src/SmBrep.cpp:1354)",
-      "values_compared": 8
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -2154,12 +2174,16 @@
       "values_compared": 14
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "combine_alias_isolated_00_True_1",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p5/review_aliases.json#43 (upstream source/SMLib/src/SmBrep.cpp:1354)",
-      "values_compared": 8
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -2170,12 +2194,16 @@
       "values_compared": 34
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "combine_alias_isolated_02_True_0",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p5/review_aliases.json#45 (upstream source/SMLib/src/SmBrep.cpp:1354)",
-      "values_compared": 28
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -6543,13 +6571,14 @@
     }
   ],
   "cases_both_errored": 0,
-  "cases_deferred": 41,
+  "cases_deferred": 48,
   "cases_failed": 0,
-  "cases_passed": 756,
+  "cases_passed": 749,
   "cases_total": 797,
   "deferred_by_unit": {
     "query.brep": 2,
     "topology.brep_p1": 28,
+    "topology.brep_p2": 7,
     "topology.brep_p3": 9,
     "topology.brep_p9": 2
   },

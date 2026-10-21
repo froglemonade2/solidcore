@@ -7,39 +7,55 @@
       "outcome": "pass",
       "pass": true,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#0 (upstream source/SMLib/src/SmBrep.cpp:5829)",
-      "values_compared": 191
+      "values_compared": 162
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_island_noface1_edge0",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#1 (upstream source/SMLib/src/SmBrep.cpp:5829)",
-      "values_compared": 182
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_island_noface1_edge1",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#2 (upstream source/SMLib/src/SmBrep.cpp:5829)",
-      "values_compared": 182
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_island_noface1_edge2",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#3 (upstream source/SMLib/src/SmBrep.cpp:5829)",
-      "values_compared": 182
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_island_noface1_edge3",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#4 (upstream source/SMLib/src/SmBrep.cpp:5829)",
-      "values_compared": 182
+      "values_compared": 0
     },
     {
       "inputs": {
@@ -124,8 +140,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "adv_island_noface1_edge7",
@@ -136,8 +152,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "adv_island_noface1_edge8",
@@ -148,8 +164,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "adv_island_noface1_edge9",
@@ -160,8 +176,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "adv_island_noface1_edge7_keep2",
@@ -176,7 +192,7 @@
       "outcome": "pass",
       "pass": true,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#13 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 191
+      "values_compared": 162
     },
     {
       "max_rel_err": 0.0,
@@ -184,23 +200,31 @@
       "outcome": "pass",
       "pass": true,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#14 (upstream source/SMLib/src/SmBrep.cpp:5829)",
-      "values_compared": 191
+      "values_compared": 162
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_island_noface0_edge0",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#15 (upstream source/SMLib/src/SmBrep.cpp:5829)",
-      "values_compared": 182
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_island_noface0_edge3",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#16 (upstream source/SMLib/src/SmBrep.cpp:5829)",
-      "values_compared": 182
+      "values_compared": 0
     },
     {
       "inputs": {
@@ -288,12 +312,12 @@
       "outcome": "pass",
       "pass": true,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#21 (upstream source/SMLib/src/SmBrep.cpp:5829)",
-      "values_compared": 191
+      "values_compared": 162
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "adv_island_noface2_edge4",
@@ -328,23 +352,31 @@
       "outcome": "pass",
       "pass": true,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#24 (upstream source/SMLib/src/SmBrep.cpp:6827)",
-      "values_compared": 122
+      "values_compared": 105
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_wire_noregion1_edge0",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#25 (upstream source/SMLib/src/SmBrep.cpp:6827)",
-      "values_compared": 113
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_wire_noregion1_edge3",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#26 (upstream source/SMLib/src/SmBrep.cpp:6827)",
-      "values_compared": 113
+      "values_compared": 0
     },
     {
       "inputs": {
@@ -412,7 +444,7 @@
       "outcome": "pass",
       "pass": true,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#30 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 122
+      "values_compared": 105
     },
     {
       "max_rel_err": 0.0,
@@ -420,39 +452,55 @@
       "outcome": "pass",
       "pass": true,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#31 (upstream source/SMLib/src/SmBrep.cpp:6827)",
-      "values_compared": 122
+      "values_compared": 105
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_wire_noregion0_edge0",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#32 (upstream source/SMLib/src/SmBrep.cpp:6827)",
-      "values_compared": 113
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_wire_noregion0_edge4",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#33 (upstream source/SMLib/src/SmBrep.cpp:6849)",
-      "values_compared": 115
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_wire_noregion0_edge5",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#34 (upstream source/SMLib/src/SmBrep.cpp:6949)",
-      "values_compared": 113
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_wire_noregion0_edge6",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#35 (upstream source/SMLib/src/SmBrep.cpp:6892)",
-      "values_compared": 115
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -460,15 +508,19 @@
       "outcome": "pass",
       "pass": true,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#36 (upstream source/SMLib/src/SmBrep.cpp:7967)",
-      "values_compared": 122
+      "values_compared": 105
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_wire_noregion2_edge4",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#37 (upstream source/SMLib/src/SmBrep.cpp:6849)",
-      "values_compared": 115
+      "values_compared": 0
     },
     {
       "inputs": {
@@ -491,76 +543,112 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_wire_noregion2_vertex1",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#39 (upstream source/SMLib/src/SmBrep.cpp:7967)",
-      "values_compared": 114
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_wire_noregion2_vertex2",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#40 (upstream source/SMLib/src/SmBrep.cpp:7967)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_wire_noregion2_vertex3",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#41 (upstream source/SMLib/src/SmBrep.cpp:7967)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_wire_noregion2_vertex4",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#42 (upstream source/SMLib/src/SmBrep.cpp:7967)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_wire_noregion2_vertex5",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#43 (upstream source/SMLib/src/SmBrep.cpp:7967)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_wire_noregion2_vertex6",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#44 (upstream source/SMLib/src/SmBrep.cpp:7967)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_wire_noregion2_vertex7",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#45 (upstream source/SMLib/src/SmBrep.cpp:7967)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_wire_noregion2_vertex8",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#46 (upstream source/SMLib/src/SmBrep.cpp:7967)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_wire_noregion2_vertex9",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#47 (upstream source/SMLib/src/SmBrep.cpp:7967)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -568,59 +656,7 @@
       "outcome": "pass",
       "pass": true,
       "source": "fixture:fixtures/topology.brep_p4/adversarial.json#48 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 122
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "adv_wire_lostvu1_check",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/adversarial.json#49 (upstream source/SMLib/src/SmBrep.cpp:7937)",
-      "values_compared": 122
-    },
-    {
-      "inputs": {
-        "brep": {
-          "file": "fixture:wire_path.smb",
-          "kind": "file"
-        },
-        "damage": {
-          "lost_vertexuse": 1
-        },
-        "op": "delete_vertex",
-        "target": 1
-      },
-      "max_rel_err": 0.0,
-      "name": "adv_wire_lostvu1_vertex1",
-      "outcome": "rejected",
-      "pass": false,
-      "rejected": "upstream dereferences NULL on the damaged B-rep (FFI guard)",
-      "source": "fixture:fixtures/topology.brep_p4/adversarial.json#50 (upstream source/SMLib/src/SmBrep.cpp:7942)",
-      "values_compared": 0
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "adv_wire_lostvu1_vertex1_noedit",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/adversarial.json#51 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 122
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "adv_wire_lostvu1_vertex0",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/adversarial.json#52 (upstream source/SMLib/src/SmBrep.cpp:7967)",
-      "values_compared": 116
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "adv_wire_lostvu1_vertex2",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/adversarial.json#53 (upstream source/SMLib/src/SmBrep.cpp:7940)",
-      "values_compared": 122
+      "values_compared": 105
     },
     {
       "max_rel_err": 0.0,
@@ -628,47 +664,67 @@
       "outcome": "pass",
       "pass": true,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#0 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 69
+      "values_compared": 58
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "strut_edge0",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#1 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 60
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "strut_edge1",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#2 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 60
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "strut_edge2",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#3 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 60
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "strut_edge3",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#4 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 60
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "strut_edge3_keep0",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#5 (upstream source/SMLib/src/SmBrep.cpp:6037)",
-      "values_compared": 60
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -676,23 +732,31 @@
       "outcome": "pass",
       "pass": true,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#6 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 69
+      "values_compared": 58
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "strut_vertex0",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#7 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 69
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "strut_vertex3",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#8 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 69
+      "values_compared": 0
     },
     {
       "deferred": {
@@ -732,8 +796,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmBrep::UnLockBoundingBox",
-        "unit": "query.brep"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "strut_destroy",
@@ -748,44 +812,60 @@
       "outcome": "pass",
       "pass": true,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#13 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 130
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "bridge_edge0",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#14 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 121
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "bridge_edge1",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#15 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 121
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "bridge_edge2",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#16 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 121
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "bridge_edge3",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#17 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 121
+      "values_compared": 109
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "bridge_edge0",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#14 (upstream source/SMLib/src/SmBrep.cpp:5752)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "bridge_edge1",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#15 (upstream source/SMLib/src/SmBrep.cpp:5752)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "bridge_edge2",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#16 (upstream source/SMLib/src/SmBrep.cpp:5752)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "bridge_edge3",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#17 (upstream source/SMLib/src/SmBrep.cpp:5752)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "bridge_edge4",
@@ -795,41 +875,57 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "bridge_edge5",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#19 (upstream source/SMLib/src/SmBrep.cpp:5911)",
-      "values_compared": 121
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "bridge_edge6",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#20 (upstream source/SMLib/src/SmBrep.cpp:5911)",
-      "values_compared": 121
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "bridge_edge7",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#21 (upstream source/SMLib/src/SmBrep.cpp:5911)",
-      "values_compared": 121
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "bridge_edge8",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#22 (upstream source/SMLib/src/SmBrep.cpp:5911)",
-      "values_compared": 121
+      "values_compared": 0
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "bridge_edge6",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#20 (upstream source/SMLib/src/SmBrep.cpp:5911)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "bridge_edge7",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#21 (upstream source/SMLib/src/SmBrep.cpp:5911)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "bridge_edge8",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#22 (upstream source/SMLib/src/SmBrep.cpp:5911)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "bridge_edge4_keep0",
@@ -839,12 +935,16 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "bridge_vertex4",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#24 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 130
+      "values_compared": 0
     },
     {
       "deferred": {
@@ -860,8 +960,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmBrep::UnLockBoundingBox",
-        "unit": "query.brep"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "bridge_destroy",
@@ -876,92 +976,132 @@
       "outcome": "pass",
       "pass": true,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#27 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 156
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "holes_edge0",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#28 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 147
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "holes_edge4",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#29 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 147
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "holes_edge5",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#30 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 147
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "holes_edge6",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#31 (upstream source/SMLib/src/SmBrep.cpp:6476)",
-      "values_compared": 143
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "holes_edge7",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#32 (upstream source/SMLib/src/SmBrep.cpp:6476)",
-      "values_compared": 147
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "holes_edge8",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#33 (upstream source/SMLib/src/SmBrep.cpp:6476)",
-      "values_compared": 147
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "holes_edge9",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#34 (upstream source/SMLib/src/SmBrep.cpp:6476)",
-      "values_compared": 147
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "holes_edge10",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#35 (upstream source/SMLib/src/SmBrep.cpp:6476)",
-      "values_compared": 147
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "holes_edge6_keep0",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#36 (upstream source/SMLib/src/SmBrep.cpp:6476)",
-      "values_compared": 143
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "holes_vertex6",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#37 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 156
+      "values_compared": 131
     },
     {
       "deferred": {
-        "symbol": "SmBrep::UnLockBoundingBox",
-        "unit": "query.brep"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "holes_edge0",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#28 (upstream source/SMLib/src/SmBrep.cpp:5752)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "holes_edge4",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#29 (upstream source/SMLib/src/SmBrep.cpp:5752)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "holes_edge5",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#30 (upstream source/SMLib/src/SmBrep.cpp:5752)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "holes_edge6",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#31 (upstream source/SMLib/src/SmBrep.cpp:6476)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "holes_edge7",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#32 (upstream source/SMLib/src/SmBrep.cpp:6476)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "holes_edge8",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#33 (upstream source/SMLib/src/SmBrep.cpp:6476)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "holes_edge9",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#34 (upstream source/SMLib/src/SmBrep.cpp:6476)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "holes_edge10",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#35 (upstream source/SMLib/src/SmBrep.cpp:6476)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "holes_edge6_keep0",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#36 (upstream source/SMLib/src/SmBrep.cpp:6476)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "holes_vertex6",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#37 (upstream source/SMLib/src/SmBrep.cpp:7871)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "holes_destroy",
@@ -976,44 +1116,60 @@
       "outcome": "pass",
       "pass": true,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#39 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 191
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "island_edge0",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#40 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 182
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "island_edge1",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#41 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 182
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "island_edge2",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#42 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 182
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "island_edge3",
-      "outcome": "pass",
-      "pass": true,
-      "source": "fixture:fixtures/topology.brep_p4/coverage.json#43 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 182
+      "values_compared": 162
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "island_edge0",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#40 (upstream source/SMLib/src/SmBrep.cpp:5752)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "island_edge1",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#41 (upstream source/SMLib/src/SmBrep.cpp:5752)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "island_edge2",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#42 (upstream source/SMLib/src/SmBrep.cpp:5752)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "island_edge3",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "fixture:fixtures/topology.brep_p4/coverage.json#43 (upstream source/SMLib/src/SmBrep.cpp:5752)",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge4",
@@ -1024,8 +1180,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge5",
@@ -1036,8 +1192,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge6",
@@ -1048,8 +1204,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge7",
@@ -1060,8 +1216,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge8",
@@ -1072,8 +1228,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge9",
@@ -1084,8 +1240,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge4_keep0",
@@ -1096,8 +1252,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge5_keep0",
@@ -1108,8 +1264,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge6_keep0",
@@ -1120,8 +1276,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge7_keep0",
@@ -1132,8 +1288,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge8_keep0",
@@ -1144,8 +1300,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge9_keep0",
@@ -1156,8 +1312,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge4_keep1",
@@ -1168,8 +1324,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge5_keep1",
@@ -1180,8 +1336,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge6_keep1",
@@ -1192,8 +1348,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge7_keep1",
@@ -1204,8 +1360,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge8_keep1",
@@ -1216,8 +1372,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge9_keep1",
@@ -1228,8 +1384,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge4_keep2",
@@ -1240,8 +1396,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge5_keep2",
@@ -1252,8 +1408,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge6_keep2",
@@ -1264,8 +1420,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge7_keep2",
@@ -1276,8 +1432,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge8_keep2",
@@ -1288,8 +1444,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmSurface::DropCurve",
-        "unit": "intersect.surface_drop_lib_p3"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_edge9_keep2",
@@ -1299,12 +1455,16 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "island_vertex4",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#68 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 191
+      "values_compared": 0
     },
     {
       "deferred": {
@@ -1332,8 +1492,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmBrep::UnLockBoundingBox",
-        "unit": "query.brep"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "island_destroy",
@@ -1348,143 +1508,211 @@
       "outcome": "pass",
       "pass": true,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#72 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 122
+      "values_compared": 105
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "wirepath_edge0",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#73 (upstream source/SMLib/src/SmBrep.cpp:6827)",
-      "values_compared": 113
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "wirepath_edge1",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#74 (upstream source/SMLib/src/SmBrep.cpp:6827)",
-      "values_compared": 113
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "wirepath_edge2",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#75 (upstream source/SMLib/src/SmBrep.cpp:6827)",
-      "values_compared": 113
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "wirepath_edge3",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#76 (upstream source/SMLib/src/SmBrep.cpp:6827)",
-      "values_compared": 113
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "wirepath_edge4",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#77 (upstream source/SMLib/src/SmBrep.cpp:6827)",
-      "values_compared": 115
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "wirepath_edge5",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#78 (upstream source/SMLib/src/SmBrep.cpp:6827)",
-      "values_compared": 113
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "wirepath_edge6",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#79 (upstream source/SMLib/src/SmBrep.cpp:6827)",
-      "values_compared": 115
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "wirepath_vertex0",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#80 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 116
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "wirepath_vertex1",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#81 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 114
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "wirepath_vertex2",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#82 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "wirepath_vertex3",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#83 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "wirepath_vertex4",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#84 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "wirepath_vertex5",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#85 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "wirepath_vertex6",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#86 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "wirepath_vertex7",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#87 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "wirepath_vertex8",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#88 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "wirepath_vertex9",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#89 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -1492,7 +1720,7 @@
       "outcome": "pass",
       "pass": true,
       "source": "fixture:fixtures/topology.brep_p4/coverage.json#90 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 122
+      "values_compared": 105
     },
     {
       "deferred": {
@@ -1520,8 +1748,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmBrep::UnLockBoundingBox",
-        "unit": "query.brep"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "wirepath_destroy",
@@ -1536,47 +1764,67 @@
       "outcome": "pass",
       "pass": true,
       "source": "fixture:fixtures/topology.brep_p4/wire_branch.json#0 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 131
+      "values_compared": 112
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "branch_edge0",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/wire_branch.json#1 (upstream source/SMLib/src/SmBrep.cpp:6560)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "branch_edge4",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/wire_branch.json#2 (upstream source/SMLib/src/SmBrep.cpp:6849)",
-      "values_compared": 124
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "branch_edge5",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/wire_branch.json#3 (upstream source/SMLib/src/SmBrep.cpp:6949)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "branch_edge6",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/wire_branch.json#4 (upstream source/SMLib/src/SmBrep.cpp:6949)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "branch_edge7",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/wire_branch.json#5 (upstream source/SMLib/src/SmBrep.cpp:6949)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -1584,47 +1832,67 @@
       "outcome": "pass",
       "pass": true,
       "source": "fixture:fixtures/topology.brep_p4/wire_branch.json#6 (upstream source/SMLib/src/SmBrep.cpp:5752)",
-      "values_compared": 131
+      "values_compared": 112
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "branch_vertex4",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/wire_branch.json#7 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 131
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "branch_vertex5",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/wire_branch.json#8 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 131
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "branch_vertex6",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/wire_branch.json#9 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 131
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "branch_vertex7",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/wire_branch.json#10 (upstream source/SMLib/src/SmBrep.cpp:7967)",
-      "values_compared": 131
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "branch_vertex9",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/wire_branch.json#11 (upstream source/SMLib/src/SmBrep.cpp:7871)",
-      "values_compared": 131
+      "values_compared": 0
     },
     {
       "deferred": {
@@ -1652,8 +1920,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmBrep::UnLockBoundingBox",
-        "unit": "query.brep"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "branch_destroy",
@@ -1683,44 +1951,64 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_branch_noregion1_edge5",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/wire_branch.json#16 (upstream source/SMLib/src/SmBrep.cpp:6949)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_branch_noregion1_edge6",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/wire_branch.json#17 (upstream source/SMLib/src/SmBrep.cpp:6949)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "adv_branch_noregion1_edge7",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "fixture:fixtures/topology.brep_p4/wire_branch.json#18 (upstream source/SMLib/src/SmBrep.cpp:6949)",
-      "values_compared": 122
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0000",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747276",
-      "values_compared": 34
+      "values_compared": 0
     },
     {
-      "max_rel_err": 1.7763568394002498e-16,
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
       "name": "gen0001",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747277",
-      "values_compared": 34
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -1728,15 +2016,19 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747278",
-      "values_compared": 65
+      "values_compared": 54
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0003",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747279",
-      "values_compared": 13
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -1744,15 +2036,19 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747280",
-      "values_compared": 143
+      "values_compared": 119
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0005",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747281",
-      "values_compared": 56
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -1760,7 +2056,7 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747282",
-      "values_compared": 43
+      "values_compared": 36
     },
     {
       "max_rel_err": 0.0,
@@ -1768,7 +2064,7 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747283",
-      "values_compared": 65
+      "values_compared": 54
     },
     {
       "deferred": {
@@ -1783,28 +2079,40 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0009",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747285",
-      "values_compared": 29
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0010",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747286",
-      "values_compared": 26
+      "values_compared": 0
     },
     {
-      "max_rel_err": 1.7763568394002498e-16,
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
       "name": "gen0011",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747287",
-      "values_compared": 34
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -1812,7 +2120,7 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747288",
-      "values_compared": 143
+      "values_compared": 119
     },
     {
       "max_rel_err": 0.0,
@@ -1820,39 +2128,55 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747289",
-      "values_compared": 62
+      "values_compared": 52
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0014",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747290",
-      "values_compared": 53
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0015",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747291",
-      "values_compared": 13
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0016",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747292",
-      "values_compared": 56
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0017",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747293",
-      "values_compared": 21
+      "values_compared": 0
     },
     {
       "deferred": {
@@ -1872,7 +2196,7 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747295",
-      "values_compared": 52
+      "values_compared": 43
     },
     {
       "deferred": {
@@ -1887,12 +2211,16 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0021",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747297",
-      "values_compared": 56
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -1900,7 +2228,7 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747298",
-      "values_compared": 65
+      "values_compared": 54
     },
     {
       "max_rel_err": 0.0,
@@ -1908,12 +2236,12 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747299",
-      "values_compared": 62
+      "values_compared": 52
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetTolerance",
-        "unit": "topology.face_p2"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0024",
@@ -1924,8 +2252,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmBrep::UnLockBoundingBox",
-        "unit": "query.brep"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0025",
@@ -1935,36 +2263,52 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0026",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747302",
-      "values_compared": 56
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0027",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747303",
-      "values_compared": 65
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0028",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747304",
-      "values_compared": 18
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0029",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747305",
-      "values_compared": 53
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -1972,7 +2316,7 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747306",
-      "values_compared": 26
+      "values_compared": 21
     },
     {
       "max_rel_err": 0.0,
@@ -1980,23 +2324,31 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747307",
-      "values_compared": 39
+      "values_compared": 32
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0032",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747308",
-      "values_compared": 56
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0033",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747309",
-      "values_compared": 52
+      "values_compared": 0
     },
     {
       "deferred": {
@@ -2011,20 +2363,28 @@
       "values_compared": 0
     },
     {
-      "max_rel_err": 1.7544265080496334e-16,
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
       "name": "gen0035",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747311",
-      "values_compared": 295
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0036",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747312",
-      "values_compared": 56
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -2032,7 +2392,7 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747313",
-      "values_compared": 62
+      "values_compared": 52
     },
     {
       "max_rel_err": 0.0,
@@ -2040,7 +2400,7 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747314",
-      "values_compared": 65
+      "values_compared": 54
     },
     {
       "max_rel_err": 0.0,
@@ -2048,7 +2408,7 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747315",
-      "values_compared": 39
+      "values_compared": 32
     },
     {
       "deferred": {
@@ -2068,23 +2428,31 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747317",
-      "values_compared": 143
+      "values_compared": 119
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0042",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747318",
-      "values_compared": 29
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0043",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747319",
-      "values_compared": 29
+      "values_compared": 0
     },
     {
       "deferred": {
@@ -2111,20 +2479,28 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0046",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747322",
-      "values_compared": 299
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0047",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747323",
-      "values_compared": 56
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -2132,15 +2508,19 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747324",
-      "values_compared": 65
+      "values_compared": 54
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0049",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747325",
-      "values_compared": 30
+      "values_compared": 0
     },
     {
       "deferred": {
@@ -2156,8 +2536,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetTolerance",
-        "unit": "topology.face_p2"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0051",
@@ -2167,20 +2547,28 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0052",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747328",
-      "values_compared": 65
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0053",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747329",
-      "values_compared": 118
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -2188,7 +2576,7 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747330",
-      "values_compared": 299
+      "values_compared": 252
     },
     {
       "max_rel_err": 0.0,
@@ -2196,31 +2584,43 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747331",
-      "values_compared": 65
+      "values_compared": 54
     },
     {
-      "max_rel_err": 1.7763568394002498e-16,
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
       "name": "gen0056",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747332",
-      "values_compared": 34
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0057",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747333",
-      "values_compared": 13
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0058",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747334",
-      "values_compared": 13
+      "values_compared": 0
     },
     {
       "deferred": {
@@ -2235,20 +2635,28 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0060",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747336",
-      "values_compared": 13
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0061",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747337",
-      "values_compared": 65
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -2256,7 +2664,7 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747338",
-      "values_compared": 65
+      "values_compared": 54
     },
     {
       "deferred": {
@@ -2272,8 +2680,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetTolerance",
-        "unit": "topology.face_p2"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0064",
@@ -2288,12 +2696,12 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747341",
-      "values_compared": 65
+      "values_compared": 54
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetTolerance",
-        "unit": "topology.face_p2"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0066",
@@ -2303,12 +2711,16 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0067",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747343",
-      "values_compared": 43
+      "values_compared": 0
     },
     {
       "deferred": {
@@ -2328,7 +2740,7 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747345",
-      "values_compared": 143
+      "values_compared": 119
     },
     {
       "deferred": {
@@ -2344,8 +2756,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetTolerance",
-        "unit": "topology.face_p2"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0071",
@@ -2356,8 +2768,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmBrep::UnLockBoundingBox",
-        "unit": "query.brep"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0072",
@@ -2368,8 +2780,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmBrep::UnLockBoundingBox",
-        "unit": "query.brep"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0073",
@@ -2380,8 +2792,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetTolerance",
-        "unit": "topology.face_p2"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0074",
@@ -2396,15 +2808,15 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747351",
-      "values_compared": 26
+      "values_compared": 21
     },
     {
-      "max_rel_err": 1.7544265080496334e-16,
+      "max_rel_err": 0.0,
       "name": "gen0076",
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747352",
-      "values_compared": 320
+      "values_compared": 269
     },
     {
       "max_rel_err": 0.0,
@@ -2412,20 +2824,24 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747353",
-      "values_compared": 26
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "gen0078",
-      "outcome": "pass",
-      "pass": true,
-      "source": "generated:seed=16427435054534747354",
-      "values_compared": 18
+      "values_compared": 21
     },
     {
       "deferred": {
-        "symbol": "SmBrep::UnLockBoundingBox",
-        "unit": "query.brep"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "gen0078",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "generated:seed=16427435054534747354",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0079",
@@ -2440,7 +2856,7 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747356",
-      "values_compared": 39
+      "values_compared": 32
     },
     {
       "deferred": {
@@ -2460,31 +2876,43 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747358",
-      "values_compared": 62
+      "values_compared": 52
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0083",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747359",
-      "values_compared": 65
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0084",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747360",
-      "values_compared": 118
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0085",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747361",
-      "values_compared": 39
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -2492,15 +2920,19 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747362",
-      "values_compared": 52
+      "values_compared": 43
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0087",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747363",
-      "values_compared": 290
+      "values_compared": 0
     },
     {
       "deferred": {
@@ -2532,15 +2964,19 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747366",
-      "values_compared": 65
+      "values_compared": 54
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0091",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747367",
-      "values_compared": 56
+      "values_compared": 0
     },
     {
       "deferred": {
@@ -2555,36 +2991,52 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0093",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747369",
-      "values_compared": 21
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0094",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747370",
-      "values_compared": 299
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0095",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747371",
-      "values_compared": 30
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0096",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747372",
-      "values_compared": 43
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -2592,44 +3044,60 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747373",
-      "values_compared": 26
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "gen0098",
-      "outcome": "pass",
-      "pass": true,
-      "source": "generated:seed=16427435054534747374",
-      "values_compared": 13
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "gen0099",
-      "outcome": "pass",
-      "pass": true,
-      "source": "generated:seed=16427435054534747375",
-      "values_compared": 53
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "gen0100",
-      "outcome": "pass",
-      "pass": true,
-      "source": "generated:seed=16427435054534747376",
-      "values_compared": 30
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "gen0101",
-      "outcome": "pass",
-      "pass": true,
-      "source": "generated:seed=16427435054534747377",
-      "values_compared": 290
+      "values_compared": 21
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetTolerance",
-        "unit": "topology.face_p2"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "gen0098",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "generated:seed=16427435054534747374",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "gen0099",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "generated:seed=16427435054534747375",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "gen0100",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "generated:seed=16427435054534747376",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "gen0101",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "generated:seed=16427435054534747377",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0102",
@@ -2652,8 +3120,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetTolerance",
-        "unit": "topology.face_p2"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0104",
@@ -2668,12 +3136,12 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747381",
-      "values_compared": 65
+      "values_compared": 54
     },
     {
       "deferred": {
-        "symbol": "SmBrep::UnLockBoundingBox",
-        "unit": "query.brep"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0106",
@@ -2683,25 +3151,33 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0107",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747383",
-      "values_compared": 53
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "gen0108",
-      "outcome": "pass",
-      "pass": true,
-      "source": "generated:seed=16427435054534747384",
-      "values_compared": 62
+      "values_compared": 0
     },
     {
       "deferred": {
-        "symbol": "SmFace::GetTolerance",
-        "unit": "topology.face_p2"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "gen0108",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "generated:seed=16427435054534747384",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0109",
@@ -2711,20 +3187,28 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0110",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747386",
-      "values_compared": 290
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0111",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747387",
-      "values_compared": 295
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -2732,7 +3216,7 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747388",
-      "values_compared": 26
+      "values_compared": 21
     },
     {
       "deferred": {
@@ -2747,36 +3231,48 @@
       "values_compared": 0
     },
     {
-      "max_rel_err": 1.7544265080496334e-16,
+      "max_rel_err": 0.0,
       "name": "gen0114",
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747390",
-      "values_compared": 320
+      "values_compared": 269
     },
     {
-      "max_rel_err": 1.7763568394002498e-16,
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
       "name": "gen0115",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747391",
-      "values_compared": 34
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0116",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747392",
-      "values_compared": 56
+      "values_compared": 0
     },
     {
-      "max_rel_err": 1.7544265080496334e-16,
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
       "name": "gen0117",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747393",
-      "values_compared": 320
+      "values_compared": 0
     },
     {
       "deferred": {
@@ -2791,12 +3287,16 @@
       "values_compared": 0
     },
     {
-      "max_rel_err": 1.7763568394002498e-16,
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
       "name": "gen0119",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747395",
-      "values_compared": 34
+      "values_compared": 0
     },
     {
       "deferred": {
@@ -2812,8 +3312,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmBrep::UnLockBoundingBox",
-        "unit": "query.brep"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0121",
@@ -2828,31 +3328,43 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747398",
-      "values_compared": 18
+      "values_compared": 16
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0123",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747399",
-      "values_compared": 13
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0124",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747400",
-      "values_compared": 299
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0125",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747401",
-      "values_compared": 143
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -2860,12 +3372,12 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747402",
-      "values_compared": 299
+      "values_compared": 252
     },
     {
       "deferred": {
-        "symbol": "SmBrep::UnLockBoundingBox",
-        "unit": "query.brep"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0127",
@@ -2880,7 +3392,7 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747404",
-      "values_compared": 26
+      "values_compared": 21
     },
     {
       "deferred": {
@@ -2907,25 +3419,33 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0131",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747407",
-      "values_compared": 18
-    },
-    {
-      "max_rel_err": 0.0,
-      "name": "gen0132",
-      "outcome": "pass",
-      "pass": true,
-      "source": "generated:seed=16427435054534747408",
-      "values_compared": 65
+      "values_compared": 0
     },
     {
       "deferred": {
-        "symbol": "SmBrep::UnLockBoundingBox",
-        "unit": "query.brep"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
+      "name": "gen0132",
+      "outcome": "deferred",
+      "pass": false,
+      "source": "generated:seed=16427435054534747408",
+      "values_compared": 0
+    },
+    {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0133",
@@ -2935,17 +3455,21 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0134",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747410",
-      "values_compared": 56
+      "values_compared": 0
     },
     {
       "deferred": {
-        "symbol": "SmBrep::UnLockBoundingBox",
-        "unit": "query.brep"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0135",
@@ -2968,8 +3492,8 @@
     },
     {
       "deferred": {
-        "symbol": "SmBrep::UnLockBoundingBox",
-        "unit": "query.brep"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0137",
@@ -2979,28 +3503,36 @@
       "values_compared": 0
     },
     {
-      "max_rel_err": 1.7544265080496334e-16,
+      "max_rel_err": 0.0,
       "name": "gen0138",
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747414",
-      "values_compared": 320
+      "values_compared": 269
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0139",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747415",
-      "values_compared": 53
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0140",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747416",
-      "values_compared": 56
+      "values_compared": 0
     },
     {
       "deferred": {
@@ -3020,15 +3552,19 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747418",
-      "values_compared": 34
+      "values_compared": 29
     },
     {
-      "max_rel_err": 1.7544265080496334e-16,
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
       "name": "gen0143",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747419",
-      "values_compared": 295
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -3036,15 +3572,19 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747420",
-      "values_compared": 43
+      "values_compared": 36
     },
     {
-      "max_rel_err": 1.7544265080496334e-16,
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
+      "max_rel_err": 0.0,
       "name": "gen0145",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747421",
-      "values_compared": 295
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -3052,12 +3592,12 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747422",
-      "values_compared": 65
+      "values_compared": 54
     },
     {
       "deferred": {
-        "symbol": "SmBrep::UnLockBoundingBox",
-        "unit": "query.brep"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0147",
@@ -3079,12 +3619,16 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0149",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747425",
-      "values_compared": 56
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -3092,15 +3636,19 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747426",
-      "values_compared": 65
+      "values_compared": 54
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0151",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747427",
-      "values_compared": 21
+      "values_compared": 0
     },
     {
       "deferred": {
@@ -3115,17 +3663,21 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0153",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747429",
-      "values_compared": 56
+      "values_compared": 0
     },
     {
       "deferred": {
-        "symbol": "SmBrep::UnLockBoundingBox",
-        "unit": "query.brep"
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
       },
       "max_rel_err": 0.0,
       "name": "gen0154",
@@ -3135,12 +3687,16 @@
       "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0155",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747431",
-      "values_compared": 65
+      "values_compared": 0
     },
     {
       "max_rel_err": 0.0,
@@ -3148,23 +3704,31 @@
       "outcome": "pass",
       "pass": true,
       "source": "generated:seed=16427435054534747432",
-      "values_compared": 26
+      "values_compared": 21
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0157",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747433",
-      "values_compared": 56
+      "values_compared": 0
     },
     {
+      "deferred": {
+        "symbol": "SmBrep::Notify",
+        "unit": "topology.brep_p2"
+      },
       "max_rel_err": 0.0,
       "name": "gen0158",
-      "outcome": "pass",
-      "pass": true,
+      "outcome": "deferred",
+      "pass": false,
       "source": "generated:seed=16427435054534747434",
-      "values_compared": 26
+      "values_compared": 0
     },
     {
       "deferred": {
@@ -3180,17 +3744,17 @@
     }
   ],
   "cases_both_errored": 0,
-  "cases_deferred": 95,
+  "cases_deferred": 249,
   "cases_failed": 0,
-  "cases_passed": 217,
-  "cases_rejected": 15,
-  "cases_total": 327,
+  "cases_passed": 59,
+  "cases_rejected": 14,
+  "cases_total": 322,
   "deferred_by_unit": {
-    "intersect.surface_drop_lib_p3": 55,
-    "query.brep": 31,
-    "topology.face_p2": 9
+    "intersect.surface_drop_lib_p3": 24,
+    "query.brep": 13,
+    "topology.brep_p2": 212
   },
-  "max_rel_err": 1.7763568394002498e-16,
+  "max_rel_err": 0.0,
   "pass": true,
   "rel_tol": 1e-9,
   "seeds": 16,
