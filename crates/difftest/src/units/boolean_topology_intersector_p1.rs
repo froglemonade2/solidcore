@@ -604,10 +604,10 @@ const K_TRIM_CURVE: u8 = 13;
 /// curve handle also carries its curve's natural interval (what `SmSolutionArray`
 /// reads through `SmCurve::GetNaturalInterval`); it takes no part in identity.
 #[derive(Debug, Clone, Copy)]
-struct H {
-    b: i8,
-    kind: u8,
-    i: u32,
+pub(crate) struct H {
+    pub(crate) b: i8,
+    pub(crate) kind: u8,
+    pub(crate) i: u32,
     ivl: [f64; 2],
 }
 
@@ -631,7 +631,7 @@ impl Ord for H {
     }
 }
 
-const fn hd(b: i8, kind: u8, i: u32) -> H {
+pub(crate) const fn hd(b: i8, kind: u8, i: u32) -> H {
     H {
         b,
         kind,
@@ -690,7 +690,7 @@ impl SolutionObject for H {
 
 const TI_HANDLE: H = hd(-1, K_TI, 0);
 
-const fn brep_h(b: i8) -> H {
+pub(crate) const fn brep_h(b: i8) -> H {
     hd(b, K_BREP, b as u32)
 }
 
@@ -759,7 +759,7 @@ fn vertexuse_ref(vu: VertexuseId) -> ObjectRef {
 
 /// The two B-reps, the registered curves (kind 5) and the port's curve copies (kind
 /// 7).
-struct Two {
+pub(crate) struct Two {
     breps: [Option<Brep>; 2],
     curves: Vec<SmCurve>,
     extra: Vec<SmCurve>,
@@ -784,7 +784,7 @@ const fn fid(h: H) -> FaceId {
 }
 
 impl Two {
-    fn new(a: Brep, b: Option<Brep>) -> Self {
+    pub(crate) fn new(a: Brep, b: Option<Brep>) -> Self {
         let env = [NotifyEnv::new(Some(&a)), NotifyEnv::new(b.as_ref())];
         Self {
             breps: [Some(a), b],
@@ -795,6 +795,17 @@ impl Two {
         }
     }
 
+    /// Deletes the cache of the B-rep behind `brep` (`SmBrep::Notify`'s `PRE_EDIT` /
+    /// `DESTRUCTION`); the next use rebuilds it.
+    pub(crate) fn delete_cache(&mut self, brep: H) -> solidcore::Result<()> {
+        let slot = usize::try_from(brep.b).map_err(|_| invalid("bad B-rep"))?;
+        self.caches
+            .get_mut(slot)
+            .ok_or_else(|| invalid("bad B-rep"))?
+            .take();
+        Ok(())
+    }
+
     fn brep(&self, h: H) -> Option<&Brep> {
         self.breps.get(usize::try_from(h.b).ok()?)?.as_ref()
     }
@@ -803,12 +814,12 @@ impl Two {
         self.breps.get_mut(usize::try_from(h.b).ok()?)?.as_mut()
     }
 
-    fn brep_r(&self, h: H) -> solidcore::Result<&Brep> {
+    pub(crate) fn brep_r(&self, h: H) -> solidcore::Result<&Brep> {
         self.brep(h)
             .ok_or_else(|| invalid("handle names an absent B-rep"))
     }
 
-    fn brep_m(&mut self, h: H) -> solidcore::Result<&mut Brep> {
+    pub(crate) fn brep_m(&mut self, h: H) -> solidcore::Result<&mut Brep> {
         self.brep_mut(h)
             .ok_or_else(|| invalid("handle names an absent B-rep"))
     }
