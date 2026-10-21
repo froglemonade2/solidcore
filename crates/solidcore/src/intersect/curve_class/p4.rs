@@ -785,8 +785,8 @@ impl<O: ClassObject> CurveClassification<O> {
     ///
     /// [`SolidError::InvalidInput`] for `index >= size()`, a classification without a
     /// face (upstream calls `GetUpwardFaceuse` on `NULL`, UB-124) and a face, edge or edge
-    /// use handle `geometry` does not resolve; [`SolidError::Unported`] from `GetMinUV` /
-    /// `GetMaxUV` on a 3D curve (`SmFace::GetSurface`, unit `topology.face_p2`).
+    /// use handle `geometry` does not resolve; [`SolidError::Unported`] from the
+    /// evaluations it reaches.
     pub fn ivl_bound_edgeuse_obj<G: ClassGeometry<O>>(
         &self,
         geometry: &G,

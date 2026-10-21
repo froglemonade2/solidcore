@@ -98,7 +98,9 @@
 //!   `SmFace::GetVertices` / `GetEdges` / `GetBrep` (`topology.face_p4`),
 //!   `SmFace::FaceIntersect` with UV curve and point outputs (`topology.face_p3`; part
 //!   2's `face_face_intersect_curves`, which [`IntersectorBrep`] does not cover),
-//!   `SmFace::CalculateBoundingBox` / `Point3DClassify` (`query.face_p1`). The
+//!   `SmFace::Point3DClassify` (`query.face_p1`; `SmFace::CalculateBoundingBox` goes
+//!   through [`IntersectorBrep::face_calculate_bounding_box`] since the `query.face_p1`
+//!   port). The
 //!   code after a stub is ported in full. `SmSurface::GlobalCurveIntersect` /
 //!   `CoincidenceCheck` (`surface.surface_p8`), `SmCurveClassification::Homogenize`
 //!   (`intersect.curve_class_p6`), `InsertTopologyIntersections`
@@ -431,6 +433,15 @@ pub trait IntersectorBrep<O>:
     ///
     /// [`SolidError::InvalidInput`] for an unknown B-rep.
     fn brep_vertices(&self, brep: O) -> Result<Vec<O>>;
+    /// The bounding box of `face` (`SmFace::CalculateBoundingBox(rBox, bTight)`, unit
+    /// `query.face_p1`: `query::face::p1::calculate_bounding_box` on the B-rep behind the
+    /// handle). The intersector passes `tight = false`, upstream's default. (Named after
+    /// the upstream call in full: `face_bounding_box` is #229's `MergeBrep` method.)
+    ///
+    /// # Errors
+    ///
+    /// [`SolidError::InvalidInput`] for an unknown face, and those of the port.
+    fn face_calculate_bounding_box(&self, k: &Kernel, face: O, tight: bool) -> Result<Extent3d>;
 }
 
 // ---- unported callees -----------------------------------------------------------------------
@@ -600,18 +611,6 @@ fn face_uv_domain_from_uv_trim_curves<O>(
         }) => Ok(None),
         r => ignore_soft(r),
     }
-}
-
-/// `SmFace::CalculateBoundingBox(rBox, bTight)` (`bTight` is `FALSE` by default).
-fn face_bounding_box<O>(_k: &Kernel, _face: O, _tight: bool) -> Result<Extent3d> {
-    // DISPATCH GAP: SmFace::CalculateBoundingBox is ported
-    // (`query::face::p1::calculate_bounding_box`, query.face_p1 partial; no UNPORTED
-    // marker), but it takes the face's `Brep` and `FaceId`, which this caller's opaque face
-    // handle does not carry.
-    Err(SolidError::unported(
-        "SmFace::CalculateBoundingBox",
-        "query.face_p1",
-    ))
 }
 
 /// `SmFace::Point3DClassify(pt, tol, bDoBoundaryIntersections, pc, pOptGuessUV,
@@ -1120,6 +1119,19 @@ impl<O: ClassObject + SolutionObject + Ord> TopologyIntersector<O> {
             this_approx_tol_3d,
             this_ang_tol_rad,
             ..Self::with_context()
+        }
+    }
+
+    /// Populate valid paired mate-map fixtures without exposing maps in production.
+    #[cfg(test)]
+    pub(crate) fn seed_mates_for_test(&mut self, pairs: &[(O, O)]) {
+        for &(primary, other) in pairs {
+            self.b_to_o
+                .get_or_insert_with(BTreeMap::new)
+                .insert(primary, Some(other));
+            self.o_to_b
+                .get_or_insert_with(BTreeMap::new)
+                .insert(Some(other), primary);
         }
     }
 
@@ -1940,8 +1952,10 @@ impl<O: ClassObject + SolutionObject + Ord> TopologyIntersector<O> {
     /// # Errors
     ///
     /// Unless `ignore_problems`, a failing vertex loop or edge split (`SER`); those of
-    /// the geometry queries; [`SolidError::Unported`] for the face bounding box
-    /// (`query.face_p1`), `SmFace::CalculateUVDomainFromUVTrimCurves`'s
+    /// the geometry queries; [`SolidError::Unported`] from the adapter's face bounding box
+    /// and the stubs after it (`gen0011` defers at `SmBrep::CalculateBoundingBox`,
+    /// `query.brep`; six cases at `SmFace::GetUpwardLoopuses`, `topology.face_p4`),
+    /// `SmFace::CalculateUVDomainFromUVTrimCurves`'s
     /// `CreateUVTrimCurves`, `SmSurface::GlobalCurveIntersect` and the B-rep edits;
     /// [`SolidError::InvalidInput`] for null handles upstream dereferences.
     #[allow(clippy::too_many_lines)]
@@ -2026,7 +2040,7 @@ impl<O: ClassObject + SolutionObject + Ord> TopologyIntersector<O> {
                 }
 
                 // BBox check.
-                if let Some(b) = ignore_soft(face_bounding_box(k, face, false))? {
+                if let Some(b) = ignore_soft(brep.face_calculate_bounding_box(k, face, false))? {
                     f_bbox = b;
                 }
                 if e_bbox.are_disjoint(&f_bbox, face_zone_tol_3d) {
