@@ -122,6 +122,11 @@ fn typed_iso_curve(
         let typed = Curve::from(base.clone());
         return Ok((base, typed));
     }
+    // a cone's own iso override makes an `SmLine`/`SmCircle`, which this `BSplineCurve` storage
+    // cannot keep yet: report main's dispatch gap in `bss` (`Unported`), not `SM_ERR`
+    if let (SurfaceKind::Cone(_), Err(e)) = (surface.kind(), bss(surface)) {
+        return Err(e);
+    }
     // the other kinds: the virtual `CreateIsoParametricCurve` (the `SmSurface` body, whose
     // approximation tolerance is `tolerance`), which makes a B-spline
     let iso = surface.create_iso_parametric_curve(k, direction, value, tolerance, None, false)?;
