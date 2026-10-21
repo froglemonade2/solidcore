@@ -7120,8 +7120,9 @@ with the runner-only profile override. No platform prerequisites enter this PR.
   it upstream (primary face use, face list and shell insertion, loops, edge uses, radial
   sectors, trims, ~500 lines of `SmBrep::MakeFaceTopology`) is that unit's own unported
   remainder, so calling the ported `topology::face::p3::set_tolerance` there would only
-  move the stop into code `topology.face_p3` does not own. It is wired when
-  `topology.brep_p6` ports the remainder.
+  move the stop into code `topology.face_p3` does not own. **Wired** (the
+  `MakeFaceTopology` remainder PR, 2026-10-21): `topology.brep_p6` now ports the whole
+  function and calls `topology::face::p3::set_tolerance(GetTolerance(), TRUE, TRUE)`.
   Also `topology.edgeuse_p3` `face_surface_cache` (merge with main, #117):
   `EvaluateBinormal`'s `smsurf_GetSurfaceCache` builds the face surface's trimmed cache,
   whose constructor calls `CreateUVTrimCurves` (`SmTrimSrfCache.cpp:209`); that is the
@@ -9131,7 +9132,7 @@ validation section below. These results do not certify the review fixes.
   not on exactness. Of the 7 lift cases above, the 4 on surfaces of revolution (gen0009,
   gen0148, gen0520, gen0683) pass again; gen0119 and gen0707 (`SmSurfOfExtrusion`) and gen0376
   (`SmSphere`) stay deferred: the Rust `SurfaceKind` has no extrusion or sphere variant to
-  import them as. Overall 861 cases, 552 pass (was 542), 0 fail, 309 deferred: 10
+  import them as (issue #76). Overall 861 cases, 552 pass (was 542), 0 fail, 309 deferred: 10
   `harness:analytic-geometry-export` deferrals pass (105-408 values: the 4 lifts plus
   gen0070, gen0178, gen0187, gen0597, gen0698, gen0767, whose B-reps' only inexact faces were
   revolutions) and 9 now defer on `intersect.surface_drop_curve`; 107 harness deferrals remain
@@ -11897,7 +11898,7 @@ request solver metadata, and corner names/type are queried only on error.
 with `PreEdit`, the face, null and null forwarded as separate arguments.
 `SM_NO_GET_BREP(face)` expands to a null object (`SmTypes.h:659`), not `GetBrep()`.
 
-Current UNPORTED audit for #244 (main 862746f4 integrated; 34 symbols / 13 owners):
+Current UNPORTED audit for #244 (main e5f3e441 integrated; 33 symbols / 12 owners):
 
 - `blend.fillet_corner_p1` (`todo`): `SmFilletCorner::GetFilletSolvers`, `SmFillet4x3Corner::AdjustTopology`, `SmFilletNxNCorner::AdjustTopology`, `SmFilletCorner::AdjustTangentCorner`, `SmFilletCorner::AdjustTopology`, `SmFilletCorner::CalcCornerEdgeGeom`, `SmFilletCorner::CalcCornerVertGeom`, `SmFilletCorner::CheckAndFixDegeneracy`, `SmFilletCorner::InsertIntersectionTopology`, `SmFilletCorner::ReInitializeCornerEdges`.
 - `blend.fillet_corner_p2` (`todo`): `SmFilletConvexNxNCorner::AdjustTopology`, `SmFilletNx1ClosedCorner::AdjustTangentCorner`.
@@ -11911,7 +11912,7 @@ Current UNPORTED audit for #244 (main 862746f4 integrated; 34 symbols / 13 owner
 - `blend.fillet_standard_solver_p2` (`todo`): `SmSurfaceSurfaceFS::CalcFilletGeom`.
 - `blend.fillet_solver_p5` (`todo`): `SmFilletSolver::TestRollOver`.
 - `heal.stitch_p2`: none since it became `partial` on main (#205). `SmStitch::DoStitching` is the required adapter `ExecutiveAccess::do_stitching`, documented as delegating to `heal::stitch::p2::Stitch::do_stitching`.
-- `topology.brep_p2` (`todo`): `SmBrep::SetTolerance`.
+- `topology.brep_p2`: none since it became `partial` on main (#149). `SmBrep::SetTolerance` is the required adapter `ExecutiveAccess::set_brep_tolerance`, delegating to `topology::brep::p2::set_tolerance`, and its status is ignored (`void` upstream).
 - `topology.brep_p3` (`todo`): `SmBrep::MergeBrep`, `SmBrep::OrientTrimmedSurfaces`.
 - `topology.brep_p4` (`todo`): `SmBrep::StitchFaces`.
 
@@ -12009,7 +12010,7 @@ Coverage still establishes zero successful geometric/topological comparisons.
   `GetFilletSolverOfEdgeuse` lookup. It has not been executed or established as
   an upstream defect, so no WR id is reserved. The scripted tangent regression
   now returns repeated first-solver entries; it is not a port of that algorithm.
-- Extended ownership audit: the tags now cover **34 distinct symbols / 13 owners**,
+- Extended ownership audit: the tags now cover **33 distinct symbols / 12 owners**,
   all `todo` in the merged plan; the complete list above includes all new tags.
   Added GetFilletSolvers; added seven derived symbols and two new owners; removed
   no dependency owners. Required-but-owned-elsewhere corner accessors are also
@@ -12067,8 +12068,8 @@ The Opus re-check of 612c6631 is CLEAN. Its runner-error nit is folded in:
 corner or solver; future fixtures must dispatch real derived objects to their
 actual owners. Explicit UNPORTED tags sit on each runner stub body, and the
 complete override-owner tags remain discoverable at the required trait methods.
-The audit counts 34 distinct upstream symbols / 13 owners, including required
-virtual-dispatch targets, not 34 independently implemented stub bodies.
+The audit counts 33 distinct upstream symbols / 12 owners, including required
+virtual-dispatch targets, not 33 independently implemented stub bodies.
 
 Merged origin/main 46ddc4ff (#179 blend.fillet_intersector), preserving both
 `fillet_executive` and `fillet_intersector` exports in the sorted blend module list.
@@ -12135,7 +12136,7 @@ other topology accessors do; no passing native fixture reaches these adapters.
 Scripted tests override them only to exercise p3 continuation order. A concrete
 executive p1/p2 object adapter is still needed for geometric integration; this
 change does not claim a new geometric pass. The current UNPORTED inventory is
-34 symbols across 13 owners; all remaining tagged callees are still unported.
+33 symbols across 12 owners; all remaining tagged callees are still unported.
 Final integrated-tree checks pending.
 
 ## blend.fillet_executive_p2 (`SmFilletExecutive.cpp` part 2: `SetFilletParameters`, `SurfaceSurfaceFillet`, `DoSurfaceFilleting`, `SetFilletBrepEdgeMap`, smooth edge sequences, `SmTemporaryRadiusChange`, the linear and elliptical fillet-law constructors; PR #267, 2026-10-20; partial, no disagreements)
@@ -12147,7 +12148,13 @@ Final integrated-tree checks pending.
   - `CollectTangentEdgeSequence` with two or more solvers before `CreateFilletCorners` reads garbage from `m_vVertexCornerMap`. The shim runs `CreateFilletCorners` first, as `CreateFilletBrep` does.
 - **Adapter.** Calls into partial units are required `ExecutiveAccess` methods: the `blend.fillet_solver_p1` surface-generator records and `SetFilletSurfaceGenerator`, `GetEdgeuse`, and `blend.fillet_standard_solver_p1`'s constant-radius constructor. `GetSetBackDist` is an inline read of `m_dSetBackDist`. The constant-distance, variable-radius and surface/surface solver constructors stay `UNPORTED(blend.fillet_standard_solver_p2)`.
 - **Duplicate enums on main.** `FilletSolverType` and `FilletSurfaceGeneratorType` exist both in `blend::fillet_solver::p1` and in `blend::fillet_standard_solver::p1` (#168's co-port), as distinct types. p2 takes the latter, as `FilletLaw` does, and maps them onto `fillet_solver::p1::FilletSurfaceGenerator`. A later dedup should re-export one of them.
-- **Not wired.** `blend::fillet_geom::p2`'s `UNPORTED(blend.fillet_executive_p2)` `SmTemporaryRadiusChange::SetUp` receives a base `FilletSolver`. Reaching the variable-radius law from it needs #260's `FilletSolverKind`, so the stub stays until that lands.
+- **Not wired (re-checked 2026-10-21, after #330 landed this unit's `9443be3f`).** `blend::fillet_geom::p2`'s `UNPORTED(blend.fillet_executive_p2)` `SmTemporaryRadiusChange::SetUp` (`temporary_radius_change`, three call sites, upstream `SmFilletGeom.cpp:1980`, `:2006`, `:2228`) stays a back-edge into this now-partial unit. Wiring it needs four things that don't exist on main yet:
+  1. **Type.** fillet geom p2 holds the #192 base `FilletSolver` (`solvers: &[FilletSolver]`), which cannot say whether it is a variable-radius solver. `SetUp` starts with `SM_CAST_PTR(SmVariableRadiusFS, pFS)` and swaps that solver's law, so this needs the `FilletSolverKind` (or an equivalent variable-radius slot on the solver) proposed on #260. #168's `VariableRadiusFs` embeds a co-ported `FilletSolverData`, not #192's `FilletSolver`.
+  2. **Scope and mutability.** Upstream's change is an RAII object whose scope covers `RailEdgeuseIntersect`; it reverts at scope end. The Rust call sites call the stub, then `rail_edgeuse_intersect`, separately. The first site only has `&` access to the solver table, while the law swap needs `&mut`. Each site has to become a `with_temporary_radius_change`-style scope around the intersection.
+  3. **API shape.** This unit's `TemporaryRadiusChange` is generic over `ExecutiveAccess<O>`; fillet geom p2 uses concrete ids and `FilletBrep`, so it needs a concrete-id entry point (or an adapter) over the same `set_up` / `revert`.
+  4. **Law evaluation.** `SetUp` evaluates the law (`SmFilletLaw::Evaluate`), which is still executive p1's on main, so even a full wiring would only move this deferral to `blend.fillet_executive_p1`.
+
+  Estimated size once (1) exists: about 150 lines across fillet geom p2's three sites and a concrete-id entry point, plus a regression. Item (1) itself is cross-unit (solver table type) and belongs with the #260 solver-base decision.
 
 ## curve.curve_p8 (`SmCurve::GlobalCurveIntersect`): Rust runs for minutes where C++ returns at once on a 1e300 control point (found by `offset.offset_geometry_creation`'s fuzz, 2026-10-20)
 
@@ -12265,3 +12272,58 @@ Exact controls still compare 4 values (`line_join_fw_tangent_start`), 18
 (`plane_square_e0_tangent`), and 50 (`Mouse_e0_query`). The Mouse query uses the
 same imported B-rep as the deferred operations: the guard still applies per
 operation, not to the whole B-rep.
+
+## topology.brep_p6: the `MakeFaceTopology` remainder (2026-10-21, no disagreements)
+
+- **What was ported.** `SmBrep.cpp:14141-14828` in full. That covers the face and face
+  uses, loops and loop uses, the mark-locked edge-loop block (keeper shell, `RemoveShell`
+  plus region `Remove` plus `delete` of the other loops' shells, wire edge-use reuse,
+  new edge-use/vertex-use pairs, `sUsedEdges` / `bVerifyRadialSectors` radial-sector
+  recovery with a temporary UV trim curve, `AddOrientedEUPair`, CW/CCW links), loop
+  vertices (shell-vertex reuse and shell deletion, `TransferChildrenTo` of a vertex's
+  shell), `cpOptUVCurves` and `CreateUVTrimCurves`, `TestClosureSplitRegion` and the
+  final `SM_NO_ADD_TO_BREP`. The former `UNPORTED(topology.face_p3): SmFace::SetTolerance`
+  stop was not a missing `face_p3` call but this unported remainder. It is gone.
+  Every callee is in a green or partial unit.
+- **API.** `make_face_topology` / `make_face_topology_attempt` take `&mut Kernel` (the mark
+  lock), the caller's `Marks` and a `NotifyEnv`. `topology.brep_p7`'s `make_face` gained a
+  `NotifyEnv` argument. `make_face`, `make_face_with_curves`, `copy_faces`,
+  `trimming_tools::trim_surface_with_model_space_curves` and
+  `FilletBrep::make_face_brep` now take `&mut Kernel`. Their library callers already
+  held one; only tests and runners changed.
+- **Coverage (op 3).** `fixtures/topology.brep_p6/make_face.json` (89 cases, see its
+  README) plus generated cases build kind-5 wire networks. Kind 5 is a new shared
+  fixture block: `MakeShellVertex` points joined by `MakeEdgeTopology` line edges. The
+  cases run sequences of `MakeFaceTopology` calls and compare every call's status and
+  outputs, the context mark counters and locks, and the whole post-operation graph:
+  surfaces, UV trim and edge curves sampled, tolerances, every link. They pass with 0
+  failures, including holes, loop vertices, shared edges, open boxes of 1 to 5 faces,
+  a non-manifold book, B-spline patches and tiny, huge or off-plane inputs.
+- **Deferred.** After the merge with `topology.face_p4` (#239), every `bCalculateTrims`
+  case and every radial-sector recovery defers at `SmSurface::DropCurve`
+  (`intersect.surface_drop_lib_p3`), inside `face_p3`'s `CreateUVTrimCurves` or
+  `edgeuse_p3`'s `CreateUVTrimCurve`. Given UV curves on a plane defer at `SmCrvOnSurf`
+  (`curve.crv_on_surf`). A face that closes a shell (the sixth cube face, zero-length
+  loops) defers at `SmBrep::CalculateBoundingBox` (`query.brep`) in
+  `TestClosureSplitRegion`. Of the 89 fixture cases, 50 pass and 39 defer.
+- **Not compared: edge marks.** `TransferChildrenTo`'s nested `GetWireEdges` (inside
+  `RemoveShell` and the loop-vertex shell merge) marks the C++ edges. `topology.shell`
+  keeps those marks in a per-call record (its documented deviation), so the edges'
+  mark flags after the operation differ (seen on holes and wire loop vertices). The
+  export therefore carries no edge marks. The context's mark counters and locks, which
+  count every claim, are compared.
+- **C++ guard.** The shim refuses (`-2`, rejected) a call whose input edge use has no
+  edge, mate, shell or vertex, whose loop counts exceed the edge uses, or whose
+  non-shell loop vertices would be merged into the NULL keeper shell of a face without
+  edge loops. Upstream dereferences those. The port returns `InvalidInput` there.
+- **Downstream.** `topology.brep_p7` 316 cases: 238 pass, 78 deferred, 0 failed (was 237
+  and 79). Its face paths now get past `MakeFaceTopology`, and 18 of them reach
+  `SmFace::GetTolerance` through a face-owned surface (`topology.face_p2` dispatch
+  stubs in `surface`). `boolean.merge_p2`'s `MakeFaceuse` now completes its face: 45
+  cases, 32 pass, 13 deferred (was 30 and 15). Its `MergeContext` gained `SplitMut`
+  (a mutable primary kernel for the face's mark lock), and `MakeFace` notifies through
+  the copy's face, edge and entity identities, so that its `Notify(SM_NO_COPY)` of the
+  new face finds the record. Before that fix, gen0006 and gen0008 failed with
+  "notified object is not a topology object". `primitive.api_primitives`: 1445 pass,
+  536 deferred, 0 failed, unchanged (its face paths go through the unported
+  `topology.brep_p8` and `primitive_creation_p*`).

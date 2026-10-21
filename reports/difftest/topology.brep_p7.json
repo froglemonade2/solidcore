@@ -2586,16 +2586,12 @@
       "values_compared": 0
     },
     {
-      "deferred": {
-        "symbol": "SmFace::SetTolerance",
-        "unit": "topology.face_p3"
-      },
       "max_rel_err": 0.0,
       "name": "face_curves_cos_no_uv_1_1",
-      "outcome": "deferred",
-      "pass": false,
+      "outcome": "pass",
+      "pass": true,
       "source": "fixture:built-in: topology.brep_p7 cases#289 (upstream tests/prog_test (pt_TestFiles B-reps))",
-      "values_compared": 0
+      "values_compared": 10
     },
     {
       "deferred": {
@@ -2855,8 +2851,7 @@
     "surface.surface_p2": 8,
     "topology.brep_p3": 36,
     "topology.brep_p9": 2,
-    "topology.face_p2": 22,
-    "topology.face_p3": 1
+    "topology.face_p2": 22
   },
   "max_rel_err": 0.0,
   "pass": true,
