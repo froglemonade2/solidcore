@@ -12,8 +12,13 @@
 //! recurses once with maximum length zero; an explicit depth limit of two guards
 //! that invariant. Split arrays are limited to 1,000,000 entries before allocation
 //! or concatenation. Unsupported surface virtuals return `Unported`, never an
-//! approximate replacement. Iso extraction is exact for B-splines, so the public
-//! approximation tolerance has no numerical effect for that supported kind.
+//! approximate replacement. Iso curves go through the `CreateIsoParametricCurve`
+//! virtual of each kind: extraction is exact for B-splines, planes and revolutions, so
+//! the approximation tolerance (`max_side / 100.0` in `FindTessellationSplits`, the
+//! caller's in `CreateIsoBoundaries`) has no numerical effect for them; for the
+//! curve-bounded, STEP, offset and surface-in-volume kinds it reaches the
+//! `SmSurface::CreateIsoParametricCurve` body, which approximates within it. A
+//! `CrvOnSurf` over those kinds (the diagonal tessellation curves) is `Unported`.
 //! Failed tessellations retain the empty parameter array;
 //! unported errors are propagated even where upstream ignores a status.
 
@@ -272,7 +277,8 @@ impl Surface {
                 } else {
                     uv.x
                 };
-                let (curve, typed) = typed_iso_curve(k, self, direction, iso, 0.0)?;
+                // the approximation tolerance is `dMaximumSideLength/100.0` (SmSurface.cpp:11690)
+                let (curve, typed) = typed_iso_curve(k, self, direction, iso, max_side / 100.0)?;
                 // `pBSC->IsDegenerate()` is virtual: a revolution circle uses
                 // `SmEllipse::IsDegenerate` (radius < tol/2 or arc < tol) and a
                 // plane line `SmLine::IsDegenerate`, not the B-spline test.

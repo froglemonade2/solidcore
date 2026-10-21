@@ -125,7 +125,7 @@ use crate::geom::tree::{
     AuxDataType, NodeClass, NodeData, NodeGeomType, NodeId, SplitDir, SurfaceAux, Tree, TreeNode,
 };
 use crate::kernel::Kernel;
-use crate::math::{Point2, Point3, Vec2, Vec3, EFF_ZERO, EFF_ZERO_SQ, EFF_ZERO_SQRT};
+use crate::math::{Point2, Point3, Vec2, Vec3, BIG_DOUBLE, EFF_ZERO, EFF_ZERO_SQ, EFF_ZERO_SQRT};
 use crate::nurbs::b_spline_curve::BSplineCurve;
 use crate::nurbs::b_spline_surface::{
     BSplineSurface, BoundingBoxRequest, BoundingBoxes, SurfParamType,
@@ -236,16 +236,18 @@ const fn bspline_curve_of(curve: &Curve) -> Option<&BSplineCurve> {
 /// virtual: the B-spline, plane (an `SmLine`) and surface of revolution (an
 /// `SmCircle` in the sweep direction) overrides, the base class body for the other
 /// kinds. The curve is held as a [`Curve`] so the derived classes' overrides
-/// (evaluation, length, degeneracy) stay in effect; the 3D tolerance is `0.0` as
-/// upstream's callers pass (the overrides do not use it).
+/// (evaluation, length, degeneracy) stay in effect; `tol_3d` is the caller's
+/// approximation tolerance (`dApproxTol3d`, `0.0` or `SM_BIG_DOUBLE` as upstream's
+/// callers pass), which the base class body uses and the overrides do not.
 fn create_iso_parametric_curve(
     k: &Kernel,
     surface: &Surface,
     param: SurfParamType,
     iso: f64,
+    tol_3d: f64,
     domain: Option<Extent2d>,
 ) -> Result<Curve> {
-    let r = surface.create_iso_parametric_curve(k, param, iso, 0.0, domain.as_ref(), false)?;
+    let r = surface.create_iso_parametric_curve(k, param, iso, tol_3d, domain.as_ref(), false)?;
     match surface.kind() {
         // the SmSurface body (surface.surface_p5) makes a B-spline
         SurfaceKind::CurveBounded(_)
@@ -598,7 +600,7 @@ impl PatchBoundaryBoundingPlanes {
         bspline_of(surface).ok_or(SolidError::null_pointer(OP_BOUNDARY))?;
         // make the curve through the virtual (the SmPlane and SmSurfOfRevolution
         // overrides; 3D Tol SM_BIG_DOUBLE: not used by any of them)
-        create_iso_parametric_curve(k, surface, spt, param, None)
+        create_iso_parametric_curve(k, surface, spt, param, BIG_DOUBLE, None)
     }
 
     /// The UV end points of boundary `index` (`GetBoundaryUVEndPoints`).
@@ -2641,14 +2643,12 @@ impl<O: Copy + PartialEq> SurfaceCache<O> {
                 "surface.plane_p1",
             ));
         }
-        let c0 =
-            create_iso_parametric_curve(k, &self.surface, SurfParamType::U, uv_domain.min().x, d)?;
-        let c1 =
-            create_iso_parametric_curve(k, &self.surface, SurfParamType::V, uv_domain.min().y, d)?;
-        let c2 =
-            create_iso_parametric_curve(k, &self.surface, SurfParamType::U, uv_domain.max().x, d)?;
-        let c3 =
-            create_iso_parametric_curve(k, &self.surface, SurfParamType::V, uv_domain.max().y, d)?;
+        // (upstream passes dApproxTol3d here)
+        let (s, t) = (&self.surface, approx_tol_3d);
+        let c0 = create_iso_parametric_curve(k, s, SurfParamType::U, uv_domain.min().x, t, d)?;
+        let c1 = create_iso_parametric_curve(k, s, SurfParamType::V, uv_domain.min().y, t, d)?;
+        let c2 = create_iso_parametric_curve(k, s, SurfParamType::U, uv_domain.max().x, t, d)?;
+        let c3 = create_iso_parametric_curve(k, s, SurfParamType::V, uv_domain.max().y, t, d)?;
         let curves = [c0, c1, c2, c3];
 
         // when domain is same as cache domain - cache curves
@@ -2709,12 +2709,14 @@ impl<O: Copy + PartialEq> SurfaceCache<O> {
 
         // IsoParamCurves
         let d = Some(*domain);
-        let bot_u = create_iso_parametric_curve(k, surface, SurfParamType::U, uv_bot.x, d)?;
-        let bot_v = create_iso_parametric_curve(k, surface, SurfParamType::V, uv_bot.y, d)?;
-        let mid_u = create_iso_parametric_curve(k, surface, SurfParamType::U, uv_mid.x, d)?;
-        let mid_v = create_iso_parametric_curve(k, surface, SurfParamType::V, uv_mid.y, d)?;
-        let top_u = create_iso_parametric_curve(k, surface, SurfParamType::U, uv_top.x, d)?;
-        let top_v = create_iso_parametric_curve(k, surface, SurfParamType::V, uv_top.y, d)?;
+        // (upstream passes the tolerance 0.0 here)
+        let (u, v) = (SurfParamType::U, SurfParamType::V);
+        let bot_u = create_iso_parametric_curve(k, surface, u, uv_bot.x, 0.0, d)?;
+        let bot_v = create_iso_parametric_curve(k, surface, v, uv_bot.y, 0.0, d)?;
+        let mid_u = create_iso_parametric_curve(k, surface, u, uv_mid.x, 0.0, d)?;
+        let mid_v = create_iso_parametric_curve(k, surface, v, uv_mid.y, 0.0, d)?;
+        let top_u = create_iso_parametric_curve(k, surface, u, uv_top.x, 0.0, d)?;
+        let top_v = create_iso_parametric_curve(k, surface, v, uv_top.y, 0.0, d)?;
 
         // 3D Udir and Vdir IsoParamCurve lengths
         let len = |c: &Curve, ivl: &Extent1d| -> Result<f64> {
